@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Helpers\Global;
+
+use Illuminate\Http\Request;
+
+class DataTablesHelper
+{
+    public static function filters(Request $request)
+    {
+        $columnIndex = $request['order'][0]['column']; // Column index
+        $columnName = $request['columns'][$columnIndex]['name']; // Order Column name
+        $columnSortOrder = $request['order'][0]['dir']; // asc or desc
+
+        $filters = [];
+        $filters['columnName'] = $columnName;
+        $filters['columnSortOrder'] = $columnSortOrder;
+
+        return $filters;
+    }
+}
