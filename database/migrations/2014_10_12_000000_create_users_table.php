@@ -24,6 +24,8 @@ return new class extends Migration
             $table->boolean('to_be_logged_out')->default(false);
             $table->rememberToken();
             $table->string('profile_photo_path', 2048)->nullable();
+            $table->boolean('user_verified')->default(false);
+            $table->timestamp('user_verified_at')->nullable();
             $table->uuid('uuid')->unique();
 
             $table->timestamps();

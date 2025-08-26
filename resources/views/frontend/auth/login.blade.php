@@ -24,8 +24,8 @@
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center mb-4 mt-2">
-                            <a href="#" class="app-brand-link gap-2" style="width: 60%;">
-                                <img src="{{ Vite::asset('resources/images/logo/Logo_Black.svg') }}" alt class="h-auto">
+                            <a href="#" class="app-brand-link gap-2" style="width: 70%;">
+                                <img src="{{ Vite::asset('resources/images/logo/PANIDIS-LOGO-BLACK-RED.png') }}" alt class="h-auto w-100">
                             </a>
                         </div>
                         <!-- /Logo -->

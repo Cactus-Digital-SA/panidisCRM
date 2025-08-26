@@ -3,6 +3,8 @@
 namespace App\Domains\Auth\Repositories\Eloquent\Models;
 
 use App\Domains\Auth\Repositories\Eloquent\Models\Traits\Method\UserMethod;
+use App\Domains\Companies\Repositories\Eloquent\Models\Company;
+use App\Domains\Companies\Repositories\Eloquent\Models\UserCompany;
 use App\Domains\ExtraData\Repositories\Eloquent\Models\ExtraData;
 use App\Domains\Files\Repositories\Eloquent\Models\File;
 use App\Domains\Notes\Repositories\Eloquent\Models\Note;
@@ -148,5 +150,14 @@ class User extends Authenticatable
     {
         return $this->morphToMany(File::class,'fileable', 'fileables')
             ->withTimestamps();
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function companies() : BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'users_companies')
+            ->using(UserCompany::class);
     }
 }

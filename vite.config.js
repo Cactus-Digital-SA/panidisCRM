@@ -62,10 +62,10 @@ export default defineConfig({
             },
         },
     },
-    logLevel: 'silent',
+    // logLevel: 'silent',
     build: {
         logLevel: 'silent',
-        chunkSizeWarningLimit: 2500,
+        chunkSizeWarningLimit: 3000,
         outDir: "public/build",
         emptyOutDir: false,
         rollupOptions: {
@@ -91,6 +91,7 @@ export default defineConfig({
                 'resources/assets/css/demo.css',
                 'resources/js/app.js',
                 'resources/js/custom.js',
+                'resources/js/wizard-leads-clients-create.js',
                 ...pageJsFiles,
                 ...vendorJsFiles,
                 ...LibsJsFiles,

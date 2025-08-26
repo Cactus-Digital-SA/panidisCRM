@@ -5,6 +5,11 @@ namespace App\Domains\Files\Repositories\Eloquent;
 use App\Domains\Files\Models\File;
 use App\Domains\Files\Repositories\Eloquent\Models\File as EloquentFile;
 use App\Domains\Files\Repositories\FileRepositoryInterface;
+use App\Domains\Notifications\Models\CactusNotification;
+use App\Domains\Notifications\Models\EmailNotification;
+use App\Domains\Notifications\Models\Recipient;
+use App\Domains\Notifications\Services\NotificationsService;
+use App\Domains\Projects\Repositories\Eloquent\Models\ProjectType;
 use App\Facades\ObjectSerializer;
 use App\Models\CactusEntity;
 use App\Models\ModelMorphEnum;
@@ -90,11 +95,76 @@ class EloqFileRepository implements FileRepositoryInterface
             // Find Relation Model
             $relationModel = $this->relationModel($model, $morphable_id);
 
+            if($model === ModelMorphEnum::LEAD->value) {
+                $file->update([
+                    'lead_status_id' => $relationModel->status_id
+                ]);
+            }
+
             // Attach Note
             $relationModel?->files()?->attach([$file->id]);
+
+
+            // Send Notification New Note
+            $body = 'Ένα καινούργιο αρχείο προστέθηκε με όνομα : ' . $file->file_name;
+            $this->sendEmailNotificationNewFile($relationModel, $model, $body);
 
             return true;
         }
        return false;
+    }
+
+    public function sendEmailNotificationNewFile(Model $model, string $modelType, string $body = null): void
+    {
+        $authUser = Auth::user();
+
+        $recipients = [];
+
+        if($authUser?->id != $model?->owner_id) {
+            $recipients[] = new Recipient($model->owner?->email, $model->owner?->name );
+        }
+        foreach ($model?->assignees ?? [] as $assignee){
+            if($assignee->id != $authUser?->id) {
+                $recipients[] = new Recipient($assignee->email, $assignee->name);
+            }
+        }
+
+
+        try {
+            $emailDTO = new EmailNotification();
+            $emailDTO->setRecipients($recipients);
+
+            $subject = "Ένα καινούργιο αρχείο προστέθηκε στο : ". $model?->name;
+            if($modelType == 'Project') {
+                $subject = "Ένα καινούργιο αρχείο προστέθηκε στο Project : ". $model?->name;
+                $actionText = 'Δες το Project';
+                $projectType = ProjectType::find($model->type_id);
+                $actionLink = route('admin.projects.show',[$projectType?->slug, $model->id]);
+            }else if($modelType == 'Ticket') {
+                $subject = "Ένα καινούργιο αρχείο προστέθηκε στο Ticket : ". $model?->name;
+                $actionText = 'Δες το Ticket';
+                $actionLink = route('admin.tickets.show', $model->id);
+            }
+
+
+            $emailDTO->setSubject($subject);
+
+            $emailDTO->addBody($body ?? $subject);
+
+            if(isset($actionText) && isset($actionLink)) {
+                $emailDTO->addAction($actionText, $actionLink, 'btn-primary');
+            }
+
+            $cactusNotification = new CactusNotification([$emailDTO]);
+
+            // Αποστολή Ειδοποίησης
+            $notificationService = new NotificationsService();
+            $notificationService->send($cactusNotification);
+
+        } catch (\Exception $e) {
+
+            \Log::error('email error: '. $e->getMessage());
+        }
+
     }
 }

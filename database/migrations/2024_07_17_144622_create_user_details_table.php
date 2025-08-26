@@ -21,7 +21,6 @@ return new class extends Migration
             $table->boolean('phone_confirmed')->default(false);
             $table->timestamp('phone_confirmed_at')->nullable();
             $table->date('birthday')->nullable();
-            $table->boolean('decision_maker')->default(false);
             $table->timestamps();
         });
     }

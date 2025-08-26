@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Pms\PmsSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,5 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AuthSeeder::class);
         $this->call(ApiPermissionRoleTableSeeder::class);
+        $this->call(PmsSeeder::class);
+
     }
 }

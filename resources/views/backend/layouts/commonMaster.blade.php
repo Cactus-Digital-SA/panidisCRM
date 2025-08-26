@@ -56,6 +56,8 @@
 <body>
 <!-- Layout Content -->
   @yield('layoutContent')
+  @yield('modals')
+  @stack('extra-modals')
   <!--/ Layout Content -->
   @include('backend/layouts/sections/scripts')
   @stack('after-scripts')
