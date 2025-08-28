@@ -7,8 +7,6 @@ use App\Domains\ExtraData\Models\ExtraData;
 use App\Domains\Files\Models\File;
 use App\Domains\Notes\Models\Note;
 use App\Models\Enums\EloqMorphEnum;
-use Carbon\Carbon;
-use DateTime;
 use App\Models\CactusEntity;
 use App\Domains\Companies\Models\Company;
 use Illuminate\Http\Request;
@@ -228,22 +226,6 @@ class Lead extends CactusEntity
         return $this;
     }
 
-
-
-    /**
-     * @param Request $request
-     * @return Lead
-     */
-    public function fromRequest(Request $request): Lead
-    {
-        $lead = new self();
-        return $lead
-            ->setCompanyId(companyId: $request['leadCompanyId']) //needed for update
-            ->setSalesPersonId(salesPersonId: $request['salesPersonId']);
-
-    }
-
-
     /**
      * @return array|null
      */
@@ -271,29 +253,18 @@ class Lead extends CactusEntity
         return $lead->getMorphables();
     }
 
-    public function getLeadSectionData(): array
+    /**
+     * @param Request $request
+     * @return Lead
+     */
+    public function fromRequest(Request $request): Lead
     {
-        return $this->leadSectionData;
+        $lead = new self();
+        return $lead
+            ->setCompanyId(companyId: $request['leadCompanyId']) //needed for update
+            ->setSalesPersonId(salesPersonId: $request['salesPersonId']);
+
     }
-
-    public function setLeadSectionData(array $leadSectionData): Lead
-    {
-        $this->leadSectionData = $leadSectionData;
-        return $this;
-    }
-
-    public function getLeadSectionComments(): array
-    {
-        return $this->leadSectionComments;
-    }
-
-    public function setLeadSectionComments(array $leadSectionComments): Lead
-    {
-        $this->leadSectionComments = $leadSectionComments;
-        return $this;
-    }
-
-
 
 
 }

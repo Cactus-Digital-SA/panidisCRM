@@ -2,8 +2,6 @@
 
 namespace App\Domains\Companies\Http\Controllers;
 
-use App\Domains\Companies\Repositories\Eloquent\EloqCompanyRepository;
-use App\Domains\Companies\Repositories\Eloquent\Models\Company;
 use App\Domains\Companies\Services\CompanyService;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
@@ -13,9 +11,7 @@ use Illuminate\Http\Request;
 
 final class CompanyDTController extends Controller
 {
-    /**
-     * @var CompanyService
-     */
+
     public function __construct(protected CompanyService $companyService)
     {}
 
@@ -38,8 +34,8 @@ final class CompanyDTController extends Controller
 
     /**
      * @param Request $request
+     * @param string $companyId
      * @return JsonResponse
-     * @throws Exception
      */
     public function dataTableCompaniesContacts(Request $request, string $companyId): JsonResponse
     {

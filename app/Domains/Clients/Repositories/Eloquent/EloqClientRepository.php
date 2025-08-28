@@ -41,7 +41,7 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
         $client = $this->model;
 
         if($withRelations) {
-            $client = $client->with('projects','company','company.doy','company.companyType','company.extraData','company.country','extraData');
+            $client = $client->with('projects','company.companyType','company.companySource','company.extraData','company.country','extraData');
         }
 
         $client = $client->find($id);
@@ -51,12 +51,12 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
 
     public function createOrUpdate(CactusEntity|Client $entity): ?Client
     {
-        $client = $this->model::updateOrCreate(
-            ['company_id' => $entity->getCompanyId(),],
-            [
-                'status_id' => $entity->getStatusId(),
-            ]
-        );
+//        $client = $this->model::updateOrCreate(
+//            ['company_id' => $entity->getCompanyId(),],
+//            [
+//                'status_id' => $entity->getStatusId(),
+//            ]
+//        );
 
         return ObjectSerializer::deserialize($client?->toJson() ?? "{}", Client::class, 'json');
     }
@@ -134,39 +134,57 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
                 });
             });
 
-        if ($filters['columnName'] && $filters['columnSortOrder']) {
-            $clients = $clients->orderBy($filters['columnName'], $filters['columnSortOrder']);
-        }
-
         return DataTables::of($clients)
+            ->editColumn('erpId', function ($lead) {
+                return '# '. $lead?->company?->erp_id ?? ' - ';
+            })
             ->editColumn('company', function ($client) {
                 return $client?->company?->name;
             })
-            ->editColumn('status', function ($client) {
-                return $client?->status?->name;
+            ->addColumn('companyType', function ($client) {
+                return $client?->company?->companyType?->name;
+            })
+            ->addColumn('companyRegion', function ($client) {
+                if($client?->company?->country?->name == 'Greece'){
+                    return $client?->company?->country?->name . ' - ' . $client?->company?->city;
+                }
+                return $client?->company?->country?->name;
+            })
+            ->addColumn('sector', function ($client) {
+                return $client?->company?->sector?->name ?? ' - ';
+            })
+            ->addColumn('currentBalance', function ($client) {
+                return $client?->company?->currentBalance ?? ' - ';
+            })
+            ->addColumn('salesPerson', function ($client) {
+                $html ='';
+                if($client?->salesPerson){
+                    $html .=  '<a href="'. route('admin.users.show',$client?->salesPerson?->id).'" class="badge bg-label-secondary">' . $client?->salesPerson?->name . '</span>';
+                }
+                return $html;
             })
             ->addColumn('actions', function ($client) {
                 $deleteUrl = route('admin.clients.destroy', [
-                    'clientId' => $client->id,
+                    'leadId' => $client->id,
                 ]);
 
                 $html = '<div class="btn-group">';
 
                 $html .= '<a href="' . route('admin.clients.show', $client->id) . '" class="btn btn-icon btn-gradient-warning">
-                             <i class="ti ti-eye ti-xs"></i>
+                             <i class="ti ti-edit ti-sm"></i>
                         </a>';
 
                 $html .= '<a href="#" class="btn btn-icon btn-gradient-danger"
                            data-bs-toggle="modal" data-bs-target="#deleteModal"
                            onclick="deleteForm(\'' . $deleteUrl . '\')">
-                            <i class="ti ti-trash ti-xs"></i>
+                            <i class="ti ti-trash ti-sm"></i>
                        </a>';
 
                 $html .= '</div>';
                 return $html;
             })
             ->makeHidden(['created_at', 'updated_at', 'deleted_at'])
-            ->rawColumns(['source', 'actions'])
+            ->rawColumns(['salesPerson', 'actions'])
             ->toJson();
     }
 
@@ -176,10 +194,14 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
     public function getTableColumns(): ?array
     {
         return  [
-            'id'=> ['name' => 'id', 'table' => 'clients.id', 'searchable' => 'false', 'sortable' => 'false', 'visible'=> 'false'],
-
-            'company' => ['name' => 'Company', 'table' => 'companies.name', 'searchable' => 'true', 'sortable' => 'true'],
-            'status' => ['name' => 'Status', 'table' => 'clients.status', 'searchable' => 'true', 'sortable' => 'true'],
+            'id'=> ['name' => 'id', 'table' => 'clients.id', 'searchable' => 'false', 'orderable' => 'true'],
+            'erpId'=> ['name' => 'ERP ID', 'table' => 'company.erp_id', 'searchable' => 'false', 'orderable' => 'true'],
+            'company' => ['name' => 'Εταιρεία', 'table' => 'company.name', 'searchable' => 'true', 'orderable' => 'true'],
+            'companyType' => ['name' => 'Κατηγορία Πελάτη', 'table' => 'company.companyType.name', 'searchable' => 'true', 'orderable' => 'true'],
+            'sector' => ['name' => 'Τομέας', 'table' => 'company.sector.name', 'searchable' => 'true', 'orderable' => 'true'],
+            'companyRegion' => ['name' => 'Περιοχή', 'table' => 'company.country.name', 'searchable' => 'true', 'orderable' => 'true'],
+            'currentBalance' => ['name' => 'Υπόλοιπο', 'table' => 'company.current_balance', 'searchable' => 'true', 'orderable' => 'true'],
+            'salesPerson' => ['name' => 'Πωλητής', 'table' => 'salesPerson.name', 'searchable' => 'true', 'orderable' => 'true'],
         ];
 
     }

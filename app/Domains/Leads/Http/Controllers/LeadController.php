@@ -53,14 +53,21 @@ final class LeadController extends Controller
      */
     public function show(EditLeadRequest $request, string $leadId): View | JsonResponse
     {
-        $lead = $this->leadService->getByIdWithMorphsAndRelations($leadId, Lead::morphBuilder() , ['company','company.companyType','company.country']);
+        $lead = $this->leadService->getByIdWithMorphsAndRelations($leadId, Lead::morphBuilder() , ['company','company.companyType','company.companySource','company.country']);
 
         $company = $this->companyService->getById($lead->getCompanyId());
         $users = $this->userService->getWithoutRole();
 
         $contactsColumns =  $this->companyService->getContactsTableColumns() ?? [];
 
-        return view('backend.content.leads.show', compact('lead',  'company', 'contactsColumns', 'users'));
+        // todo add sales role
+        $salesPersonsATH = $this->userService->getByRoleId(RolesEnum::SALES_ATH->value);
+        $salesPersonsSKG = $this->userService->getByRoleId(RolesEnum::SALES_SKG->value);
+
+        $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
+        $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
+
+        return view('backend.content.leads.show', compact('lead',  'company', 'contactsColumns', 'users', 'salesPersons'));
     }
 
     /**
@@ -75,7 +82,11 @@ final class LeadController extends Controller
         $sources = $this->companySourceService->get();
 
         // todo add sales role
-        $salesPersons = $this->userService->getByRoleId(RolesEnum::Administrator->value);
+        $salesPersonsATH = $this->userService->getByRoleId(RolesEnum::SALES_ATH->value);
+        $salesPersonsSKG = $this->userService->getByRoleId(RolesEnum::SALES_SKG->value);
+
+        $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
+        $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
 
         return view('backend.content.leads.create', compact('companies', 'types', 'countries', 'sources', 'salesPersons'));
     }
@@ -118,21 +129,18 @@ final class LeadController extends Controller
 
             $this->companyService->storeContacts($companyDTO, $company->getId());
         }
-dd($lead);
 
-        return redirect()->route('admin.leads.index')->with('success', 'Το Lead δημιουργήθηκε με επιτυχία!');
+        return redirect()->route('admin.leads.index')->with('success', 'Επιτυχής αποθήκευση!');
     }
 
     /**
      * @param EditLeadRequest $request
      * @param string $leadId
-     * @return View
+     * @return RedirectResponse
      */
-    public function edit(EditLeadRequest $request, string $leadId): View
+    public function edit(EditLeadRequest $request, string $leadId): RedirectResponse
     {
-        $lead = $this->leadService->getById($leadId);
-
-        return view('backend.content.leads.edit', compact('lead'));
+        return redirect()->route('admin.leads.show', ['leadId' => $leadId]);
     }
 
     /**
@@ -144,7 +152,7 @@ dd($lead);
     {
         $this->leadService->update((new Lead())->fromRequest($request), $leadId);
 
-        return redirect()->route('admin.leads.show', ['leadId' => $leadId])->with('success', 'Το Lead ενημερώθηκε με επιτυχία!');
+        return redirect()->route('admin.leads.show', ['leadId' => $leadId])->with('success', 'Επιτυχής αποθήκευση!');
     }
 
     /**
@@ -157,7 +165,7 @@ dd($lead);
         $response = $this->leadService->deleteById($leadId);
 
         if ($response) {
-            return redirect()->route('admin.leads.index')->with('success', 'Το Lead διαγράφηκε με επιτυχία!');
+            return redirect()->route('admin.leads.index')->with('success', 'Επιτυχής διαγραφή!');
         }
 
         return redirect()->route('admin.leads.index')->with('error', 'Υπήρξε κάποιο πρόβλημα κατά την διαγραφή!');

@@ -33,11 +33,60 @@
             <span class="menu-header-text"> Διαχείριση </span>
         </li>
 
-        <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
+        <li class="menu-item {{ Route::currentRouteName() === 'admin.home' ? 'active' : '' }}">
             <a class="menu-link" href="{{ route('admin.home') }}">
-                <i class="menu-icon tf-icons ti ti-smart-home"></i>
+                <i class="menu-icon tf-icons ti ti-home"></i>
                 <div>
-                    <span class="menu-title" >{{__('locale.Home')}}</span>
+                    <span class="menu-title" >Dashboard</span>
+                </div>
+            </a>
+        </li>
+        <li class="menu-item {{ Route::currentRouteName() === 'admin.leads.index' ? 'active' : '' }}">
+            <a class="menu-link" href="{{ route('admin.leads.index') }}">
+                <i class="menu-icon tf-icons ti ti-users"></i>
+                <div>
+                    <span class="menu-title" >Leads</span>
+                </div>
+            </a>
+        </li>
+        <li class="menu-item {{ Route::currentRouteName() === 'admin.clients.index' ? 'active' : '' }}">
+            <a class="menu-link" href="{{ route('admin.clients.index') }}">
+                <i class="menu-icon tf-icons ti ti-users"></i>
+                <div>
+                    <span class="menu-title" >Clients</span>
+                </div>
+            </a>
+        </li>
+        <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
+            <a class="menu-link" href="#">
+                <i class="menu-icon tf-icons ti ti-users-group"></i>
+                <div>
+                    <span class="menu-title" >Visits</span>
+                </div>
+            </a>
+        </li>
+        <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
+            <a class="menu-link" href="#">
+                <i class="menu-icon tf-icons ti ti-align-box-bottom-center"></i>
+                <div>
+                    <span class="menu-title" >Quotes</span>
+                </div>
+            </a>
+        </li>
+        <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
+            <a class="menu-link" href="#">
+                <i class="menu-icon tf-icons ti ti-flask"></i>
+                <div>
+                    <span class="menu-title" >R&D</span>
+                </div>
+            </a>
+        </li>
+
+        <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
+            <a class="menu-link" href="#">
+                <i class="menu-icon tf-icons ti ti-checklist"></i>
+                <div>
+                    <span class="menu-title" >Tasks</span>
                 </div>
             </a>
         </li>
@@ -47,6 +96,7 @@
         </li>
 
 
+        @if(Auth::user()->can('settings.view'))
         <li class="menu-item {{ activeClass(request()->is('admin/extraData*'),'open active') }}">
             <a class="menu-link menu-toggle" href="#">
                 <i class="menu-icon tf-icons ti ti-settings"></i>
@@ -68,13 +118,14 @@
                 </li>
             </ul>
         </li>
+        @endif
 
         @if(Auth::user()->can('admin.access.user'))
             <li class="menu-item {{ activeClass(request()->is('admin/users*'),'open active') }}">
                 <a class="menu-link menu-toggle" href="#">
                     <i class="menu-icon tf-icons ti ti-user"></i>
                     <div>
-                    <span class="menu-title">Διαχείριση Χρηστών</span>
+                        <span class="menu-title">Διαχείριση Χρηστών</span>
                     </div>
                 </a>
 

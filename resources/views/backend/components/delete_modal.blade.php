@@ -25,4 +25,11 @@
     </div>
 </div>
 <!-- /Διαγραφή -->
-
+@push('after-scripts')
+    <script>
+        function deleteForm(actionUrl) {
+            let form = $('#deleteForm');
+            form.attr('action', actionUrl);
+        }
+    </script>
+@endpush

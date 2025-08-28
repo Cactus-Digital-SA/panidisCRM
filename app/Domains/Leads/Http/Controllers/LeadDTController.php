@@ -29,7 +29,6 @@ final class LeadDTController extends Controller
         $filters = Helpers::filters($request);
 
         $filters['filterName'] = $request['filterName'];
-        $filters['filterStatus'] = $request['filterStatus'];
 
         return $this->leadService->dataTableLeads($filters);
     }

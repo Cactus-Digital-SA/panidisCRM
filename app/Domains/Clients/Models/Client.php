@@ -102,13 +102,11 @@ class Client extends CactusEntity
         $data = [
             'id' => $this->getId(),
             'companyId' => $this->companyId,
-            'statusId' => $this->statusId
         ];
 
         if ($withRelations) {
             $data['company'] = $this->getCompany();
             $data['projects'] = $this->projects;
-            $data['status'] = $this->getStatus();
         }
 
         return $data;
@@ -168,48 +166,26 @@ class Client extends CactusEntity
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getStatusId(): int
+    public function getSalesPersonId(): ?int
     {
-        return $this->statusId;
+        return $this->salesPersonId;
     }
 
-    /**
-     * @param int $statusId
-     * @return $this
-     */
-    public function setStatusId(int $statusId): Client
+    public function setSalesPersonId(?int $salesPersonId): Client
     {
-        $this->statusId = $statusId;
+        $this->salesPersonId = $salesPersonId;
         return $this;
     }
 
-    /**
-     * @return ClientStatus|null
-     */
-    public function getStatus(): ?ClientStatus
+    public function getSalesPerson(): ?User
     {
-        return $this->status;
+        return $this->salesPerson;
     }
 
-    /**
-     * @param ClientStatus|null $status
-     * @return $this
-     */
-    public function setStatus(?ClientStatus $status): Client
+    public function setSalesPerson(?User $salesPerson): Client
     {
-        $this->status = $status;
+        $this->salesPerson = $salesPerson;
         return $this;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getProjects(): ?array
-    {
-        return $this->projects;
     }
 
     /**
@@ -292,18 +268,12 @@ class Client extends CactusEntity
      */
     public static function fromRequest(Request $request): Client
     {
-        $extraDataIds = isset($request['extra_data']) ? array_filter($request['extra_data'], fn($value) => $value !== null) : null;
-
-
         $client = new self();
         $client->setCompanyId($request['clientCompanyId']) //needed for update
-                ->setStatusId($request['statusId'])
-                ->setExtraDataIds($extraDataIds ?? []);
+                ->setSalesPersonId($request['salesPersonId']);
 
 
         return $client;
     }
-
-
 
 }

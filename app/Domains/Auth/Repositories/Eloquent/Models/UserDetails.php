@@ -18,7 +18,6 @@ class UserDetails extends Model
         'phone_confirmed',
         'phone_confirmed_at',
         'birthday',
-        'decision_maker'
     ];
 
     protected $casts = [

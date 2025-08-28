@@ -313,9 +313,9 @@ class Helpers
 
     public static function filters(Request $request)
     {
-        $columnIndex = $request['order'][0]['column']; // Column index
+        $columnIndex = $request['order'][0]['column'] ?? 0; // Column index
         $columnName = $request['columns'][$columnIndex]['name']; // Order Column name
-        $columnSortOrder = $request['order'][0]['dir']; // asc or desc
+        $columnSortOrder = $request['order'][0]['dir'] ?? 'asc'; // asc or desc
 
         $filters = [];
         $filters['columnName'] = $columnName;

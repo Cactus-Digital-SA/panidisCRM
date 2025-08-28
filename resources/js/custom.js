@@ -34,10 +34,6 @@ Array.prototype.slice.call(bsValidationForms).forEach(function (form) {
     );
 });
 
-$('#search').on("click", function () {
-    search();
-});
-
 let elementsArray = document.querySelectorAll(".enter_filter");
 
 elementsArray.forEach(function(elem) {

@@ -30,7 +30,6 @@ final class ClientController extends Controller
         protected CompanyService $companyService,
         protected CompanyTypeService $companyTypeService,
         protected UserService $userService,
-        private ExtraDataService $extraDataService,
 //        private TagService $tagService,
         private CountryCodeService $countryCodeService,
     ){}
@@ -57,14 +56,7 @@ final class ClientController extends Controller
      */
      public function show(ShowClientRequest $request, string $clientId): View
      {
-        $client = $this->clientService->getByIdWithMorphsAndRelations($clientId, Client::morphBuilder() ,['projects','company','company.doy','company.companyType','company','company.country']);
 
-        $company = $this->companyService->getById($client->getCompanyId());
-        $users = $this->userService->getWithoutRole();
-
-        $contactsColumns =  $this->companyService->getContactsTableColumns() ?? [];
-
-         return view('backend.content.clients.show', compact('client',  'company', 'contactsColumns', 'users'));
      }
 
 
@@ -94,38 +86,7 @@ final class ClientController extends Controller
      */
     public function store(StoreClientRequest $request): RedirectResponse
     {
-        $companyDTO = new Company();
 
-        $companyDTO->setErpId($request->input('erpID'));
-        $companyDTO->setName($request->input('newCompanyName'));
-        $companyDTO->setTypeId($request->input('typeId'));
-        $companyDTO->setEmail($request->input('email'));
-        $companyDTO->setPhone($request->input('phone'));
-        $companyDTO->setActivity($request->input('activity'));
-        $companyDTO->setAddress($request->input('address'));
-        $companyDTO->setVat($request->input('vat'));
-        $companyDTO->setDoyId($request->input('doyId'));
-        $companyDTO->setGemi($request->input('gemi'));
-        $companyDTO->setCountryId($request->input('countryId'));
-        $companyDTO->setWebsite($request->input('website'));
-        $companyDTO->setExtraDataIds($extraDataIds ?? []);
-
-        $company = $this->companyService->createOrUpdateByCompanyId($companyDTO, $request->input('existing_company_id'));
-
-        $leadDTO  = (new Client())->fromRequest($request);
-        $leadDTO->setCompanyId($company->getId());
-
-        $this->clientService->store($leadDTO);
-
-        if($company->getId() !== null) {
-            // Assign User to Company
-            $companyDTO = new Company();
-            $companyDTO->setUsers($request['userIds'] ?? []);
-
-            $this->companyService->storeContacts($companyDTO, $company->getId());
-        }
-
-        return redirect()->route('admin.clients.index')->with('success', 'Ο πελάτης δημιουργήθηκε με επιτυχία!');
     }
 
     /**
@@ -137,9 +98,7 @@ final class ClientController extends Controller
      */
     public function edit(EditClientRequest $request, string $clientId)
     {
-        $client = $this->clientService->getById($clientId);
 
-        return view('backend.content.clients.edit', compact('client'));
     }
 
     /**
@@ -151,11 +110,7 @@ final class ClientController extends Controller
      */
     public function update(UpdateClientRequest $request, string $clientId): RedirectResponse
     {
-        $request = $this->extraDataService->createOrUpdate($request);
 
-        $this->clientService->update((new Client())->fromRequest($request), $clientId);
-
-        return redirect()->route('admin.clients.index')->with('success', 'Ο πελάτης ενημερώθηκε με επιτυχία!');
     }
 
     /**

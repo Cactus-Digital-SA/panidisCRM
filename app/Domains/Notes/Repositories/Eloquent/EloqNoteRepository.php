@@ -126,7 +126,7 @@ class EloqNoteRepository implements NoteRepositoryInterface
 
         $recipients = [];
 
-        if($authUser?->id != $model?->owner_id) {
+        if($authUser?->id != $model?->owner_id && $model?->owner_id) {
             $recipients[] = new Recipient($model->owner?->email, $model->owner?->name );
         }
         foreach ($model?->assignees ?? [] as $assignee){

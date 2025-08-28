@@ -26,7 +26,6 @@ class ContactController extends Controller
         $extraData = $this->extraDataService->getByModel(ExtraDataModelsEnum::USER);
 
         return view('backend.content.contacts.edit', compact('user', 'extraData'));
-
     }
 
 

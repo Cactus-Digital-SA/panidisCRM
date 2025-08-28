@@ -67,13 +67,6 @@ class UserDetails extends CactusEntity
     private ?DateTime $birthday = null;
 
     /**
-     * @var bool $decisionMaker
-     * @JMS\Serializer\Annotation\SerializedName("decision_maker")
-     * @JMS\Serializer\Annotation\Type("bool")
-     */
-    private bool $decisionMaker = false;
-
-    /**
      * @var ?User $user
      * @JMS\Serializer\Annotation\SerializedName("user")
      * @JMS\Serializer\Annotation\Type("App\Domains\Auth\Models\User")
@@ -272,17 +265,6 @@ class UserDetails extends CactusEntity
         return $this;
     }
 
-    public function getDecisionMaker(): bool
-    {
-        return $this->decisionMaker;
-    }
-
-    public function setDecisionMaker(bool $decisionMaker): UserDetails
-    {
-        $this->decisionMaker = $decisionMaker;
-        return $this;
-    }
-
     /**
      * Summary of getUser
      * @return User|null
@@ -318,8 +300,7 @@ class UserDetails extends CactusEntity
             ->setPhone($request['phone'])
             ->setPhoneConfirmed($request['phoneConfirmed'] ?? true)
             ->setPhoneConfirmedAt(Carbon::parse($request['phoneConfirmedAt']))
-            ->setBirthday(Carbon::parse($request['birthday']))
-            ->setDecisionMaker($request['decisionMaker'] ?? false);
+            ->setBirthday(Carbon::parse($request['birthday']));
     }
 
 }

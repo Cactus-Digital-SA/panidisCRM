@@ -20,7 +20,6 @@ class ContactApiController extends Controller
         $contact->lastName = $user->getUserDetails()->getLastName();
         $contact->email = $user->getEmail();
         $contact->phone = $user->getUserDetails()->getPhone();
-        $contact->decisionMaker = $user->getUserDetails()->getDecisionMaker();
 
         $contact->extraData = [];
         foreach($user->getExtraData() as $extraData) {

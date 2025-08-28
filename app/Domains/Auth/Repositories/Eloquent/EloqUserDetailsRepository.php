@@ -62,7 +62,6 @@ class EloqUserDetailsRepository implements UserDetailsRepositoryInterface
             'phone_confirmed' => $entity->getPhoneConfirmed(),
             'phone_confirmed_at' => $entity->getPhoneConfirmedAt()->format('Y-m-d H:i:s'),
             'birthday' => $entity->getBirthday()->format('Y-m-d'),
-            'decision_maker' => $entity->getDecisionMaker(),
         ]);
 
         return ObjectSerializer::deserialize($userDetails?->toJson() ?? "{}", UserDetails::class, 'json');
@@ -89,7 +88,6 @@ class EloqUserDetailsRepository implements UserDetailsRepositoryInterface
                 'phone_confirmed' => $entity->getPhoneConfirmed(),
                 'phone_confirmed_at' => $entity->getPhoneConfirmedAt()->format('Y-m-d H:i:s') ?? $userDetails->phone_confirmed_at,
                 'birthday' => $entity->getBirthday()->format('Y-m-d'),
-                'decision_maker' => $entity->getDecisionMaker(),
             ]);
 
         }

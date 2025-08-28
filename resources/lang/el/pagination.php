@@ -13,7 +13,8 @@ return [
     |
     */
 
-    'previous' => '&laquo; Προηγούμενο',
-    'next' => 'Επόμενο &raquo;',
+    'previous' => '&laquo;',
+    'next' => '&raquo;',
+    'info' => 'Βλέπετε _START_ έως _END_ αποτελέσματα από _TOTAL_ εγγραφές',
 
 ];

@@ -31,7 +31,7 @@ class Company extends CactusEntity
      * @JMS\Serializer\Annotation\SerializedName("erp_id")
      * @JMS\Serializer\Annotation\Type("int")
      */
-    private ?int $erpId;
+    private ?int $erpId = null;
 
     /**
      * @var string $name
@@ -87,7 +87,7 @@ class Company extends CactusEntity
      * @JMS\Serializer\Annotation\SerializedName("company_source")
      * @JMS\Serializer\Annotation\Type("App\Domains\CompanySource\Models\CompanySource")
      */
-    private ?CompanySource $companySource;
+    private ?CompanySource $companySource = null;
 
     /**
      * @var string|null $website

@@ -10,19 +10,16 @@ use App\Domains\Companies\Http\Requests\DeleteAssignUserRequest;
 use App\Domains\Companies\Http\Requests\DeleteCompanyRequest;
 use App\Domains\Companies\Http\Requests\EditCompanyRequest;
 use App\Domains\Companies\Http\Requests\ManageCompanyRequest;
-use App\Domains\Companies\Http\Requests\StoreCompanyRequest;
 use App\Domains\Companies\Http\Requests\UpdateCompanyRequest;
 use App\Domains\Companies\Models\Company;
 use App\Domains\Companies\Services\CompanyService;
+use App\Domains\CompanySource\Services\CompanySourceService;
 use App\Domains\CompanyTypes\Services\CompanyTypeService;
 use App\Domains\CountryCodes\Services\CountryCodeService;
-use App\Domains\ExtraData\Enums\ExtraDataModelsEnum;
-use App\Domains\ExtraData\Services\ExtraDataService;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 final class CompanyController extends Controller
 {
@@ -32,51 +29,13 @@ final class CompanyController extends Controller
         protected CompanyTypeService $companyTypeService,
         protected UserService $userService,
         private UserDetailsService $userDetailsService ,
-        private ExtraDataService $extraDataService,
+        protected CompanySourceService $companySourceService,
         private CountryCodeService $countryCodeService,
     ){}
 
-
-    /**
-     * @param ManageCompanyRequest $request
-     * @return View
-     */
-    public function index(ManageCompanyRequest $request): View
-    {
-       // todo
-    }
-
-    /**
-     * @param EditCompanyRequest $request
-     * @param string $companyId
-     * @return View
-     */
-    public function show(EditCompanyRequest $request, string $companyId): View|JsonResponse
-    {
-        // todo
-    }
-
-    /**
-     * @return View
-     */
-    public function create(): View
-    {
-        // todo
-    }
-
-    /**
-     * Summary of store
-     * @param \App\Domains\Companies\Http\Requests\StoreCompanyRequest $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(StoreCompanyRequest $request): RedirectResponse
-    {
-        // todo
-    }
-
     /**
      * Summary of edit
-     * @param \App\Domains\Companies\Http\Requests\EditCompanyRequest $request
+     * @param EditCompanyRequest $request
      * @param string $companyId
      * @return \Illuminate\Contracts\View\View
      */
@@ -84,30 +43,35 @@ final class CompanyController extends Controller
     {
         $company = $this->companyService->getById($companyId);
         $types = $this->companyTypeService->get();
+        $sources = $this->companySourceService->get();
 
         $countries = $this->countryCodeService->get();
 
-        return view('backend.content.companies.edit',compact('company','types', 'countries'));
+        return view('backend.content.companies.edit',compact('company','types', 'sources','countries'));
     }
 
     /**
      * Summary of update
-     * @param \App\Domains\Companies\Http\Requests\UpdateCompanyRequest $request
+     * @param UpdateCompanyRequest $request
      * @param string $companyId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(UpdateCompanyRequest $request, string $companyId): RedirectResponse
     {
-        $this->companyService->update((new Company())->fromRequest($request), $companyId);
+        $companyDTO = new Company();
+        $companyDTO = $companyDTO->fromRequest($request);
+        $companyDTO = $companyDTO->setErpId($request->erpId);
+
+        $this->companyService->update($companyDTO, $companyId);
 
         return redirect()->back()->with('success', 'Η εταιρεία ενημερώθηκε με επιτυχία!');
     }
 
     /**
      * Summary of destroy
-     * @param \App\Domains\Companies\Http\Requests\DeleteCompanyRequest $request
+     * @param DeleteCompanyRequest $request
      * @param string $companyId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy(DeleteCompanyRequest $request, string $companyId): RedirectResponse
     {
@@ -122,9 +86,9 @@ final class CompanyController extends Controller
 
     /**
      * Summary of addContact
-     * @param \App\Domains\Companies\Http\Requests\ManageCompanyRequest $request
+     * @param ManageCompanyRequest $request
      * @param string $companyId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function addContact(ManageCompanyRequest $request, string $companyId): RedirectResponse
     {
@@ -153,6 +117,13 @@ final class CompanyController extends Controller
 
         try {
             $user = $this->userService->store($userDTO);
+
+            // Create User Details
+            $request['userId'] = $user->getId();
+            $userDetailsDTO = UserDetails::fromRequest($request);
+
+            $this->userDetailsService->createOrUpdateByUserId($userDetailsDTO, $user->getId());
+
         }catch (Exception $e) {
             if (str_contains($e->getMessage(), 'Υπάρχει χρήστης με το ίδιο email')) {
                 return response()->json([
@@ -166,12 +137,6 @@ final class CompanyController extends Controller
                 'message' => $e->getMessage()
             ], 400);
         }
-
-        // Create User Details
-        $request['userId'] = $user->getId();
-        $userDetailsDTO = UserDetails::fromRequest($request);
-
-        $this->userDetailsService->createOrUpdateByUserId($userDetailsDTO, $user->getId());
 
         if($companyId) {
             // Assign User to Company
@@ -197,7 +162,7 @@ final class CompanyController extends Controller
 
     /**
      * Summary of deleteContact
-     * @param \App\Domains\Companies\Http\Requests\DeleteAssignUserRequest $request
+     * @param DeleteAssignUserRequest $request
      * @param string $companyId
      * @return RedirectResponse
      */

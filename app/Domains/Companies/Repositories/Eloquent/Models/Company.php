@@ -7,7 +7,6 @@ use App\Domains\Clients\Repositories\Eloquent\Models\Client;
 use App\Domains\CompanySource\Repositories\Eloquent\Models\CompanySource;
 use App\Domains\CompanyTypes\Repositories\Eloquent\Models\CompanyType;
 use App\Domains\CountryCodes\Repositories\Eloquent\Models\CountryCode;
-use App\Domains\ExtraData\Repositories\Eloquent\Models\ExtraData;
 use App\Domains\Files\Repositories\Eloquent\Models\File;
 use App\Domains\Leads\Repositories\Eloquent\Models\Lead;
 use App\Domains\Notes\Repositories\Eloquent\Models\Note;
@@ -96,13 +95,6 @@ class Company extends Model
     {
         return $this->belongsTo(CountryCode::class, 'country_id');
     }
-
-//    public function extraData(): BelongsToMany
-//    {
-//        return $this->belongsToMany(ExtraData::class, 'company_extra_data', 'company_id', 'extra_data_id')
-//            ->withPivot('value', 'sort','visibility')
-//            ->withTimestamps();
-//    }
 
     /**
      * @return MorphToMany

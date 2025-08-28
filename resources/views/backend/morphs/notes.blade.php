@@ -106,6 +106,7 @@
 @push('after-scripts')
     @vite('resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')
     @vite('resources/assets/js/extended-ui-perfect-scrollbar.js')
+    @vite('resources/assets/vendor/libs/autosize/autosize.js')
 
     <script type="module">
         $(function() {

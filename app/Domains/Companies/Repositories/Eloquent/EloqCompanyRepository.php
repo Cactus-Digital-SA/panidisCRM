@@ -39,7 +39,7 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
         $company = $this->model;
 
         if($withRelations) {
-            $company = $company->with('users','companyType', 'doy','extraData','country', 'files', 'notes');
+            $company = $company->with('users','companyType', 'country', 'files', 'notes');
         }
 
         $company = $company->find($id);
@@ -258,33 +258,13 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
             ->toJson();
     }
 
-
-    /**
-     * @inheritDoc
-     */
-    public function getTableColumns(): ?array
-    {
-        return  [
-            'id'=> ['name' => 'id', 'table' => 'companies.id', 'searchable' => 'false', 'sortable' => 'true'],
-
-            'name' => ['name' => 'Name', 'table' => 'companies.name', 'searchable' => 'true', 'sortable' => 'true'],
-            'activity' => ['name' => 'Activity', 'table' => 'companies.activity', 'searchable' => 'true', 'sortable' => 'true'],
-            'type_id' => ['name' => 'Type', 'table' => 'companies.companyType.id', 'searchable' => 'true', 'sortable' => 'true'],
-            'address' => ['name' => 'Address', 'table' => 'companies.address', 'searchable' => 'true', 'sortable' => 'true'],
-            'vat' => ['name' => 'Vat', 'table' => 'companies.vat', 'searchable' => 'true', 'sortable' => 'true'],
-            'doy_id' => ['name' => 'Doy', 'table' => 'companies.doy_id', 'searchable' => 'true', 'sortable' => 'true'],
-            'gemi' => ['name' => 'Gemi', 'table' => 'companies.gemi', 'searchable' => 'true', 'sortable' => 'true'],
-       ];
-
-    }
-
     public function getContactsTableColumns(): ?array
     {
         return  [
-            'id'=> ['name' => 'id', 'table' => 'users.id', 'searchable' => 'false', 'sortable' => 'true'],
+            'id'=> ['name' => 'id', 'table' => 'users.id', 'searchable' => 'false', 'orderable' => 'true'],
 
-            'name' => ['name' => 'Name', 'table' => 'users.name', 'searchable' => 'true', 'sortable' => 'true'],
-            'phone' => ['name' => 'Phone', 'table' => 'users.userDetails.phone', 'searchable' => 'false', 'sortable' => 'false'],
+            'name' => ['name' => 'Name', 'table' => 'users.name', 'searchable' => 'true', 'orderable' => 'true'],
+            'phone' => ['name' => 'Phone', 'table' => 'users.userDetails.phone', 'searchable' => 'false', 'orderable' => 'true'],
         ];
 
     }

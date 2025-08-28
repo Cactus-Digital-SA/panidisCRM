@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Domains\Auth\Models\RolesEnum;
 use App\Domains\Auth\Repositories\Eloquent\Models\Role;
 use Database\Seeders\Auth\CustomPermissionRoleSeeder;
+use Database\Seeders\Auth\ExtraRolesSeeder;
 use Database\Seeders\Auth\PermissionRoleSeeder;
 use Database\Seeders\Auth\UserRoleSeeder;
 use Database\Seeders\Auth\UserSeeder;
@@ -38,6 +39,8 @@ class AuthSeeder extends Seeder
 
         $role=Role::findById(RolesEnum::Administrator->value);
         $role->syncPermissions(\Spatie\Permission\Models\Permission::all());
+
+        $this->call(ExtraRolesSeeder::class);
 
     }
 }

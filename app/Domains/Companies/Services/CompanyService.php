@@ -117,14 +117,6 @@ class CompanyService
     /**
      * @return array
      */
-    public function getTableColumns() : array
-    {
-        return $this->repository->getTableColumns();
-    }
-
-    /**
-     * @return array
-     */
     public function getContactsTableColumns() : array
     {
         return $this->repository->getContactsTableColumns();
