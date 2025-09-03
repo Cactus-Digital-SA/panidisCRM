@@ -428,6 +428,23 @@ class User extends CactusEntity
         return $this;
     }
 
+    /**
+     * Summary of hasRole
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
+    {
+        $hasRole = false;
+        foreach ($this->getRoles() as $userRole) {
+            if ($userRole->getName() === $role || $userRole->getId() == $role) {
+                $hasRole = true;
+                break;
+            }
+        }
+
+        return $hasRole;
+    }
 
     /**
      * @return Role[]

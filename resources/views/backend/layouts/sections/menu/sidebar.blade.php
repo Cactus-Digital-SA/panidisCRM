@@ -57,8 +57,8 @@
                 </div>
             </a>
         </li>
-        <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
-            <a class="menu-link" href="#">
+        <li class="menu-item {{ Route::currentRouteName() === 'admin.visits.index' ? 'active' : '' }}">
+            <a class="menu-link" href="{{ route('admin.visits.index') }}">
                 <i class="menu-icon tf-icons ti ti-users-group"></i>
                 <div>
                     <span class="menu-title" >Visits</span>

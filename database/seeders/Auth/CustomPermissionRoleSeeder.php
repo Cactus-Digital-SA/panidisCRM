@@ -70,6 +70,39 @@ class CustomPermissionRoleSeeder extends Seeder
             ]
         );
 
+        updateOrCreatePermissions(
+            ['id' => 50, 'name' => 'tickets', 'description' => 'Διαχείριση Tickets'],
+            [
+                [ 'id' => 51, 'name' => 'tickets.view', 'description' => 'Προβολή Ticket'],
+                [ 'id' => 52, 'name' => 'tickets.create', 'description' => 'Δημιουργία Tickets', 'sort' => 2],
+                [ 'id' => 53, 'name' => 'tickets.update', 'description' => 'Επεξεργασία Tickets', 'sort' => 3],
+                [ 'id' => 54, 'name' => 'tickets.delete', 'description' => 'Διαγραφή Tickets', 'sort' => 4],
+            ]
+        );
+
+        updateOrCreatePermissions(
+            ['id' => 70, 'name' => 'leads', 'description' => 'Διαχείριση Leads'],
+            [
+                [ 'id' => 71, 'name' => 'leads.view', 'description' => 'Προβολή Leads'],
+                [ 'id' => 72, 'name' => 'leads.create', 'description' => 'Δημιουργία Lead', 'sort' => 2],
+                [ 'id' => 73, 'name' => 'leads.update', 'description' => 'Επεξεργασία Lead', 'sort' => 3],
+                [ 'id' => 74, 'name' => 'leads.delete', 'description' => 'Διαγραφή Lead', 'sort' => 4],
+                [ 'id' => 75, 'name' => 'leads.create.select.company', 'description' => 'Επιλογή εταιρείας κατά την δημιουργία', 'sort' => 5],
+            ]
+        );
+
+        updateOrCreatePermissions(
+            ['id' => 80, 'name' => 'clients', 'description' => 'Διαχείριση Clients'],
+            [
+                [ 'id' => 81, 'name' => 'clients.view', 'description' => 'Προβολή Clients'],
+                [ 'id' => 82, 'name' => 'clients.create', 'description' => 'Δημιουργία Client', 'sort' => 2],
+                [ 'id' => 83, 'name' => 'clients.update', 'description' => 'Επεξεργασία Client', 'sort' => 3],
+                [ 'id' => 84, 'name' => 'clients.delete', 'description' => 'Διαγραφή Client', 'sort' => 4],
+                [ 'id' => 85, 'name' => 'clients.create.select.company', 'description' => 'Επιλογή εταιρείας κατά την δημιουργία', 'sort' => 5],
+            ]
+        );
+
+
         // Assign Permissions to other Roles
         $this->enableForeignKeys();
 

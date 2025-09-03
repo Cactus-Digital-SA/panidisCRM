@@ -63,6 +63,12 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
         return ObjectSerializer::deserialize($user->toJson() ?? "{}", User::class, 'json');
     }
 
+    public function hasRole(int $userId, string|int $role):bool
+    {
+        $user = $this->model->findOrFail($userId);
+        return $user->hasRole($role);
+    }
+
     public function getById(string $id): ?User
     {
         $user = $this->model->with(['roles','permissions','userDetails','notes','notes.user','extraData'])->findOrFail($id);

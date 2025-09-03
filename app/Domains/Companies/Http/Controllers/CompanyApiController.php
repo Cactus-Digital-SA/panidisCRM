@@ -71,4 +71,46 @@ final class CompanyApiController extends Controller
         return response()->json($results);
 
     }
+
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getContactsByCompanyId(Request $request, int $companyId){
+        $validated = $request->validate([
+            'page' => 'required|integer',
+            'term' => 'nullable|string',
+        ]);
+
+        $page = $validated['page'];
+        $resultCount = 25;
+
+        $offset = ($page - 1) * $resultCount;
+
+        /**
+         * result['data']
+         * result['count']
+         */
+        $result = $this->companyService->getContactsPaginatedByCompanyId($validated['term'], $offset, $resultCount, $companyId);
+
+
+        $data = $result['data'];
+        $count = $result['count'];
+
+
+        $endCount = $offset + $resultCount;
+        $morePages = $count > $endCount;
+
+
+        $results = array(
+            "results" => $data,
+            "pagination" => array(
+                "more" => $morePages
+            )
+        );
+
+        return response()->json($results);
+
+    }
 }

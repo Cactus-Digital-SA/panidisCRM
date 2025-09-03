@@ -53,7 +53,7 @@
                     <td>{{ $company->getCountry()?->getName() }}</td>
                 </tr>
                 <tr>
-                    <td style="width: 10%;"><span class="fw-bold">Χώρα</span></td>
+                    <td style="width: 10%;"><span class="fw-bold">Πόλη</span></td>
                     <td>{{ $company->getCity() }}</td>
                 </tr>
 

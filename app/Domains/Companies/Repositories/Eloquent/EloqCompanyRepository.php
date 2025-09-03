@@ -10,6 +10,7 @@ use App\Facades\ObjectSerializer;
 use App\Models\CactusEntity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
 class EloqCompanyRepository implements CompanyRepositoryInterface
@@ -132,7 +133,7 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
 
         if($company){
             $users = $entity->getUsers();
-            $company->users()->attach($users);
+            $company->users()->syncWithoutDetaching($users);
 
             return true;
         }
@@ -312,6 +313,36 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
 
         return array(
             "data" => $results,
+            "count" => $count
+        );
+    }
+
+    /**
+     * @param string|null $searchTerm
+     * @param int $offset
+     * @param int $resultCount number of results per page
+     * @return array{data: Collection, count: int} Array contains paginated data and total count.
+     */
+    public function getContactsPaginatedByCompanyId(?string $searchTerm, int $offset, int $resultCount, int $companyId): array
+    {
+        $company = \App\Domains\Companies\Repositories\Eloquent\Models\Company::find($companyId);
+
+        $users = $company->users()->select('users.id', DB::raw('users.name AS text'));
+
+        if ($searchTerm != null) {
+            $users = $users->where('users.name', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        if ($searchTerm == null) {
+            $count = $users->count();
+            $users = $users->skip($offset)->take($resultCount)->get();
+        } else {
+            $users = $users->skip($offset)->take($resultCount)->get();
+            $count = $users->count();
+        }
+
+        return array(
+            "data" => $users,
             "count" => $count
         );
     }

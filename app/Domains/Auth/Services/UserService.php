@@ -45,6 +45,15 @@ class UserService
         return $this->repository->getAuthUser();
     }
 
+    /**
+     * @param int $userId
+     * @param string|int $role
+     * @return bool
+     */
+    public function hasRole(int $userId, string|int $role): bool
+    {
+        return $this->repository->hasRole($userId, $role);
+    }
 
     /**
      * @param string $id

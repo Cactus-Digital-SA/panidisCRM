@@ -870,3 +870,7 @@ Profile
 .page-item .page-link {
     border-radius: 0;
 }
+
+.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback){
+    border-radius: inherit;
+}

@@ -133,4 +133,15 @@ class CompanyService
     {
         return $this->repository->namesPaginated($searchTerm, $offset, $resultCount);
     }
+
+    /**
+     * @param string|null $searchTerm
+     * @param int $offset
+     * @param int $resultCount number of results per page
+     * @return array{data: Collection, count: int} Array contains paginated data and total count.
+     */
+    public function getContactsPaginatedByCompanyId(?string $searchTerm, int $offset, int $resultCount, int $companyId): array
+    {
+        return $this->repository->getContactsPaginatedByCompanyId($searchTerm, $offset, $resultCount, $companyId);
+    }
 }

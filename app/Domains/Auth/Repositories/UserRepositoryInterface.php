@@ -21,6 +21,13 @@ interface UserRepositoryInterface extends RepositoryInterface
 
     public function getAuthUser(): ?User;
 
+    /**
+     * @param int $userId
+     * @param string|int $role
+     * @return bool
+     */
+    public function hasRole(int $userId, string|int $role): bool;
+
     public function getById(string $id): ?User;
 
     /**

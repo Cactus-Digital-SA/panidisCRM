@@ -11,5 +11,6 @@ class PmsSeeder extends Seeder
         $this->call(CountryCodeSeeder::class);
         $this->call(CompanyTypeSeeder::class);
         $this->call(CompanySourceSeeder::class);
+        $this->call(TicketStatusSeeder::class);
     }
 }

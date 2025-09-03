@@ -32,8 +32,11 @@ use App\Domains\Leads\Repositories\Eloquent\Models\Lead;
 use App\Domains\Leads\Repositories\LeadRepositoryInterface;
 use App\Domains\Notes\Repositories\Eloquent\EloqNoteRepository;
 use App\Domains\Notes\Repositories\NoteRepositoryInterface;
-use App\Domains\Projects\Repositories\Eloquent\Models\Project;
+use App\Domains\Tickets\Repositories\Eloquent\EloqTicketRepository;
+use App\Domains\Tickets\Repositories\Eloquent\EloqTicketStatusRepository;
 use App\Domains\Tickets\Repositories\Eloquent\Models\Ticket;
+use App\Domains\Tickets\Repositories\TicketRepositoryInterface;
+use App\Domains\Tickets\Repositories\TicketStatusRepositoryInterface;
 use App\Models\ModelMorphEnum;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -59,6 +62,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CompanyTypeRepositoryInterface::class, EloqCompanyTypeRepository::class);
         $this->app->bind(CompanySourceRepositoryInterface::class, EloqCompanySourceRepository::class);
         $this->app->bind(LeadRepositoryInterface::class, EloqLeadRepository::class);
+        $this->app->bind( TicketRepositoryInterface::class, EloqTicketRepository::class);
+        $this->app->bind( TicketStatusRepositoryInterface::class, EloqTicketStatusRepository::class);
 
         $this->relations();
 
@@ -73,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
             ModelMorphEnum::USER->value => User::class,
             ModelMorphEnum::CLIENT->value => Client::class,
 //            ModelMorphEnum::PROJECT->value => Project::class,
-//            ModelMorphEnum::TICKET->value => Ticket::class,
+            ModelMorphEnum::TICKET->value => Ticket::class,
             ModelMorphEnum::LEAD->value => Lead::class,
             ModelMorphEnum::COMPANY->value => Company::class,
         ]);
