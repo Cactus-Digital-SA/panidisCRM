@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace App\Domains\Tickets\Models;
 
@@ -8,17 +7,16 @@ use App\Domains\Auth\Models\User;
 use App\Domains\Companies\Models\Company;
 use App\Domains\Files\Models\File;
 use App\Domains\Notes\Models\Note;
-use App\Domains\Tickets\Enums\TicketActionTypesEnum;
 use App\Domains\Tickets\Enums\TicketSourceEnum;
-use App\Domains\Tickets\Enums\VisitNextActionSourceEnum;
-use App\Domains\Tickets\Enums\VisitProductDiscussedSourceEnum;
-use App\Domains\Tickets\Enums\VisitTypeSourceEnum;
+use App\Domains\Visits\Enums\VisitNextActionSourceEnum;
+use App\Domains\Visits\Enums\VisitProductDiscussedSourceEnum;
+use App\Domains\Visits\Enums\VisitTypeSourceEnum;
+use App\Helpers\Enums\ActionTypesEnum;
 use App\Helpers\Enums\PriorityEnum;
 use App\Models\CactusEntity;
 use App\Models\Enums\EloqMorphEnum;
 use Carbon\Carbon;
 use DateTime;
-use JMS\Serializer\Annotation as Serializer;
 use Illuminate\Http\Request;
 
 class Ticket extends CactusEntity
@@ -58,48 +56,6 @@ class Ticket extends CactusEntity
      * @Serializer\Type("enum<'App\Domains\Tickets\Enums\TicketSourceEnum'>")
      */
     private ?TicketSourceEnum $source = null;
-
-    /**
-     * @var TicketActionTypesEnum|null $actionType
-     * @Serializer\SerializedName("action_type")
-     * @Serializer\Type("enum<'App\Domains\Tickets\Enums\TicketActionTypesEnum'>")
-     */
-    private ?TicketActionTypesEnum $actionType = null;
-
-    /**
-     * @var DateTime|null $visitDate
-     * @Serializer\SerializedName("visit_date")
-     * @Serializer\Type("DateTime<'Y-m-d'>")
-     */
-    private ?DateTime $visitDate = null;
-
-    /**
-     * @var VisitTypeSourceEnum|null $visitType
-     * @Serializer\SerializedName("visit_type")
-     * @Serializer\Type("enum<'App\Domains\Tickets\Enums\VisitTypeSourceEnum'>")
-     */
-    private ?VisitTypeSourceEnum $visitType = null;
-
-    /**
-     * @var string|null $outcome
-     * @Serializer\SerializedName("outcome")
-     * @Serializer\Type("string")
-     */
-    private ?string $outcome = null;
-
-    /**
-     * @var VisitProductDiscussedSourceEnum|null $productsDiscussed
-     * @Serializer\SerializedName("products_discussed")
-     * @Serializer\Type("enum<'App\Domains\Tickets\Enums\VisitProductDiscussedSourceEnum'>")
-     */
-    private ?VisitProductDiscussedSourceEnum $productsDiscussed = null;
-
-    /**
-     * @var VisitNextActionSourceEnum|null $nextAction
-     * @Serializer\SerializedName("next_action")
-     * @Serializer\Type("enum<'App\Domains\Tickets\Enums\VisitNextActionSourceEnum'>")
-     */
-    private ?VisitNextActionSourceEnum $nextAction = null;
 
     /**
      * @var bool|null $public
@@ -341,96 +297,6 @@ class Ticket extends CactusEntity
     public function setSource(?TicketSourceEnum $source): Ticket
     {
         $this->source = $source;
-        return $this;
-    }
-
-    public function getActionType(): ?TicketActionTypesEnum
-    {
-        return $this->actionType;
-    }
-
-    public function setActionType(?TicketActionTypesEnum $actionType): Ticket
-    {
-        $this->actionType = $actionType;
-        return $this;
-    }
-
-    public function setActionTypeAttribute(?string $value): ?Ticket
-    {
-        $this->setActionType($value ? TicketActionTypesEnum::from($value) : null);
-        return $this;
-    }
-
-    public function getVisitDate(): ?DateTime
-    {
-        return $this->visitDate;
-    }
-
-    public function setVisitDate(?DateTime $visitDate): Ticket
-    {
-        $this->visitDate = $visitDate;
-        return $this;
-    }
-
-    public function getVisitType(): ?VisitTypeSourceEnum
-    {
-        return $this->visitType;
-    }
-
-    public function setVisitType(?VisitTypeSourceEnum $visitType): Ticket
-    {
-        $this->visitType = $visitType;
-        return $this;
-    }
-
-    public function setVisitTypeAttribute(?string $value): ?Ticket
-    {
-        $this->setVisitType($value ? VisitTypeSourceEnum::from($value) : null);
-        return $this;
-    }
-
-    public function getOutcome(): ?string
-    {
-        return $this->outcome;
-    }
-
-    public function setOutcome(?string $outcome): Ticket
-    {
-        $this->outcome = $outcome;
-        return $this;
-    }
-
-    public function getProductsDiscussed(): ?VisitProductDiscussedSourceEnum
-    {
-        return $this->productsDiscussed;
-    }
-
-    public function setProductsDiscussed(?VisitProductDiscussedSourceEnum $productsDiscussed): Ticket
-    {
-        $this->productsDiscussed = $productsDiscussed;
-        return $this;
-    }
-
-    public function setProductsDiscussedAttribute(?string $value): ?Ticket
-    {
-        $this->setProductsDiscussed($value ? VisitProductDiscussedSourceEnum::from($value) : null);
-        return $this;
-    }
-
-    public function getNextAction(): ?VisitNextActionSourceEnum
-    {
-        return $this->nextAction;
-    }
-
-    public function setNextAction(?VisitNextActionSourceEnum $nextAction): Ticket
-    {
-        $this->nextAction = $nextAction;
-        return $this;
-    }
-
-    public function setNextActionAttribute(?string $value): ?Ticket
-    {
-        $this->setNextAction($value ? VisitNextActionSourceEnum::from($value) : null);
         return $this;
     }
 
@@ -775,12 +641,6 @@ class Ticket extends CactusEntity
             ->setEstTime($request['est_time'])
             ->setOwnerId($request['owner_id'])
             ->setCompanyId($request['company_id'])
-            ->setActionTypeAttribute($request['action_type'])
-            ->setVisitDate($request['visit_date'] ? Carbon::parse($request['visit_date']) : null)
-            ->setVisitTypeAttribute($request['visit_type'])
-            ->setOutcome($request['outcome'])
-            ->setProductsDiscussedAttribute($request['products_discussed'])
-            ->setNextActionAttribute($request['next_action'])
            ;
     }
 

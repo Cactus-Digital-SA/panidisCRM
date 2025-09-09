@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Domains\Tickets\Http\Controllers;
+namespace App\Domains\Visits\Http\Controllers;
 
-use App\Domains\Tickets\Services\TicketService;
+use App\Domains\Visits\Services\VisitService;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-final class TicketDTController extends Controller
+final class VisitDTController extends Controller
 {
 
     /**
-     * @param TicketService $ticketService
+     * @param VisitService $visitService
      */
-    public function __construct(protected TicketService $ticketService)
+    public function __construct(protected VisitService $visitService)
     {}
 
     /**
@@ -23,7 +23,7 @@ final class TicketDTController extends Controller
      * @return JsonResponse
      * @throws Exception
      */
-    public function dataTableTickets(Request $request): JsonResponse
+    public function dataTableVisits(Request $request): JsonResponse
     {
         $filters = Helpers::filters($request);
 
@@ -36,15 +36,13 @@ final class TicketDTController extends Controller
         $filters['filterPriority'] = $request['filterPriority'];
         $filters['filterCompany'] = $request['filterCompany'];
 
-        $filters['ticketMine'] =  $request['ticketMine'];
         $filters['assignedBy'] =  $request['assignedBy'];
         if($request['morphableType']) {
             $filters['morphableType'] = $request['morphableType'];
             $filters['morphableId'] = $request['morphableId'];
         }
 
-
-        return $this->ticketService->dataTableTickets($filters);
+        return $this->visitService->dataTableVisits($filters);
     }
 
 }

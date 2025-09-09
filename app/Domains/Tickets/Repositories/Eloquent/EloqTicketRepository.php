@@ -4,9 +4,7 @@ namespace App\Domains\Tickets\Repositories\Eloquent;
 
 
 use App\Domains\Auth\Models\RolesEnum;
-use App\Domains\Tickets\Enums\TicketActionTypesEnum;
 use App\Domains\Tickets\Enums\TicketSourceEnum;
-use App\Domains\Tickets\Enums\VisitTypeSourceEnum;
 use App\Domains\Tickets\Models\Ticket;
 use App\Domains\Tickets\Models\TicketsStatusesPivot;
 use App\Domains\Tickets\Repositories\Eloquent\Models\TicketsStatusesPivot as EloquentTicketsStatusesPivot;
@@ -14,6 +12,7 @@ use App\Domains\Tickets\Repositories\Eloquent\Models\TicketStatus;
 use App\Domains\Tickets\Repositories\TicketRepositoryInterface;
 use App\Facades\ObjectSerializer;
 use App\Helpers\EloquentRelationHelper;
+use App\Helpers\Enums\ActionTypesEnum;
 use App\Helpers\Enums\PriorityEnum;
 use App\Models\CactusEntity;
 use Carbon\Carbon;
@@ -146,12 +145,6 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
             'source' => $entity->getSource() ?? TicketSourceEnum::SYSTEM->value,
             'company_id' => $entity->getCompanyId(),
             'owner_id' => $entity->getOwnerId() ?? \Auth::user()->id,
-            'action_type' => $entity->getActionType()?->value ?? null,
-            'visit_type' => $entity->getVisitType()?->value ?? null,
-            'visit_date' => $entity->getVisitDate()?->format('Y-m-d') ?? null,
-            'products_discussed' => $entity->getProductsDiscussed()?->value ?? null,
-            'next_action' => $entity->getNextAction()?->value ?? null,
-            'outcome' => $entity->getOutcome() ?? null,
         ]);
 
         $maxSort = EloquentTicketsStatusesPivot::where('ticket_status_id', $entity?->getActiveStatus()?->getId() ?? 1)->max('sort');
@@ -203,33 +196,19 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
      */
     public function update(CactusEntity|Ticket $entity, string $id): ?Ticket
     {
-
         $ticket = $this->model::find($id);
         $oldTicket = $ticket;
 
-        if($ticket->action_type == TicketActionTypesEnum::VISITS){
-            $ticket->update([
-                'name' => $entity->getName(),
-                'company_id' => $entity->getCompanyId(),
-                'visit_type' => $entity->getVisitType()?->value,
-                'visit_date' => $entity->getVisitDate()?->format('Y-m-d'),
-                'products_discussed' => $entity->getProductsDiscussed()?->value,
-                'next_action' => $entity->getNextAction()?->value,
-                'outcome' => $entity->getOutcome(),
-                ]);
-        }else{
-            $ticket->update([
-                'name' => $entity->getName(),
-                'deadline' => ($deadline = $entity->getDeadline()) ? $deadline->format('Y-m-d') : null,
-                'billable' => $entity->getBillable(),
-                'public' => $entity->getPublic(),
-                'est_time' => $entity->getEstTime(),
-                'priority' => $entity->getPriority(),
-                'source' => $entity->getSource(),
-                'company_id' => $entity->getCompanyId(),
-            ]);
-
-        }
+        $ticket->update([
+            'name' => $entity->getName(),
+            'deadline' => ($deadline = $entity->getDeadline()) ? $deadline->format('Y-m-d') : null,
+            'billable' => $entity->getBillable(),
+            'public' => $entity->getPublic(),
+            'est_time' => $entity->getEstTime(),
+            'priority' => $entity->getPriority(),
+            'source' => $entity->getSource(),
+            'company_id' => $entity->getCompanyId(),
+        ]);
 
         if($ticket->owner_id == \Auth::user()->id || \Auth::user()->hasRole(RolesEnum::Administrator->value)) {
             $ticket->update([
@@ -258,8 +237,6 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
             $ticket->blockedBy()->sync($entity->getBlockedByTickets());
         }
 
-        //Assignees
-//        $ticket->assignees()->sync($entity->getAssignees(), false);
 
         return ObjectSerializer::deserialize($ticket?->toJson() ?? "{}",  Ticket::class , 'json');
     }
@@ -268,7 +245,7 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
     {
         $ticket = $this->model::find($ticketId);
 
-        $statusSlug = $entity->getTicketStatusSlug();        // The ticket status you're updating
+        $statusSlug = $entity->getTicketStatusSlug();
         $newTicketStatusId = TicketStatus::where('slug', $statusSlug)->first()->id;
 
         $oldTicketStatusId = $ticket->status()->first()->pivot->ticket_status_id;
@@ -463,87 +440,8 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
     /**
      * @inheritDoc
      */
-    public function dataTableVisits(array $filters = []): JsonResponse
+    public function getTableColumns(?ActionTypesEnum $type = null): ?array
     {
-        $tickets = $this->model->with(['owner','company'])
-            ->leftJoin('companies', 'companies.id', '=', 'tickets.company_id')
-            ->select('tickets.*', 'companies.name as company_name');
-
-        if(isset($filters['morphableType']) && $filters['morphableType'] && $filters['morphableId']) {
-            $tickets = $tickets->when($filters['morphableId'], function ($query, $searchTerm) use ($filters) {
-                $query->whereHas($filters['morphableType'], function($q) use ($searchTerm, $filters) {
-                    $q->where($filters['morphableType'].'.id', $searchTerm);
-                });
-            });
-        }
-
-//        if ($filters['columnName'] && $filters['columnSortOrder']) {
-//            $tickets = $tickets->orderBy($filters['columnName'], $filters['columnSortOrder']);
-//        }
-
-        return DataTables::of($tickets)
-            ->editColumn('company', function ($ticket){
-                return  $ticket->company_id ? '<a href="'. route('admin.companies.show',$ticket->company_id).'" class="badge bg-label-primary">' . $ticket->company_name . '</span>' : '-';
-            })
-            ->addColumn('date', function ($ticket){
-                return $ticket->visit_date?->format('d-m-Y') ?? ' - ';
-            })
-            ->editColumn('visit_type', function ($ticket){
-                return $ticket->visit_type?->value ?? ' - ';
-            })
-            ->editColumn('outcome', function ($ticket){
-                return $ticket->outcome ?? ' - ';
-            })
-            ->editColumn('next_action', function ($ticket){
-                return $ticket->next_action?->value ?? ' - ';
-            })
-            ->addColumn('actions', function ($ticket) use ($filters) {
-                if(\Auth::user()->hasRole(RolesEnum::Administrator->value)) {
-                    $deleteUrl = route('admin.tickets.destroy', $ticket->id);
-                }
-
-                $html = '<div class="btn-group">';
-
-                $html .= '<a href="' . route('admin.tickets.show', [$ticket->id]) . '" class="btn btn-icon btn-gradient-warning">
-                             <i class="ti ti-eye ti-xs"></i>
-                        </a>';
-
-                if(isset($deleteUrl)){
-                    $html .= '<a href="#" class="btn btn-icon btn-gradient-danger"
-                           data-bs-toggle="modal" data-bs-target="#deleteModal"
-                           onclick="deleteForm(\'' . $deleteUrl . '\')">
-                            <i class="ti ti-trash ti-xs"></i>
-                       </a>';
-                }
-
-                $html .= '</div>';
-                return $html;
-            })
-            ->makeHidden(['created_at', 'updated_at', 'deleted_at'])
-            ->rawColumns(['company','date','visit_type','outcome','next_action','actions'])
-            ->toJson();
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getTableColumns(?TicketActionTypesEnum $type = null): ?array
-    {
-        if($type == TicketActionTypesEnum::VISITS){
-            return  [
-                'id'=> ['name' => 'id', 'table' => 'tickets.id', 'searchable' => 'false', 'orderable' => 'true'],
-
-                'name' => ['name' => 'Name', 'table' => 'tickets.name', 'searchable' => 'true', 'orderable' => 'true'],
-                'company' => ['name' => 'Company', 'table' => 'companies.name', 'searchable' => 'false', 'orderable' => 'true'],
-                'date' => ['name' => 'date', 'table' => 'visit_date', 'searchable' => 'false', 'orderable' => 'true'],
-                'visit_type' => ['name' => 'Visit Type', 'table' => 'visit_type', 'searchable' => 'false', 'orderable' => 'true'],
-                'outcome' => ['name' => 'Outcome', 'table' => 'outcome', 'searchable' => 'false', 'orderable' => 'true'],
-                'next_action' => ['name' => 'Next Action', 'table' => 'next_action', 'searchable' => 'false', 'orderable' => 'true'],
-            ];
-        }
-
-
         return  [
             'id'=> ['name' => 'id', 'table' => 'tickets.id', 'searchable' => 'false', 'orderable' => 'true'],
 

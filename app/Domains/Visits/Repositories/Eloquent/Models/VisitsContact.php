@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Domains\Tickets\Repositories\Eloquent\Models;
+namespace App\Domains\Visits\Repositories\Eloquent\Models;
 
 use App\Domains\Auth\Repositories\Eloquent\Models\User;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class TicketContact extends Pivot
+class VisitsContact extends Pivot
 {
-    protected $table = 'ticket_contacts';
+    protected $table = 'visit_contacts';
     protected $fillable = [
-        'ticket_id',
+        'visit_id',
         'user_id',
     ];
 
-    public function ticket(): HasOne
+    public function visit(): HasOne
     {
-        return $this->hasOne(Ticket::class, 'id','ticket_id');
+        return $this->hasOne(Visit::class, 'id','visit_id');
     }
 
     public function user(): HasOne

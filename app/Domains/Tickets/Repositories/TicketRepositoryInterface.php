@@ -2,9 +2,9 @@
 
 namespace App\Domains\Tickets\Repositories;
 
-use App\Domains\Tickets\Enums\TicketActionTypesEnum;
 use App\Domains\Tickets\Models\Ticket;
 use App\Domains\Tickets\Models\TicketsStatusesPivot;
+use App\Helpers\Enums\ActionTypesEnum;
 use App\Models\CactusEntity;
 use App\Repositories\RepositoryInterface;
 use Illuminate\Http\JsonResponse;
@@ -93,13 +93,7 @@ interface TicketRepositoryInterface extends RepositoryInterface
     public function dataTableTickets(array $filters = []): JsonResponse;
 
     /**
-     * @param array $filters
-     * @return JsonResponse
-     */
-    public function dataTableVisits(array $filters = []): JsonResponse;
-
-    /**
      * @return array|null
      */
-    public function getTableColumns(?TicketActionTypesEnum $type = null):?array;
+    public function getTableColumns(?ActionTypesEnum $type = null):?array;
 }

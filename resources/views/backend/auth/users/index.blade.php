@@ -158,7 +158,7 @@
                         }
                     },
                     columns: [
-                        { data: 'uuid' },
+                        { data: 'id' },
                         // { data: 'id' },
                         // { data: 'id' }, // used for sorting so will hide this column
                         { data: 'name' , name: 'users.name'},

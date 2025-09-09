@@ -1,14 +1,14 @@
-@php use App\Domains\Tickets\Models\Ticket;use App\Domains\Tickets\Models\TicketStatus; use Carbon\Carbon; use App\Domains\ExtraData\Enums\ExtraDataTypesEnum; use App\Models\Enums\EloqMorphEnum; @endphp
+@php use App\Domains\Visits\Models\Visit;use App\Domains\Visits\Models\VisitStatus; use Carbon\Carbon; use App\Domains\ExtraData\Enums\ExtraDataTypesEnum; use App\Models\Enums\EloqMorphEnum; @endphp
 @php
     /**
-    * @var Ticket $ticket
-    * @var TicketStatus $ticketStatuse
-    * @var array<TicketStatus> $ticketStatuses
+    * @var Visit $visit
+    * @var VisitStatus $visitStatuse
+    * @var array<VisitStatus> $visitStatuses
     * */
 @endphp
 @extends('backend.layouts.app')
 
-@section('title', 'Ticket')
+@section('title', 'Visit')
 
 @section('vendor-style')
     @vite([])
@@ -22,7 +22,7 @@
     <div class="col-xl-12">
         <div class="nav-align-top mb-4">
             <ul class="nav nav-pills mb-3" role="tablist">
-                @foreach($ticket->getMorphables() as $morph)
+                @foreach($visit->getMorphables() as $morph)
                     <li class="nav-item">
                         <button type="button" class="nav-link {{ $morph->value === EloqMorphEnum::NOTES->value ? 'active' : '' }}" role="tab" data-bs-toggle="tab"
                                 data-bs-target="#navs-pills-{{$morph->value}}"
@@ -42,8 +42,8 @@
 
 @section('content-header-breadcrumbs')
     <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Αρχική</a></li>
-    <li class="breadcrumb-item"> <a href="{{ route('admin.tickets.index') }}">{{ __('Tickets') }}</a></li>
-    <li class="breadcrumb-item active"> {{ $ticket->getName() }}</li>
+    <li class="breadcrumb-item"> <a href="{{ route('admin.visits.index') }}">{{ __('Visits') }}</a></li>
+    <li class="breadcrumb-item active"> {{ $visit->getName() }}</li>
 @endsection
 
 @section('content')
@@ -51,17 +51,17 @@
     <div class="row mb-4">
         <div class="col-12 row">
             <div class="col-md-9 col-xs-12">
-                <h4>{{$ticket->getName()}} ( {{$ticket->getOwner()->getName()}} )</h4>
+                <h4>{{$visit->getName()}} ( {{$visit->getOwner()->getName()}} )</h4>
             </div>
             <div class="col-md-3">
-                <select name="ticket_status" id="ticket_status" class="form-control select2" data-placeholder="status">
+                <select name="visit_status" id="visit_status" class="form-control select2" data-placeholder="status">
                     <option value="">---</option>
                     @if($canEditStatus ?? false)
-                        @foreach($ticketStatuses ?? [] as $status)
-                            <option value="{{$status->getSlug()}}" @if($status->getId() == $ticket->getActiveStatus()?->getId()) selected @endif>{{$status->getName()}}</option>
+                        @foreach($visitStatuses ?? [] as $status)
+                            <option value="{{$status->getSlug()}}" @if($status->getId() == $visit->getActiveStatus()?->getId()) selected @endif>{{$status->getName()}}</option>
                         @endforeach
                     @else
-                        <option value="{{$ticket->getActiveStatus()->getSlug()}}" selected >{{$ticket->getActiveStatus()->getName()}}</option>
+                        <option value="{{$visit->getActiveStatus()->getSlug()}}" selected >{{$visit->getActiveStatus()->getName()}}</option>
                     @endif
                 </select>
             </div>
@@ -85,25 +85,25 @@
                 <div class="card-body pb-0 pt-2">
                     <div class="d-flex mb-3 align-items-center">
                         <div class="col-md-3">
-                            <span class="h5 text-default">{{$ticket->getDeadline()?->format('d-m-Y') ?? ' - '}}</span>
+                            <span class="h5 text-default">{{$visit->getDeadline()?->format('d-m-Y') ?? ' - '}}</span>
                         </div>
                         <div class="col-md-3">
                             @php
                                 $url = '#';
-                                if($ticket->getCompany()?->getLead()){
-                                    $url = route('admin.leads.show', $ticket->getCompany()?->getLead()?->getId());
+                                if($visit->getCompany()?->getLead()){
+                                    $url = route('admin.leads.show', $visit->getCompany()?->getLead()?->getId());
                                 }
-                                if($ticket->getCompany()?->getClient()){
-                                    $url = route('admin.clients.show', $ticket->getCompany()?->getClient()?->getId());
+                                if($visit->getCompany()?->getClient()){
+                                    $url = route('admin.clients.show', $visit->getCompany()?->getClient()?->getId());
                                 }
                             @endphp
-                            <a href="{{$url}}" class="font-medium-1"> {{$ticket->getCompany()?->getName()  ?? ' - '}} </a>
+                            <a href="{{$url}}" class="font-medium-1"> {{$visit->getCompany()?->getName()  ?? ' - '}} </a>
                         </div>
                         <div class="col-md-3">
-                            <span id="ticket-status-{{ $ticket->getId() }}" class="font-medium-1 text-{{$ticket->getActiveStatus()?->getLabel()?->value}}"> <strong>{{$ticket->getActiveStatus()?->getName() ?? ' - '}}</strong> </span>
+                            <span id="visit-status-{{ $visit->getId() }}" class="font-medium-1 text-{{$visit->getActiveStatus()?->getLabel()?->value}}"> <strong>{{$visit->getActiveStatus()?->getName() ?? ' - '}}</strong> </span>
                         </div>
                         <div class="col-md-3">
-                            @foreach($ticket->getAssignees() ?? [] as $assignee)
+                            @foreach($visit->getAssignees() ?? [] as $assignee)
                                 {{$assignee->getName()}} <br>
                             @endforeach
                         </div>
@@ -123,7 +123,7 @@
                                 <h5 class="card-title m-0 me-2 pt-1 mb-2 d-flex align-items-center"><i
                                         class="fa fa-table me-3"></i> {{ __('Details') }}</h5>
                                 <div class="card-header-elements ms-auto">
-                                    <a href="{{ route('admin.tickets.edit', [$ticket->getId()] ) }}"
+                                    <a href="{{ route('admin.visits.edit', [$visit->getId()] ) }}"
                                        class="btn btn-xs btn-primary waves-effect waves-light">
                                         <span class="tf-icon fa fa-pen fa-xs me-1"></span>
                                         {{__('Edit')}}
@@ -134,13 +134,13 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label"> {{__('Name')}} </label>
-                                        <span class="d-block font-small-4"> {{ $ticket->getName() }} </span>
+                                        <span class="d-block font-small-4"> {{ $visit->getName() }} </span>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label"> {{__('Company')}} </label>
-                                        @if($ticket->getCompanyId())
-                                            <a href="{{route('admin.companies.show', $ticket->getCompanyId())}}"
-                                           class="d-block font-small-4"> {{ $ticket->getCompany()->getName() }} </a>
+                                        @if($visit->getCompanyId())
+                                            <a href="{{route('admin.companies.show', $visit->getCompanyId())}}"
+                                           class="d-block font-small-4"> {{ $visit->getCompany()->getName() }} </a>
                                         @endif
                                     </div>
                                 </div>
@@ -148,54 +148,54 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label"> {{__('Deadline')}} </label>
-                                        <span class="d-block font-small-4"> {{  $ticket->getDeadline() ? Carbon::parse($ticket->getDeadline())->format('d-m-Y') : '-' }} </span>
+                                        <span class="d-block font-small-4"> {{  $visit->getDeadline() ? Carbon::parse($visit->getDeadline())->format('d-m-Y') : '-' }} </span>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label"> {{__('Priority')}} </label>
-                                        <span class="d-block font-small-4"> {{  $ticket->getPriority() ?: '-' }} </span>
+                                        <span class="d-block font-small-4"> {{  $visit->getPriority() ?: '-' }} </span>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label"> Ημ/νια επίσκεψης </label>
-                                        <span class="d-block font-small-4"> {{  $ticket->getVisitDate()?->format('d-m-Y') ?? '-' }} </span>
+                                        <span class="d-block font-small-4"> {{  $visit->getVisitDate()?->format('d-m-Y') ?? '-' }} </span>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label"> Τύπος επίσκεψης </label>
-                                        <span class="d-block font-small-4"> {{  $ticket->getVisitType()?->value ?? '-' }} </span>
+                                        <span class="d-block font-small-4"> {{  $visit->getVisitType()?->value ?? '-' }} </span>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label"> Outcome </label>
-                                        <span class="d-block font-small-4"> {{  $ticket->getOutcome() ?? '-' }} </span>
+                                        <span class="d-block font-small-4"> {{  $visit->getOutcome() ?? '-' }} </span>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label"> Προϊόν συζήτησης </label>
-                                        <span class="d-block font-small-4"> {{  $ticket->getProductsDiscussed()?->value ?? '-' }} </span>
+                                        <span class="d-block font-small-4"> {{  $visit->getProductsDiscussed()?->value ?? '-' }} </span>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label"> Επαφές επικοινωνίας </label>
-                                        @foreach($ticket->getContacts() as $contact)
+                                        @foreach($visit->getContacts() as $contact)
                                             <span class="d-block font-small-4"> {{ $contact->getName() ?? '-' }} </span>
                                         @endforeach
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label"> Επόμενο Action </label>
-                                        <span class="d-block font-small-4"> {{  $ticket->getNextAction()?->value ?? '-' }} </span>
+                                        <span class="d-block font-small-4"> {{  $visit->getNextAction()?->value ?? '-' }} </span>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label"> {{__('Manager')}} </label>
-                                        <a href="{{ route('admin.users.show', $ticket->getOwnerId()) }}"
-                                           class="d-block font-small-4"> {{ $ticket->getOwner()->getName() ?: '-'}} </a>
+                                        <a href="{{ route('admin.users.show', $visit->getOwnerId()) }}"
+                                           class="d-block font-small-4"> {{ $visit->getOwner()->getName() ?: '-'}} </a>
                                     </div>
                                     <div class="col-md-6">
 
@@ -207,7 +207,7 @@
                     </div>
                 </div>
                 <div class="col">
-                    @include('backend.content.companies.includes.showDetails', ['company' => $ticket->getCompany()])
+                    @include('backend.content.companies.includes.showDetails', ['company' => $visit->getCompany()])
 
                     <div class="card mt-2">
                         <div class="card-header d-flex justify-content-between">
@@ -217,7 +217,7 @@
                         </div>
                         <div class="card-body pb-xxl-0">
                             <ul class="timeline mb-0">
-                                @foreach($ticket->getTicketStatuses() as $status)
+                                @foreach($visit->getVisitStatuses() as $status)
                                     <li class="timeline-item timeline-item-transparent">
                                         <span class="timeline-point timeline-point-{{ $status->getLabel() }}"></span>
                                         <div class="timeline-event">
@@ -236,10 +236,10 @@
 
             </div>
         </div>
-        @foreach($ticket->getMorphables() as $morph)
+        @foreach($visit->getMorphables() as $morph)
             <div class="tab-pane fade {{ $morph->value === EloqMorphEnum::NOTES->value ? 'active show' : '' }}" id="navs-pills-{{$morph->value}}" role="tabpanel">
                 <div class="pb-3">
-                    <x-morphs.morph morph="{{ $morph->value }}" :model="$ticket"/>
+                    <x-morphs.morph morph="{{ $morph->value }}" :model="$visit"/>
                 </div>
             </div>
         @endforeach
@@ -296,8 +296,8 @@
                 }
             }
 
-            $('#ticket_status').on('change', function() { //remove margin for the placeholder when the select option is not empty
-                let apiUrl = `{{ route('admin.tickets.update-status', ':ticketId') }}`.replace(':ticketId', '{{ $ticket->getId() }}');
+            $('#visit_status').on('change', function() { //remove margin for the placeholder when the select option is not empty
+                let apiUrl = `{{ route('admin.visits.update-status', ':visitId') }}`.replace(':visitId', '{{ $visit->getId() }}');
                 $.ajax({
                     type: 'POST',
                     headers: {
@@ -306,16 +306,16 @@
                     url: apiUrl,
                     data: {
                         ajax: true,
-                        ticket_status: $(this).val()
+                        visit_status: $(this).val()
                     },
                     success: function(response) {
-                        // console.log('Ticket updated successfully', response);
+                        // console.log('Visit updated successfully', response);
                         if(response.status === 200){
-                            const ticketId = response.data.ticketId;
+                            const visitId = response.data.visitId;
                             const newLabelClass = response.data.labelClass;
                             const newLabelName = response.data.labelName;
 
-                            $(`#ticket-status-${ticketId}`)
+                            $(`#visit-status-${visitId}`)
                                 .removeClass(function (index, className) {
                                     return (className.match(/(^|\s)text-\S+/g) || []).join(' ');
                                 })
@@ -324,7 +324,7 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error updating ticket:', error);  // Handle error
+                        console.error('Error updating visit:', error);  // Handle error
                     }
                 });
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Tickets\Enums;
+namespace App\Domains\Visits\Enums;
 
 enum VisitNextActionSourceEnum : string
 {

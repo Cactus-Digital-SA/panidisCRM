@@ -27,14 +27,17 @@
 
     <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
         <div class="mb-1 breadcrumb-right">
-            <a href="{{route('admin.tickets.actionType.create', \App\Domains\Tickets\Enums\TicketActionTypesEnum::VISITS->slug())}}" class="btn btn-primary  me-2">
+            <a href="{{route('admin.visits.create')}}"
+               class="btn btn-primary  me-2">
                 <i class="ti ti-plus me-1"></i>
-                Δημιουργία Ticket
+                Δημιουργία Visit
             </a>
-            <button class="btn btn-info btn-round waves-effect waves-float waves-light" onclick="jQuery('#filters').toggle()">
+            <button class="btn btn-info btn-round waves-effect waves-float waves-light"
+                    onclick="jQuery('#filters').toggle()">
                 <i class="ti ti-filter"></i> Φίλτρα
             </button>
-            <button class="btn btn-dark btn-round waves-effect waves-float waves-light" onclick="jQuery('#columns').toggle()">
+            <button class="btn btn-dark btn-round waves-effect waves-float waves-light"
+                    onclick="jQuery('#columns').toggle()">
                 <i class="ti ti-folder"></i> Στήλες Πίνακα
             </button>
         </div>
@@ -44,35 +47,41 @@
 @section('content')
     <!-- Search Bar -->
     <div class="col-12 mb-4">
-        <div id="filters" class="col-12 card card-accent-info mt-card-accent" >
+        <div id="filters" class="col-12 card card-accent-info mt-card-accent">
             <div class="card-body p-0">
                 <div class="row justify-content-end card-header">
                     <div class="col-md-12 col-12">
                         <div class="row">
                             <div class="col-md-2 col-12 ">
                                 <label for="filter_name">Όνομα</label>
-                                <input type="text" id="filter_name" class="form-control project_name enter_filter" autocomplete="off" placeholder="Όνομα"/>
+                                <input type="text" id="filter_name" class="form-control project_name enter_filter"
+                                       autocomplete="off" placeholder="Όνομα"/>
                             </div>
                             <div class="col-md-2 col-12">
                                 <label for="filter_owner">Manager</label>
-                                <select name="filter_owner" id="filter_owner" class="form-control select2 filter_owner" data-placeholder="Manager">
+                                <select name="filter_owner" id="filter_owner" class="form-control select2 filter_owner"
+                                        data-placeholder="Manager">
                                 </select>
                             </div>
                             <div class="col-md-3-5 col-12">
                                 <label for="filter_assignees">Ανάθεση Χρήστη</label>
-                                <select name="filter_assignees[]" id="filter_assignees" class="form-control select2 filter_assignees" data-placeholder="Ανάθεση Χρήστη" data-allow-clear="true" multiple>
+                                <select name="filter_assignees[]" id="filter_assignees"
+                                        class="form-control select2 filter_assignees" data-placeholder="Ανάθεση Χρήστη"
+                                        data-allow-clear="true" multiple>
                                 </select>
                             </div>
                             <div class="col-md-2-5 col-12">
                                 <label for="filter_status">{{ __('Status') }}</label>
-                                <select name="filter_status[]" id="filter_status" class="form-control select2" data-placeholder="{{ __('Status') }}" data-allow-clear="true" multiple>
+                                <select name="filter_status[]" id="filter_status" class="form-control select2"
+                                        data-placeholder="{{ __('Status') }}" data-allow-clear="true" multiple>
                                     @foreach($ticketStatus ?? [] as $status)
                                         <option value="{{ $status->getId() }}"> {{$status->getName()}} </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-2 col-12" style="display: flex; align-items: end;">
-                                <button style="width: 90%;" id="search" name="search" class="btn btn-success waves-effect waves-light" data-toggle="tooltip">
+                                <button style="width: 90%;" id="search" name="search"
+                                        class="btn btn-success waves-effect waves-light" data-toggle="tooltip">
                                     <i class="fa fa-search mx-2"></i>
                                     {{__('Search')}}
                                 </button>
@@ -91,22 +100,28 @@
                             </div>
                             <div class="col-md-2 col-12">
                                 <label for="filter_company">Εταιρεία</label>
-                                <select name="filter_company" id="filter_company" class="form-control select2 filter_companies" data-placeholder="Εταιρεία">
+                                <select name="filter_company" id="filter_company"
+                                        class="form-control select2 select_companies" data-placeholder="Εταιρεία">
                                     <option></option>
                                 </select>
                             </div>
                             <div class="col-md-4 col-12">
                                 <label for="filter_start_date_start">Ημ/νια Εισαγωγής</label>
                                 <div class="input-group" id="filter_start_date">
-                                    <input type="text" data-flatpickr="date" id="filter_start_date_start" placeholder="Απο" autocomplete="off">
-                                    <input type="text" data-flatpickr="date" id="filter_start_date_end" placeholder="Έως" autocomplete="off" data-flatpickr-end-for="#filter_start_date_start">
+                                    <input type="text" data-flatpickr="date" id="filter_start_date_start"
+                                           placeholder="Απο" autocomplete="off">
+                                    <input type="text" data-flatpickr="date" id="filter_start_date_end"
+                                           placeholder="Έως" autocomplete="off"
+                                           data-flatpickr-end-for="#filter_start_date_start">
                                 </div>
                             </div>
                             <div class="col-md-4 col-12">
                                 <label for="filter_deadline_start">Ημ/νια Deadline</label>
                                 <div class="input-group" id="filter_deadline">
-                                    <input type="text" id="filter_deadline_start" placeholder="Απο" class="form-control" autocomplete="off">
-                                    <input type="text" id="filter_deadline_end" placeholder="Έως" class="form-control" autocomplete="off" data-flatpickr-end-for="#filter_deadline_start">
+                                    <input type="text" id="filter_deadline_start" placeholder="Απο" class="form-control"
+                                           autocomplete="off">
+                                    <input type="text" id="filter_deadline_end" placeholder="Έως" class="form-control"
+                                           autocomplete="off" data-flatpickr-end-for="#filter_deadline_start">
                                 </div>
                             </div>
                         </div>
@@ -139,7 +154,7 @@
         </div>
     </section>
     @include('backend.components.delete_modal')
-{{--    @include('backend.content.tickets.modals.create')--}}
+    {{--    @include('backend.content.tickets.modals.create')--}}
 @endsection
 
 
@@ -197,12 +212,12 @@
                                 @isset($mine)
                                     data.ticketMine = '{{$mine}}';
                                 @endisset
-                                @isset($assignedBy)
+                                    @isset($assignedBy)
                                     data.assignedBy = '{{$assignedBy}}';
                                 @endisset
 
 
-                                @isset($company)
+                                    @isset($company)
                                     data.filterCompany = '{{$company->getId()}}';
                                 @endisset
                             }
@@ -581,7 +596,7 @@
             altInput: true,
             altFormat: 'd-m-Y',
             dateFormat: 'Y-m-d',
-            locale: { ...flatpickr.l10ns.gr, firstDayOfWeek: 1 }
+            locale: {...flatpickr.l10ns.gr, firstDayOfWeek: 1}
         };
 
         // Ημ/νια Εισαγωγής
@@ -592,7 +607,7 @@
 
         function linkRange(startSelector, endSelector) {
             const startEl = document.querySelector(startSelector);
-            const endEl   = document.querySelector(endSelector);
+            const endEl = document.querySelector(endSelector);
             if (!startEl || !endEl) return null;
 
             const endPicker = flatpickr(endEl, {
@@ -610,7 +625,7 @@
 
                         // Αν το end είναι κενό βάζουμε ίδια ημ/νια
                         const end = endPicker.selectedDates?.[0] ?? null;
-                        if ( !end ) {
+                        if (!end) {
                             endPicker.setDate(start, true);
                         }
                     } else {
@@ -620,7 +635,7 @@
                 }
             });
 
-            return { startPicker, endPicker };
+            return {startPicker, endPicker};
         }
 
 

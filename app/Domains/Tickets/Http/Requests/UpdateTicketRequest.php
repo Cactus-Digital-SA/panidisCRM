@@ -4,11 +4,10 @@ namespace App\Domains\Tickets\Http\Requests;
 
 use App\Domains\Projects\Enums\ProjectCategoryEnum;
 use App\Domains\Projects\Enums\ProjectCategoryStatusEnum;
-use App\Domains\Tickets\Enums\VisitNextActionSourceEnum;
-use App\Domains\Tickets\Enums\VisitProductDiscussedSourceEnum;
-use App\Domains\Tickets\Enums\VisitTypeSourceEnum;
+use App\Domains\Visits\Enums\VisitNextActionSourceEnum;
+use App\Domains\Visits\Enums\VisitProductDiscussedSourceEnum;
+use App\Domains\Visits\Enums\VisitTypeSourceEnum;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 class UpdateTicketRequest extends FormRequest
@@ -20,25 +19,13 @@ class UpdateTicketRequest extends FormRequest
 
     public function rules(): array
     {
-        $rules = [];
-        if ($this->routeIs('admin.tickets.store')) {
-            $rules['name'] = ['required', 'string'];
-            $rules['deadline'] = ['nullable', 'date'];
-            $rules['company_id'] = ['nullable', 'integer'];
-            $rules['billable'] = ['sometimes', 'in:true,false'];
-            $rules['public'] = ['sometimes', 'in:true,false'];
-        }
-
-        if ($this->routeIs('admin.visits.store')) {
-            $rules['visit_date'] = ['nullable', 'date'];
-            $rules['visit_type'] = ['nullable', new Enum(VisitTypeSourceEnum::class)];
-            $rules['outcome'] = ['nullable', 'string'];
-            $rules['products_discussed'] = ['nullable', new Enum(VisitProductDiscussedSourceEnum::class)];
-            $rules['contacts'] = ['sometimes', 'array'];
-            $rules['contacts.*'] = ['integer'];
-            $rules['next_action'] = ['nullable', new Enum(VisitNextActionSourceEnum::class)];
-        }
-
+        $rules = [
+            'name' => ['required', 'string'],
+            'deadline' => ['nullable', 'date'],
+            'company_id' => ['nullable', 'integer'],
+            'billable' => ['sometimes', 'in:true,false'],
+            'public' => ['sometimes', 'in:true,false'],
+        ];
 
         return $rules;
 

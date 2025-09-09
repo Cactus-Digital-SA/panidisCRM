@@ -7,7 +7,6 @@ use App\Domains\Auth\Services\UserService;
 use App\Domains\Files\Services\FileService;
 use App\Domains\Notes\Models\Note;
 use App\Domains\Notes\Services\NoteService;
-use App\Domains\Tickets\Enums\TicketActionTypesEnum;
 use App\Domains\Tickets\Http\Requests\DeleteTicketRequest;
 use App\Domains\Tickets\Http\Requests\StoreTicketRequest;
 use App\Domains\Tickets\Http\Requests\UpdateStatusRequest;
@@ -16,7 +15,6 @@ use App\Domains\Tickets\Models\Ticket;
 use App\Domains\Tickets\Models\TicketsStatusesPivot;
 use App\Domains\Tickets\Services\TicketService;
 use App\Domains\Tickets\Services\TicketStatusService;
-use App\Helpers\Enums\PriorityEnum;
 use App\Http\Controllers\Controller;
 use App\Models\ModelMorphEnum;
 use Illuminate\Http\JsonResponse;
@@ -69,22 +67,6 @@ final class TicketController extends Controller
         return view('backend.content.tickets.index',compact('assignedBy','ticketStatus','columns'));
     }
 
-    public function visitsIndex()
-    {
-        $ticketStatus = $this->ticketStatusService->getVisible();
-        $columns = $this->ticketService->getTableColumns(TicketActionTypesEnum::VISITS);
-
-        return view('backend.content.tickets.visits.index',compact('ticketStatus','columns'));
-    }
-
-    public function quotesIndex()
-    {
-        $ticketStatus = $this->ticketStatusService->getVisible();
-        $columns = $this->ticketService->getTableColumns(TicketActionTypesEnum::QUOTES);
-
-        return view('backend.content.tickets.index',compact('ticketStatus','columns'));
-    }
-
     /**
      * @param Request $request
      * @param string $id
@@ -109,12 +91,6 @@ final class TicketController extends Controller
             $canEditStatus = true;
         }
 
-        $type = $ticket->getActionType();
-
-        if(!$type){
-            return view('backend.content.tickets.show',compact('ticket','ticketStatuses', 'canEditStatus'));
-        }
-
         return view('backend.content.tickets.' . strtolower($type->value) .'.show', [
             'type' => $type,
             'ticket' => $ticket,
@@ -124,21 +100,9 @@ final class TicketController extends Controller
 
     }
 
-    public function create(Request $request, ?string $type = null ) : View
+    public function create(Request $request, ?string $type = null )
     {
-        if(!$type){
-            abort(404);
-        }
-
-        try {
-            $typeEnum = TicketActionTypesEnum::fromSlug($type);
-        } catch (\ValueError $e) {
-            abort(404);
-        }
-
-        return view('backend.content.tickets.' . strtolower($typeEnum->value) .'.create', [
-            'type' => $typeEnum
-        ]);
+       return redirect()->route('admin.tickets.index');
     }
 
     public function store(StoreTicketRequest $request)
@@ -207,27 +171,8 @@ final class TicketController extends Controller
             $canEditStatus = true;
         }
 
-        $type = $ticket->getActionType();
 
-        if(!$type){
-            return view('backend.content.tickets.edit',compact('ticket','ticketStatus', 'canEditStatus'));
-        }
-
-        $companyContacts = $ticket->getCompany()->getUsers();
-        $ticketContactsIds = [];
-        foreach($ticket->getContacts() as $contact){
-            $ticketContactsIds[] = $contact->getId();
-        }
-
-        return view('backend.content.tickets.' . strtolower($type->value) .'.edit', [
-            'type' => $type,
-            'ticket' => $ticket,
-            'ticketStatus' => $ticketStatus,
-            'canEditStatus' => $canEditStatus,
-            'companyContacts' => $companyContacts,
-            'ticketContactsIds' => $ticketContactsIds
-        ]);
-
+        return view('backend.content.tickets.edit',compact('ticket','ticketStatus', 'canEditStatus'));
     }
 
     public function update(UpdateTicketRequest $request , string $ticketId)
@@ -249,15 +194,6 @@ final class TicketController extends Controller
         $ticketDTO->setBlockedByTickets($blockedByIds);
 
         $ticketDTO = $this->ticketService->update($ticketDTO, $ticketId);
-
-
-        if($request['contacts'] !== null) {
-            // Assign User to Company
-            $ticketDTO = new Ticket();
-            $ticketDTO->setContacts($request['contacts']);
-
-            $this->ticketService->storeContacts($ticketDTO, $ticketId);
-        }
 
         if($request['ajax'] && $ticketId){
             return response()->json(['message' => 'Το ticket ενημερώθηκε με επιτυχία', 'status'=>200], 200);

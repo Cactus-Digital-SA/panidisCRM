@@ -22,18 +22,10 @@ return new class extends Migration
 
             $table->string('priority')->nullable();
             $table->string('source')->nullable();
-            $table->string('action_type')->nullable();
 
             $table->unsignedBigInteger('est_time')->nullable()->default(0);
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
-
-            // Visit fields
-            $table->dateTime('visit_date')->nullable();
-            $table->string('visit_type')->nullable();
-            $table->double('outcome')->nullable();
-            $table->string('products_discussed')->nullable();
-            $table->string('next_action')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

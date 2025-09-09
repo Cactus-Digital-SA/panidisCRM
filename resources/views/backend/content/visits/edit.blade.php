@@ -1,6 +1,6 @@
 @php
     /**
-     * @var \App\Domains\Tickets\Models\Ticket $ticket
+     * @var \App\Domains\Visits\Models\Visit $visit
      * @var \App\Domains\Companies\Models\Company $company
     **/
 @endphp
@@ -70,25 +70,31 @@
 
     <div class="row">
         <div class="col-lg-10 container-p-y container-fluid">
-            <form id="form" method="POST" action="{{ route('admin.visits.update', $ticket->getId()) }}" class="form-horizontal needs-validation" enctype="multipart/form-data" novalidate>
+            <form id="form" method="POST" action="{{ route('admin.visits.update', $visit->getId()) }}"
+                  class="form-horizontal needs-validation" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PATCH')
                 <div class="card">
                     <div class="card-body">
 
                         <div class="form-group row mb-3 mt-1">
-                            <label for="company_id" class="col-md-2 col-form-label">Τίτλος επίσκεψης <small class="text-danger"> *</small></label>
+                            <label for="company_id" class="col-md-2 col-form-label">Τίτλος επίσκεψης <small
+                                    class="text-danger"> *</small></label>
                             <div class="col-md-10">
-                                <input type="text" name="name" class="form-control" placeholder="Τίτλος επίσκεψης" maxlength="255" value="{{ $ticket->getName() }}" required/>
+                                <input type="text" name="name" class="form-control" placeholder="Τίτλος επίσκεψης"
+                                       maxlength="255" value="{{ $visit->getName() }}" required/>
                                 <div class="invalid-feedback">Ο τίτλος είναι απαραίτητος.</div>
                             </div>
                         </div>
 
                         <div class="form-group row mb-3 mt-1">
-                            <label for="company_id" class="col-md-2 col-form-label">Εταιρεία <small class="text-danger"> *</small></label>
+                            <label for="company_id" class="col-md-2 col-form-label">Εταιρεία <small class="text-danger">
+                                    *</small></label>
                             <div class="col-md-10">
-                                <select name="company_id" id="company_id" class="form-control companies_select" data-placeholder="{{ 'Εταιρεία' }}" required>
-                                    <option value="{{ $ticket->getCompany()?->getId() }}">{{ $ticket->getCompany()?->getName() }}</option>
+                                <select name="company_id" id="company_id" class="form-control companies_select"
+                                        data-placeholder="{{ 'Εταιρεία' }}" required>
+                                    <option
+                                        value="{{ $visit->getCompany()?->getId() }}">{{ $visit->getCompany()?->getName() }}</option>
                                 </select>
                                 <div class="invalid-feedback">Η εταιρεία είναι απαραίτητη.</div>
                             </div>
@@ -97,17 +103,21 @@
                         <div class="form-group row mb-3 mt-1">
                             <label for="visit_date" class="col-md-2 col-form-label">Ημ/νια επίσκεψης</label>
                             <div class="col-md-10">
-                                <input type="text" name="visit_date" id="visit_date" placeholder="dd-mm-yyyy" autocomplete="off" class="form-control datepicker" value="{{ $ticket->getVisitDate()->format('Y-m-d') }}">
+                                <input type="text" name="visit_date" id="visit_date" placeholder="dd-mm-yyyy"
+                                       autocomplete="off" class="form-control datepicker"
+                                       value="{{ $visit->getVisitDate()?->format('Y-m-d') }}">
                             </div>
                         </div>
 
                         <div class="form-group row mb-3 mt-1">
                             <label for="visit_type" class="col-md-2 col-form-label">Τύπος επίσκεψης</label>
                             <div class="col-md-10">
-                                <select id="visit_type" name="visit_type" class="select2 form-select" data-placeholder="Τύπος επίσκεψης" data-allow-clear="true">
+                                <select id="visit_type" name="visit_type" class="select2 form-select"
+                                        data-placeholder="Τύπος επίσκεψης" data-allow-clear="true">
                                     <option></option>
-                                    @foreach(\App\Domains\Tickets\Enums\VisitTypeSourceEnum::cases() as $type)
-                                        <option value="{{ $type->value }}" {{ $ticket->getVisitType()?->value == $type->value ? 'selected' : '' }} > {{ $type->value }} </option>
+                                    @foreach(\App\Domains\Visits\Enums\VisitTypeSourceEnum::cases() as $type)
+                                        <option
+                                            value="{{ $type->value }}" {{ $visit->getVisitType()?->value == $type->value ? 'selected' : '' }} > {{ $type->value }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -116,17 +126,20 @@
                         <div class="form-group row mb-3 mt-1">
                             <label for="outcome" class="col-md-2 col-form-label">Outcome</label>
                             <div class="col-md-10">
-                                <input type="number" name="outcome" id="outcome" autocomplete="off" class="form-control" value="{{ $ticket->getOutcome() }}">
+                                <input type="number" name="outcome" id="outcome" autocomplete="off" class="form-control"
+                                       value="{{ $visit->getOutcome() }}">
                             </div>
                         </div>
 
                         <div class="form-group row mb-3 mt-1">
                             <label for="products_discussed" class="col-md-2 col-form-label">Προϊόν συζήτησης</label>
                             <div class="col-md-10">
-                                <select name="products_discussed" id="products_discussed" class="form-control select2" data-placeholder="Προϊόν συζήτησης">
+                                <select name="products_discussed" id="products_discussed" class="form-control select2"
+                                        data-placeholder="Προϊόν συζήτησης">
                                     <option></option>
-                                    @foreach(\App\Domains\Tickets\Enums\VisitProductDiscussedSourceEnum::cases() as $productDiscussed)
-                                        <option value="{{ $productDiscussed->value }}" {{ $ticket->getProductsDiscussed()?->value == $productDiscussed->value ? 'selected' : '' }} > {{ $productDiscussed->value }} </option>
+                                    @foreach(\App\Domains\Visits\Enums\VisitProductDiscussedSourceEnum::cases() as $productDiscussed)
+                                        <option
+                                            value="{{ $productDiscussed->value }}" {{ $visit->getProductsDiscussed()?->value == $productDiscussed->value ? 'selected' : '' }} > {{ $productDiscussed->value }} </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -135,9 +148,11 @@
                         <div class="form-group row mb-3 mt-1">
                             <label for="contacts" class="col-md-2 col-form-label">Επαφή επικοινωνίας</label>
                             <div class="col-md-10">
-                                <select name="contacts[]" class="form-select select2 select_contacts" data-placeholder="Επαφή επικοινωνίας" data-allow-clear="true" multiple>
+                                <select id="contacts" name="contacts[]" class="form-select select2 select_contacts"
+                                        data-placeholder="Επαφή επικοινωνίας" data-allow-clear="true" multiple>
                                     @foreach($companyContacts ?? [] as $contact)
-                                        <option value="{{ $contact->getId() }}" {{ in_array($contact->getId(), $ticketContactsIds) ? 'selected' : '' }}>{{ $contact->getName() }}</option>
+                                        <option
+                                            value="{{ $contact->getId() }}" {{ in_array($contact->getId(), $visitsContactsIds) ? 'selected' : '' }}>{{ $contact->getName() }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -146,12 +161,21 @@
                         <div class="form-group row mb-3 mt-1">
                             <label for="next_action" class="col-md-2 col-form-label">Επόμενο Action</label>
                             <div class="col-md-10">
-                                <select name="next_action" id="next_action" class="form-control select2" data-placeholder="Επόμενο Action">
+                                <select name="next_action" id="next_action" class="form-control select2"
+                                        data-placeholder="Επόμενο Action">
                                     <option></option>
-                                    @foreach(\App\Domains\Tickets\Enums\VisitNextActionSourceEnum::cases() as $action)
-                                        <option value="{{ $action->value }}" {{ $ticket->getNextAction()?->value == $action->value ? 'selected' : '' }} > {{ $action->value }} </option>
+                                    @foreach(\App\Domains\Visits\Enums\VisitNextActionSourceEnum::cases() as $action)
+                                        <option
+                                            value="{{ $action->value }}" {{ $visit->getNextAction()?->value == $action->value ? 'selected' : '' }} > {{ $action->value }} </option>
                                     @endforeach
                                 </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-3 mt-1">
+                            <label for="next_action_comment" class="col-md-2 col-form-label">Action Comment</label>
+                            <div class="col-md-10">
+                                <textarea class="form-control" name="next_action_comment" id="next_action_comment" rows="3" placeholder="Προσθήκη σχολίου">{{ $visit->getNextActionComment() }}</textarea>
                             </div>
                         </div>
 
@@ -240,7 +264,12 @@
 
 
         $('#company_id').on('change', function () {
-            glet companyId = $('#company_id').val();
+            let companyId = $('#company_id').val();
+
+            let contacts = $("#contacts");
+            contacts.val(null).trigger('change');
+            contacts.empty();
+
             let url = `{{ route('api.internal.companies.getContactsByCompanyId', ':companyId') }}`.replace(':companyId', companyId);
             $(".select_contacts").select2({
                 placeholder: 'Αναζήτηση...',

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domains\Tickets\Enums;
+namespace App\Helpers\Enums;
 
-enum TicketActionTypesEnum : string
+enum ActionTypesEnum : string
 {
     case TASKS = 'Tasks';
     case QUOTES = 'Quotes';

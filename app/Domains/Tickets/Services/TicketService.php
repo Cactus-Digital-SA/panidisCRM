@@ -7,10 +7,10 @@ use App\Domains\Notifications\Models\CactusNotification;
 use App\Domains\Notifications\Models\EmailNotification;
 use App\Domains\Notifications\Models\Recipient;
 use App\Domains\Notifications\Services\NotificationsService;
-use App\Domains\Tickets\Enums\TicketActionTypesEnum;
 use App\Domains\Tickets\Models\Ticket;
 use App\Domains\Tickets\Models\TicketsStatusesPivot;
 use App\Domains\Tickets\Repositories\TicketRepositoryInterface;
+use App\Helpers\Enums\ActionTypesEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 
@@ -103,18 +103,9 @@ readonly class TicketService
     }
 
     /**
-     * @param array $filters
-     * @return JsonResponse
-     */
-    public function dataTableVisits(array $filters) : JsonResponse
-    {
-        return $this->repository->dataTableVisits($filters);
-    }
-
-    /**
      * @return array
      */
-    public function getTableColumns(?TicketActionTypesEnum $type = null) : array
+    public function getTableColumns(?ActionTypesEnum $type = null) : array
     {
         return $this->repository->getTableColumns($type);
     }
