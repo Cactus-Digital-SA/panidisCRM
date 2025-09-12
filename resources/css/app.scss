@@ -848,6 +848,57 @@ table > thead > tr > th{
 }
 
 /**
+Files
+ */
+.file-input-label {
+    display: inline-block;
+    padding: 7px 12px;
+    cursor: pointer;
+    //border-right: 1px solid #ccc;
+    border-radius: 4px;
+    //background-color: #f9f9f9;
+    text-align: center;
+    margin: 0 8px;
+    text-wrap: nowrap;
+    z-index: 3;
+}
+
+//.file-input-label:hover {
+//    background-color: #eaeaea;
+//}
+
+#file-upload {
+    display: none;
+}
+
+.file-name {
+    z-index: 1;
+    font-size: 0.9rem;
+    color: #555;
+    max-width: 400px;
+    /*white-space: nowrap;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 998px) {
+    .file-name, .file-input-label {
+        text-align: start;
+    }
+
+    .file-input-label {
+        padding: 7px;
+    }
+}
+
+@media (max-width: 568px) {
+    .file-name, .file-input-label {
+        font-size: 12px;
+        text-align: start;
+    }
+}
+
+/**
 Bootstrap Select
  */
 .bootstrap-select .dropdown-toggle .bs-select-clear-selected {

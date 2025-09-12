@@ -12,7 +12,7 @@ return [
 //        'primaryColor' => '#FF4646', // Set the primary color
         'myTheme' => 'light', // Theme options: 'light' (default), 'dark', 'system'
         'mySkins' => 'default', // Skin options: 'default', 'bordered'
-        'hasSemiDark' => true, // Semi-dark mode: true/false (false by default)
+        'hasSemiDark' => false, // Semi-dark mode: true/false (false by default)
         'myRTLMode' => false, // options[Boolean]: false(default), true // To set layout to RTL layout  (myRTLSupport must be true for rtl mode)
         'hasCustomizer' => false, // Enable/Disable customizer: true (default) or false
         'displayCustomizer' => false, // Display customizer UI: true (default) or false

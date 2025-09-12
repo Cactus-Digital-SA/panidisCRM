@@ -71,7 +71,8 @@ $color-contrast-light: $white !default;
 $color-contrast-dark: $pure-black !default;
 
 // scss-docs-start theme-color-variables
-$primary: $purple !default;
+//$primary: $purple !default;
+$primary: #006bc5 !default;
 $secondary: #808390 !default;
 $success: $green !default;
 $info: $cyan !default;

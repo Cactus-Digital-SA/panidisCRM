@@ -35,7 +35,7 @@
 
         <li class="menu-item {{ Route::currentRouteName() === 'admin.home' ? 'active' : '' }}">
             <a class="menu-link" href="{{ route('admin.home') }}">
-                <i class="menu-icon tf-icons ti ti-home"></i>
+                <i class="menu-icon tf-icons ti ti-layout-dashboard"></i>
                 <div>
                     <span class="menu-title" >Dashboard</span>
                 </div>
@@ -59,7 +59,7 @@
         </li>
         <li class="menu-item {{ Route::currentRouteName() === 'admin.visits.index' ? 'active' : '' }}">
             <a class="menu-link" href="{{ route('admin.visits.index') }}">
-                <i class="menu-icon tf-icons ti ti-users-group"></i>
+                <i class="menu-icon tf-icons ti ti-phone"></i>
                 <div>
                     <span class="menu-title" >Visits</span>
                 </div>
@@ -67,7 +67,7 @@
         </li>
         <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
             <a class="menu-link" href="#">
-                <i class="menu-icon tf-icons ti ti-align-box-bottom-center"></i>
+                <i class="menu-icon tf-icons ti ti-file-description"></i>
                 <div>
                     <span class="menu-title" >Quotes</span>
                 </div>
@@ -84,7 +84,7 @@
 
         <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
             <a class="menu-link" href="#">
-                <i class="menu-icon tf-icons ti ti-checklist"></i>
+                <i class="menu-icon tf-icons ti ti-list-check"></i>
                 <div>
                     <span class="menu-title" >Tasks</span>
                 </div>

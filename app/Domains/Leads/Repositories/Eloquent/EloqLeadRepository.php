@@ -169,7 +169,7 @@ class EloqLeadRepository  extends EloquentRelationHelper implements LeadReposito
                 $html = '<div class="btn-group">';
 
                 $html .= '<a href="' . route('admin.leads.show', $lead->id) . '" class="btn btn-icon btn-gradient-warning">
-                             <i class="ti ti-edit ti-sm"></i>
+                             <i class="ti ti-eye ti-sm"></i>
                         </a>';
 
                 $html .= '<a href="#" class="btn btn-icon btn-gradient-danger"

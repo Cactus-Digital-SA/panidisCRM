@@ -2,6 +2,7 @@
 
 namespace App\Domains\Visits\Http\Controllers;
 
+use App\Domains\Visits\Enums\VisitNextActionSourceEnum;
 use App\Domains\Visits\Services\VisitService;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
@@ -45,4 +46,20 @@ final class VisitDTController extends Controller
         return $this->visitService->dataTableVisits($filters);
     }
 
+
+    public function dataTableFollowUp(Request $request): JsonResponse
+    {
+        $filters = Helpers::filters($request);
+        $filters['nextAction'] = VisitNextActionSourceEnum::FOLLOW_UP->value;
+
+        return $this->visitService->dataTableVisits($filters);
+    }
+
+    public function dataTableOpen(Request $request): JsonResponse
+    {
+        $filters = Helpers::filters($request);
+        $filters['nextAction'] = VisitNextActionSourceEnum::OPEN->value;
+
+        return $this->visitService->dataTableVisits($filters);
+    }
 }

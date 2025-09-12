@@ -14,7 +14,7 @@
 @section('content-header')
     <div class="col-md-5 content-header-right text-md-end">
         <div class="d-flex flex-nowrap mb-md-2 breadcrumb-right d-flex justify-content-center justify-content-md-end">
-            <a class="col-6 col-md-auto btn btn-success d-inline-flex align-items-center waves-effect waves-float waves-light me-2 mb-lg-0"
+            <a class="col-6 col-md-auto btn btn-primary d-inline-flex align-items-center waves-effect waves-float waves-light me-2 mb-lg-0"
                href="{{ route('admin.leads.create') }}" >
                 <i class="ti ti-square-plus me-1"></i> Δημιουργία
             </a>

@@ -10,53 +10,7 @@
 
 @section('page-style')
     <style>
-        .file-input-label {
-            display: inline-block;
-            padding: 7px 12px;
-            cursor: pointer;
-            border-right: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            text-align: center;
-            margin: 0 8px;
-            text-wrap: nowrap;
-            z-index: 3;
-        }
 
-        .file-input-label:hover {
-            background-color: #eaeaea;
-        }
-
-        #file-upload {
-            display: none;
-        }
-
-        .file-name {
-            z-index: 1;
-            font-size: 0.9rem;
-            color: #555;
-            max-width: 400px;
-            /*white-space: nowrap;*/
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @media (max-width: 998px) {
-            .file-name, .file-input-label {
-                text-align: start;
-            }
-
-            .file-input-label {
-                padding: 7px;
-            }
-        }
-
-        @media (max-width: 568px) {
-            .file-name, .file-input-label {
-                font-size: 12px;
-                text-align: start;
-            }
-        }
     </style>
 @endsection
 
@@ -69,116 +23,110 @@
 @section('content')
 
     <div class="row">
-        <div class="col-lg-10 container-p-y container-fluid">
-            <form id="form" method="POST" action="{{ route('admin.visits.update', $visit->getId()) }}"
-                  class="form-horizontal needs-validation" enctype="multipart/form-data" novalidate>
+        <div class="col-lg-12 container-p-y container-fluid">
+            <form id="form" method="POST" action="{{ route('admin.visits.update', $visit->getId()) }}" class="form-horizontal needs-validation" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PATCH')
                 <div class="card">
                     <div class="card-body">
 
                         <div class="form-group row mb-3 mt-1">
-                            <label for="company_id" class="col-md-2 col-form-label">Τίτλος επίσκεψης <small
-                                    class="text-danger"> *</small></label>
-                            <div class="col-md-10">
-                                <input type="text" name="name" class="form-control" placeholder="Τίτλος επίσκεψης"
-                                       maxlength="255" value="{{ $visit->getName() }}" required/>
-                                <div class="invalid-feedback">Ο τίτλος είναι απαραίτητος.</div>
+                            <div class="col-lg-6">
+                                <label for="company_id" class="col-form-label">Θέμα επίσκεψης <small class="text-danger"> *</small></label>
+                                <div class="col-md-12">
+                                    <input type="text" name="name" class="form-control" placeholder="Θέμα επίσκεψης" maxlength="255" value="{{ $visit->getName() }}" required/>
+                                    <div class="invalid-feedback">Το θέμα επίσκεψης είναι απαραίτητο.</div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label for="company_id" class="col-form-label">Εταιρεία <small class="text-danger">*</small></label>
+                                <div class="col-md-12">
+                                    <select name="company_id" id="company_id" class="form-control companies_select" data-placeholder="{{ 'Εταιρεία' }}" required>
+                                        <option value="{{ $visit->getCompany()?->getId() }}">{{ $visit->getCompany()?->getName() }}</option>
+                                    </select>
+                                    <div class="invalid-feedback">Η εταιρεία είναι απαραίτητη.</div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group row mb-3 mt-1">
-                            <label for="company_id" class="col-md-2 col-form-label">Εταιρεία <small class="text-danger">
-                                    *</small></label>
-                            <div class="col-md-10">
-                                <select name="company_id" id="company_id" class="form-control companies_select"
-                                        data-placeholder="{{ 'Εταιρεία' }}" required>
-                                    <option
-                                        value="{{ $visit->getCompany()?->getId() }}">{{ $visit->getCompany()?->getName() }}</option>
-                                </select>
-                                <div class="invalid-feedback">Η εταιρεία είναι απαραίτητη.</div>
+                            <div class="col-lg-6">
+                                <label for="visit_date" class="col-form-label">Ημ/νια επίσκεψης</label>
+                                <div class="col-md-12">
+                                    <input type="text" name="visit_date" id="visit_date" placeholder="dd-mm-yyyy" autocomplete="off" class="form-control datepicker" required
+                                           value="{{ $visit->getVisitDate()?->format('Y-m-d') }}">
+                                    <div class="invalid-feedback">Ημ/νια επίσκεψης είναι απαραίτητη.</div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label for="visit_type" class="col-form-label">Τύπος επίσκεψης</label>
+                                <div class="col-md-12">
+                                    <select id="visit_type" name="visit_type" class="select2 form-select" data-placeholder="Τύπος επίσκεψης" data-allow-clear="true">
+                                        <option></option>
+                                        @foreach(\App\Domains\Visits\Enums\VisitTypeSourceEnum::cases() as $type)
+                                            <option value="{{ $type->value }}" {{ $visit->getVisitType()?->value == $type->value ? 'selected' : '' }} > {{ $type->value }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group row mb-3 mt-1">
-                            <label for="visit_date" class="col-md-2 col-form-label">Ημ/νια επίσκεψης</label>
-                            <div class="col-md-10">
-                                <input type="text" name="visit_date" id="visit_date" placeholder="dd-mm-yyyy"
-                                       autocomplete="off" class="form-control datepicker"
-                                       value="{{ $visit->getVisitDate()?->format('Y-m-d') }}">
+                            <div class="col-lg-6">
+                                <label for="products_discussed" class="col-form-label">Προϊόν συζήτησης</label>
+                                <div class="col-md-12">
+                                    <select name="products_discussed" id="products_discussed" class="form-control select2"
+                                            data-placeholder="Προϊόν συζήτησης">
+                                        <option></option>
+                                        @foreach(\App\Domains\Visits\Enums\VisitProductDiscussedSourceEnum::cases() as $productDiscussed)
+                                            <option
+                                                value="{{ $productDiscussed->value }}" {{ $visit->getProductsDiscussed()?->value == $productDiscussed->value ? 'selected' : '' }} > {{ $productDiscussed->value }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label for="contacts" class="col-form-label">Επαφή επικοινωνίας</label>
+                                <div class="col-md-12">
+                                    <select id="contacts" name="contacts[]" class="form-select select2 select_contacts" data-placeholder="Επαφή επικοινωνίας" data-allow-clear="true" multiple>
+                                        @foreach($companyContacts ?? [] as $contact)
+                                            <option value="{{ $contact->getId() }}" {{ in_array($contact->getId(), $visitsContactsIds) ? 'selected' : '' }}>{{ $contact->getName() }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         <div class="form-group row mb-3 mt-1">
-                            <label for="visit_type" class="col-md-2 col-form-label">Τύπος επίσκεψης</label>
-                            <div class="col-md-10">
-                                <select id="visit_type" name="visit_type" class="select2 form-select"
-                                        data-placeholder="Τύπος επίσκεψης" data-allow-clear="true">
-                                    <option></option>
-                                    @foreach(\App\Domains\Visits\Enums\VisitTypeSourceEnum::cases() as $type)
-                                        <option
-                                            value="{{ $type->value }}" {{ $visit->getVisitType()?->value == $type->value ? 'selected' : '' }} > {{ $type->value }} </option>
-                                    @endforeach
-                                </select>
+                            <div class="col-lg-6">
+                                <label for="outcome" class="col-form-label">Outcome</label>
+                                <div class="col-md-12">
+                                    <input type="number" name="outcome" id="outcome" autocomplete="off" class="form-control" value="{{ $visit->getOutcome() }}">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label for="next_action" class="col-form-label">Επόμενο Action</label>
+                                <div class="col-md-12">
+                                    <select name="next_action" id="next_action" class="form-control select2" data-placeholder="Επόμενο Action">
+                                        <option></option>
+                                        @foreach(\App\Domains\Visits\Enums\VisitNextActionSourceEnum::selectableCases() as $action)
+                                            <option value="{{ $action->value }}" {{ $visit->getNextAction()?->value == $action->value ? 'selected' : '' }} > {{ $action->value }} </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group row mb-3 mt-1">
-                            <label for="outcome" class="col-md-2 col-form-label">Outcome</label>
-                            <div class="col-md-10">
-                                <input type="number" name="outcome" id="outcome" autocomplete="off" class="form-control"
-                                       value="{{ $visit->getOutcome() }}">
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-3 mt-1">
-                            <label for="products_discussed" class="col-md-2 col-form-label">Προϊόν συζήτησης</label>
-                            <div class="col-md-10">
-                                <select name="products_discussed" id="products_discussed" class="form-control select2"
-                                        data-placeholder="Προϊόν συζήτησης">
-                                    <option></option>
-                                    @foreach(\App\Domains\Visits\Enums\VisitProductDiscussedSourceEnum::cases() as $productDiscussed)
-                                        <option
-                                            value="{{ $productDiscussed->value }}" {{ $visit->getProductsDiscussed()?->value == $productDiscussed->value ? 'selected' : '' }} > {{ $productDiscussed->value }} </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-3 mt-1">
-                            <label for="contacts" class="col-md-2 col-form-label">Επαφή επικοινωνίας</label>
-                            <div class="col-md-10">
-                                <select id="contacts" name="contacts[]" class="form-select select2 select_contacts"
-                                        data-placeholder="Επαφή επικοινωνίας" data-allow-clear="true" multiple>
-                                    @foreach($companyContacts ?? [] as $contact)
-                                        <option
-                                            value="{{ $contact->getId() }}" {{ in_array($contact->getId(), $visitsContactsIds) ? 'selected' : '' }}>{{ $contact->getName() }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-3 mt-1">
-                            <label for="next_action" class="col-md-2 col-form-label">Επόμενο Action</label>
-                            <div class="col-md-10">
-                                <select name="next_action" id="next_action" class="form-control select2"
-                                        data-placeholder="Επόμενο Action">
-                                    <option></option>
-                                    @foreach(\App\Domains\Visits\Enums\VisitNextActionSourceEnum::cases() as $action)
-                                        <option
-                                            value="{{ $action->value }}" {{ $visit->getNextAction()?->value == $action->value ? 'selected' : '' }} > {{ $action->value }} </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-3 mt-1">
-                            <label for="next_action_comment" class="col-md-2 col-form-label">Action Comment</label>
-                            <div class="col-md-10">
+                        <div class="form-group row mb-3 pt-3">
+                            <label for="next_action_comment" class="col-form-label">Action Comment</label>
+                            <div class="col-md-12">
                                 <textarea class="form-control" name="next_action_comment" id="next_action_comment" rows="3" placeholder="Προσθήκη σχολίου">{{ $visit->getNextActionComment() }}</textarea>
                             </div>
                         </div>
-
                     </div>
                     <div class="card-footer">
                         <div class="row">
@@ -304,6 +252,18 @@
                     cache: true
                 }
             });
+        });
+
+        $('#form').on('submit', function (e) {
+            let visitDate = $('#visit_date').val();
+
+            if (!visitDate) {
+                e.preventDefault();
+                $('#visit_date').addClass('is-invalid');
+                return false;
+            } else {
+                $('#visit_date').removeClass('is-invalid');
+            }
         });
 
     </script>

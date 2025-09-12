@@ -104,6 +104,11 @@ class VisitService
         return $this->repository->getTableColumns();
     }
 
+    public function getDashboardTableColumns() : array
+    {
+        return $this->repository->getDashboardTableColumns();
+    }
+
     /**
      * @param string|null $searchTerm
      * @param int $offset

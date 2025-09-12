@@ -94,4 +94,9 @@ interface VisitRepositoryInterface extends RepositoryInterface
      * @return array|null
      */
     public function getTableColumns():?array;
+
+    /**
+     * @return array|null
+     */
+    public function getDashboardTableColumns():?array;
 }

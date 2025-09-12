@@ -4,6 +4,7 @@ namespace App\Domains\Visits\Repositories\Eloquent;
 
 
 use App\Domains\Auth\Models\RolesEnum;
+use App\Domains\Visits\Enums\VisitNextActionSourceEnum;
 use App\Domains\Visits\Models\Visit;
 use App\Domains\Visits\Models\VisitsStatusesPivot;
 use App\Domains\Visits\Repositories\Eloquent\Models;
@@ -318,43 +319,50 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
             ->select('visits.*', 'companies.name as company_name');
 
         $visits = $visits
-            ->when($filters['filterName'], function ($query,$searchTerm) {
+            ->when($filters['filterName'] ?? false, function ($query,$searchTerm) {
                 $query->where('name', 'LIKE', '%'.$searchTerm.'%');
             })
-            ->when($filters['filterOwner'], function ($query,$searchTerm) {
+            ->when($filters['filterOwner'] ?? false, function ($query,$searchTerm) {
                 $query->where('owner_id', $searchTerm);
             })
-            ->when($filters['filterDeadline'], function ($query,$searchTerm) {
+            ->when($filters['filterDeadline'] ?? false, function ($query,$searchTerm) {
                 $dates[0] = Carbon::parse($searchTerm[0])->toDate();
                 $dates[1] = Carbon::parse($searchTerm[1])->endOfDay();
                 $query->whereBetween('deadline', [$dates[0], $dates[1]]);
             })
-            ->when($filters['filterStartDate'], function ($query, $searchTerm) {
+            ->when($filters['filterStartDate'] ?? false, function ($query, $searchTerm) {
                 $dates[0] = Carbon::parse($searchTerm[0])->toDate();
                 $dates[1] = Carbon::parse($searchTerm[1])->endOfDay();
                 $query->whereBetween('visits.created_at', [$dates[0], $dates[1]]);
             })
-            ->when($filters['filterPriority'], function ($query,$searchTerm) {
+            ->when($filters['filterPriority'] ?? false, function ($query,$searchTerm) {
                 $query->where('priority', $searchTerm);
             })
-            ->when($filters['filterStatus'], function ($query,$searchTerm) {
+            ->when($filters['filterStatus'] ?? false, function ($query,$searchTerm) {
                 $query->whereHas('status', function($q) use ($searchTerm) {
                     $q->whereIn('ticket_status.id', $searchTerm)
                         ->whereRaw('tickets_statuses.date = (SELECT MAX(date) FROM tickets_statuses WHERE tickets_statuses.ticket_id = tickets.id)');
                 });
             })
-            ->when($filters['filterAssignees'], function ($query,$searchTerm) {
+            ->when($filters['filterAssignees'] ?? false, function ($query,$searchTerm) {
                 $query->whereHas('assignees', function($q) use ($searchTerm) {
                     $q->whereIn('users.id', $searchTerm);
                 });
             })
-            ->when($filters['filterCompany'], function ($query,$searchTerm) {
+            ->when($filters['filterCompany'] ?? false, function ($query,$searchTerm) {
                 $query->where('company_id', $searchTerm);
             })
-            ->when($filters['assignedBy'], function ($query, $searchTerm) {
+            ->when($filters['assignedBy'] ?? false, function ($query, $searchTerm) {
                 $query->whereHas('assignees', function ($q) use ($searchTerm) {
                     $q->where('assigned_by', $searchTerm);
                 });
+            })
+            ->when($filters['nextAction'] ?? false, function ($query, $searchTerm) {
+                if($searchTerm == VisitNextActionSourceEnum::OPEN->value){
+                    $query->where('next_action', null);
+                }else{
+                    $query->where('next_action', $searchTerm);
+                }
             })
         ;
 
@@ -413,7 +421,7 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
     /**
      * @inheritDoc
      */
-    public function getTableColumns(?ActionTypesEnum $type = null): ?array
+    public function getTableColumns(): ?array
     {
         return  [
             'id'=> ['name' => 'id', 'table' => 'visits.id', 'searchable' => 'false', 'orderable' => 'true'],
@@ -424,6 +432,21 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
             'visit_type' => ['name' => 'Visit Type', 'table' => 'visit_type', 'searchable' => 'false', 'orderable' => 'true'],
             'outcome' => ['name' => 'Outcome', 'table' => 'outcome', 'searchable' => 'false', 'orderable' => 'true'],
             'next_action' => ['name' => 'Next Action', 'table' => 'next_action', 'searchable' => 'false', 'orderable' => 'true'],
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDashboardTableColumns(): ?array
+    {
+        return  [
+            'id'=> ['name' => 'id', 'table' => 'visits.id', 'searchable' => 'false', 'orderable' => 'true'],
+
+            'name' => ['name' => 'Name', 'table' => 'visits.name', 'searchable' => 'true', 'orderable' => 'true'],
+            'company' => ['name' => 'Company', 'table' => 'companies.name', 'searchable' => 'false', 'orderable' => 'true'],
+            'date' => ['name' => 'date', 'table' => 'visit_date', 'searchable' => 'false', 'orderable' => 'true'],
+            'visit_type' => ['name' => 'Visit Type', 'table' => 'visit_type', 'searchable' => 'false', 'orderable' => 'true'],
         ];
     }
 }

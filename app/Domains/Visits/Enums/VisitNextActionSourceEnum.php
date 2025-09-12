@@ -4,6 +4,8 @@ namespace App\Domains\Visits\Enums;
 
 enum VisitNextActionSourceEnum : string
 {
+    case OPEN = 'Open';
+
     case SEND_QUOTATION = 'Send Quotation';
     case SEND_INFORMATIONAL_MATERIAL = 'Send Informational Material / Brochure';
     case SCHEDULE_NEXT_CALL = 'Schedule Next Call';
@@ -18,7 +20,15 @@ enum VisitNextActionSourceEnum : string
      */
     public static function values(): array
     {
-        return array_column(self::cases(), 'value');
+        return array_map(
+            fn($case) => $case->value,
+            array_filter(self::cases(), fn($case) => $case !== self::OPEN)
+        );
+    }
+
+    public static function selectableCases(): array
+    {
+        return array_filter(self::cases(), fn($case) => $case !== self::OPEN);
     }
 
 }

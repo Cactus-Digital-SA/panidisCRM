@@ -32,10 +32,10 @@
                 <i class="ti ti-plus me-1"></i>
                 Δημιουργία Visit
             </a>
-            <button class="btn btn-info btn-round waves-effect waves-float waves-light"
-                    onclick="jQuery('#filters').toggle()">
-                <i class="ti ti-filter"></i> Φίλτρα
-            </button>
+{{--            <button class="btn btn-info btn-round waves-effect waves-float waves-light"--}}
+{{--                    onclick="jQuery('#filters').toggle()">--}}
+{{--                <i class="ti ti-filter"></i> Φίλτρα--}}
+{{--            </button>--}}
             <button class="btn btn-dark btn-round waves-effect waves-float waves-light"
                     onclick="jQuery('#columns').toggle()">
                 <i class="ti ti-folder"></i> Στήλες Πίνακα
