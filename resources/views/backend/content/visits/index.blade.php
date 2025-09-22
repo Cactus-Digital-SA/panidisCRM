@@ -89,16 +89,6 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-2 col-12">
-                                <label for="filter_priority">Προτεραιότητα</label>
-                                <select name="filter_priority" id="filter_priority" class="form-control select2"
-                                        data-placeholder="Προτεραιότητα">
-                                    <option></option>
-                                    @foreach(\App\Helpers\Enums\PriorityEnum::cases() as $priority)
-                                        <option value="{{ $priority->value }}"> {{ $priority->value }} </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2 col-12">
                                 <label for="filter_company">Εταιρεία</label>
                                 <select name="filter_company" id="filter_company"
                                         class="form-control select2 select_companies" data-placeholder="Εταιρεία">

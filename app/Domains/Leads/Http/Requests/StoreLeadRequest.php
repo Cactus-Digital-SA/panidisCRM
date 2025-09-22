@@ -2,10 +2,6 @@
 
 namespace App\Domains\Leads\Http\Requests;
 
-use App\Domains\Leads\Repositories\Eloquent\Models\LeadQualificationEnum;
-use App\Domains\Leads\Repositories\Eloquent\Models\LeadStatusEnum;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreLeadRequest extends FormRequest
@@ -29,6 +25,7 @@ class StoreLeadRequest extends FormRequest
             'city' => ['nullable', 'string'],
             'website' => ['nullable', 'string'],
             'linkedin' => ['nullable', 'string'],
+            'tagIds' => ['nullable', 'array'],
             'extraDataIds' => ['nullable', 'array'],
             'extraDataIds.*' => ['exists:extra_data,id'],
         ];

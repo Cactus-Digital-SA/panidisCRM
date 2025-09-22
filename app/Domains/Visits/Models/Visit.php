@@ -122,7 +122,7 @@ class Visit extends CactusEntity
      * @Serializer\SerializedName("assignees")
      * @Serializer\Type("array<App\Domains\Auth\Models\User>")
      */
-    private ?array $assignees = null;
+    private ?array $assignees = [];
 
     /**
      * @var VisitStatus[] $visitStatuses
@@ -164,7 +164,7 @@ class Visit extends CactusEntity
      * @Serializer\SerializedName("morphables")
      * @Serializer\Type("enum<'App\Models\Enums\EloqMorphEnum'>")
      */
-    private ?array $morphables = [EloqMorphEnum::NOTES, EloqMorphEnum::FILES, EloqMorphEnum::ASSIGNEES];
+    private ?array $morphables = [EloqMorphEnum::NOTES, EloqMorphEnum::FILES];
 
     /**
      * @param bool $withRelations

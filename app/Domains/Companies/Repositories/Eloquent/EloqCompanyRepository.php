@@ -21,7 +21,8 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
      * @param \App\Domains\Companies\Repositories\Eloquent\Models\Company $model
      */
     public function __construct(private EloquentCompany $model)
-    {}
+    {
+    }
 
     /**
      * @inheritDoc
@@ -39,8 +40,8 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
     {
         $company = $this->model;
 
-        if($withRelations) {
-            $company = $company->with('users','companyType', 'country', 'files', 'notes');
+        if ($withRelations) {
+            $company = $company->with('users', 'companyType', 'country', 'files', 'notes');
         }
 
         $company = $company->find($id);
@@ -115,6 +116,21 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
 
 
         return ObjectSerializer::deserialize($company->toJson() ?? "{}", Company::class, 'json');
+    }
+
+    public function updateErpIdByCompanyId(Company|CactusEntity $entity, string $companyId): ?Company
+    {
+        $company = $this->model->find($companyId);
+
+        if($company){
+            $company->update([
+                'erp_id' => $entity->getErpId(),
+            ]);
+
+            return ObjectSerializer::deserialize($company->toJson() ?? "{}", Company::class, 'json');
+        }
+
+        return null;
     }
 
     /**
@@ -345,5 +361,17 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
             "data" => $users,
             "count" => $count
         );
+    }
+
+    public function storeTags(array $tagIds, string $companyId): ?bool
+    {
+        $company = \App\Domains\Companies\Repositories\Eloquent\Models\Company::find($companyId);
+
+        if($company){
+            $company->tags()->syncWithoutDetaching($tagIds);
+            return true;
+        }
+
+        return false;
     }
 }

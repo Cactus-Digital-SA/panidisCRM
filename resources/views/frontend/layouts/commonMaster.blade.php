@@ -46,7 +46,7 @@
     <meta name="description" content="{{ config('appVariables.templateDescription') ? config('appVariables.templateDescription') : '' }}" />
     <meta name="keywords" content="{{ config('appVariables.templateKeyword') ? config('appVariables.templateKeyword') : '' }}">
     <link rel="canonical" href="{{ config('appVariables.productPage') ? config('appVariables.productPage') : '' }}">
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.png') }}" />
     @include('frontend/layouts/sections/stylesFront')
     @include('frontend/layouts/sections/scriptsIncludesFront')
     @stack('after-styles')

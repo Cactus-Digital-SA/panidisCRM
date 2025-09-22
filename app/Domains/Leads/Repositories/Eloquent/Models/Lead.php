@@ -6,20 +6,18 @@ use App\Domains\Auth\Repositories\Eloquent\Models\User;
 use App\Domains\Companies\Repositories\Eloquent\Models\Company;
 use App\Domains\ExtraData\Repositories\Eloquent\Models\ExtraData;
 use App\Domains\Files\Repositories\Eloquent\Models\File;
-use App\Domains\LeadSections\Repositories\Eloquent\Models\Section;
-use App\Domains\LeadSubSections\Repositories\Eloquent\Models\SubSection;
 use App\Domains\Notes\Repositories\Eloquent\Models\Note;
 use App\Domains\Tags\Repositories\Eloquent\Models\Tag;
-use App\Helpers\Casts\SecondsToTime;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lead extends Model
 {
+    use SoftDeletes;
+
     /**
      * Summary of table
      * @var string
@@ -43,6 +41,9 @@ class Lead extends Model
 
     ];
 
+    protected $appends = ['tag_ids'];
+
+
     protected static function boot()
     {
         parent::boot();
@@ -53,6 +54,10 @@ class Lead extends Model
 
         static::updating(function ($lead) {
 
+        });
+
+        static::deleting(function ($lead) {
+            $lead->tags()->detach();
         });
     }
 
@@ -89,17 +94,6 @@ class Lead extends Model
             ->withTimestamps();
     }
 
-//    public function tags()
-//    {
-//        return Tag::whereHas('taggables', function ($query) {
-//            $query->whereHasMorph('taggable', [Section::class, SubSection::class], function ($q) {
-//                $q->whereHas('leadSectionData', function ($subQuery) {
-//                    $subQuery->where('lead_id', $this->id);
-//                });
-//            });
-//        })->get();
-//    }
-
     /**
      * @return MorphToMany
      */
@@ -109,4 +103,16 @@ class Lead extends Model
             ->withTimestamps();
     }
 
+    /**
+     * @return BelongsToMany
+     */
+    public function tags() : BelongsToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable', 'taggables', 'taggable_id', 'tag_id');
+    }
+
+    public function getTagIdsAttribute(): array
+    {
+        return $this->tags->pluck('id')->toArray();
+    }
 }

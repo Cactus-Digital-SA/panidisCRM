@@ -5,6 +5,7 @@ namespace App\Domains\Leads\Repositories\Eloquent;
 use App\Domains\Leads\Models\Lead;
 use App\Domains\Leads\Repositories\Eloquent\Models\Lead as EloquentLead;
 use App\Domains\Leads\Repositories\LeadRepositoryInterface;
+use App\Domains\Tags\Enums\TagTypesEnum;
 use App\Domains\Tags\Repositories\Eloquent\Models\Tag;
 use App\Facades\ObjectSerializer;
 use App\Helpers\EloquentRelationHelper;
@@ -43,7 +44,7 @@ class EloqLeadRepository  extends EloquentRelationHelper implements LeadReposito
         $lead = $this->model;
 
         if($withRelations) {
-            $lead = $lead->with(['company','company.companyType','company.companySource','extraData'])->find($id);
+            $lead = $lead->with(['company','company.companyType','company.companySource','tags'])->find($id);
         }
         // $lead = $lead->find($id);
 
@@ -74,6 +75,25 @@ class EloqLeadRepository  extends EloquentRelationHelper implements LeadReposito
             'sales_person_id' => $entity->getSalesPersonId(),
         ]);
 
+        $tagIds = [];
+        if (!empty($entity->getTagIds())) {
+            foreach ($entity->getTagIds() as $tag) {
+                if (is_numeric($tag)) {
+                    $tagIds[] = (int) $tag;
+                } else {
+                    // προσθήκη νέου tag
+                    $newTag = Tag::firstOrCreate(['name' => $tag]);
+
+                    $newTag->types()->syncWithoutDetaching([TagTypesEnum::PRODUCT->value]);
+
+                    $tagIds[] = $newTag->id;
+                }
+            }
+        }
+
+        $lead->tags()->syncWithoutDetaching($tagIds);
+
+
         return ObjectSerializer::deserialize($lead?->toJson() ?? "{}", Lead::class, 'json');
     }
 
@@ -88,6 +108,24 @@ class EloqLeadRepository  extends EloquentRelationHelper implements LeadReposito
             'company_id' => $entity->getCompanyId(),
             'sales_person_id' => $entity->getSalesPersonId(),
         ]);
+
+        $tagIds = [];
+        if (!empty($entity->getTagIds())) {
+            foreach ($entity->getTagIds() as $tag) {
+                if (is_numeric($tag)) {
+                    $tagIds[] = (int) $tag;
+                } else {
+                    // προσθήκη νέου tag
+                    $newTag = Tag::firstOrCreate(['name' => $tag]);
+
+                    $newTag->types()->syncWithoutDetaching([TagTypesEnum::PRODUCT->value]);
+
+                    $tagIds[] = $newTag->id;
+                }
+            }
+        }
+
+        $lead->tags()->syncWithoutDetaching($tagIds);
 
 
         return ObjectSerializer::deserialize($lead->toJson() ?? "{}", Lead::class, 'json');
@@ -148,9 +186,6 @@ class EloqLeadRepository  extends EloquentRelationHelper implements LeadReposito
                 }
                 return $lead?->company?->country?->name;
             })
-            ->addColumn('sector', function ($lead) {
-                return $lead?->company?->sector?->name ?? ' - ';
-            })
             ->addColumn('currentBalance', function ($lead) {
                 return $lead?->company?->currentBalance ?? ' - ';
             })
@@ -196,7 +231,6 @@ class EloqLeadRepository  extends EloquentRelationHelper implements LeadReposito
             'erpId'=> ['name' => 'ERP ID', 'table' => 'company.erp_id', 'searchable' => 'false', 'orderable' => 'true'],
             'company' => ['name' => 'Εταιρεία', 'table' => 'company.name', 'searchable' => 'true', 'orderable' => 'true'],
             'companyType' => ['name' => 'Κατηγορία Πελάτη', 'table' => 'company.companyType.name', 'searchable' => 'true', 'orderable' => 'true'],
-            'sector' => ['name' => 'Τομέας', 'table' => 'company.sector.name', 'searchable' => 'true', 'orderable' => 'true'],
             'companyRegion' => ['name' => 'Περιοχή', 'table' => 'company.country.name', 'searchable' => 'true', 'orderable' => 'true'],
             'currentBalance' => ['name' => 'Υπόλοιπο', 'table' => 'company.current_balance', 'searchable' => 'true', 'orderable' => 'true'],
             'salesPerson' => ['name' => 'Πωλητής', 'table' => 'salesPerson.name', 'searchable' => 'true', 'orderable' => 'true'],

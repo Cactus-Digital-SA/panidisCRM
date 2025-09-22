@@ -97,7 +97,7 @@
                             <div class="col-lg-6">
                                 <label for="outcome" class="col-form-label">Outcome</label>
                                 <div class="col-md-12">
-                                    <input type="number" name="outcome" id="outcome" autocomplete="off" class="form-control">
+                                    <input type="text" name="outcome" id="outcome" autocomplete="off" class="form-control">
                                 </div>
                             </div>
 
@@ -113,7 +113,13 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="form-group row mb-3 mt-1">
+                            <div class="col-lg-6">
+                                <label aria-label="Assignees" class="form-label">@lang('Assignees')</label>
+                                <select type="text" name="assignees[]" class="form-control select2 filter_assignees" data-placeholder="{{ __('Assignees') }}" multiple>
+                                </select>
+                            </div>
+                        </div>
 
                         <div class="form-group row mb-3 pt-3 align-items-center">
                             <label for="note" class="col-md-2 col-form-label">Προσθήκη σχολίου</label>
@@ -199,6 +205,36 @@
             });
         }
 
+        $(".filter_assignees").select2({
+            placeholder: 'Assignees',
+            allowClear: true,
+            ajax: {
+                type: 'POST',
+                delay: 500,
+                url: "{{ route('api.internal.users.namesPaginated') }}",
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+                },
+                data: function (params) {
+                    return {
+                        term: params.term || '',
+                        page: params.page || 1
+                    }
+                },
+                // processResults: function (data, params) {
+                //     return data
+                // },
+                processResults: function (data) {
+                    return {
+                        results: $.map(data.results, function (obj) {
+                            return {id: obj.id, text: obj.text}; // Use id and name
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
 
         $(".companies_select").select2({
             placeholder: 'Αναζήτηση...',

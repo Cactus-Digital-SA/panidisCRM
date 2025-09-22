@@ -12,7 +12,7 @@ Route::group([
     Route::get('tickets/mine', [TicketController::class, 'mine'])->name('tickets.mine');
     Route::get('tickets/assigned-by-me', [TicketController::class, 'assignedByMe'])->name('tickets.assigned-by-me');
 
-    Route::resource('tickets', TicketController::class);
+    Route::resource('tickets', TicketController::class)->except('destroy');
 
     Route::post('/tickets/{ticketId}/update-status', [TicketController::class, 'updateStatus'])->name('tickets.update-status');
 

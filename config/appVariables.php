@@ -3,7 +3,7 @@
 return [
   "creatorName" => "Cactus Digital Growth",
   "creatorUrl" => "https://cactusweb.gr",
-  "templateName" => "Cactus",
+  "templateName" => "Panidis SA",
   "templateSuffix" => " ",
   "templateVersion" => "1.0.0",
   "templateDescription" => "Cactus Digital Growth",

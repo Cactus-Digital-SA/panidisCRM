@@ -8,6 +8,7 @@ use App\Domains\ExtraData\Repositories\Eloquent\Models\ExtraData;
 use App\Domains\Files\Repositories\Eloquent\Models\File;
 use App\Domains\Notes\Repositories\Eloquent\Models\Note;
 use App\Domains\Projects\Repositories\Eloquent\Models\Project;
+use App\Domains\Tags\Repositories\Eloquent\Models\Tag;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,6 +25,17 @@ class Client extends Model
         'company_id',
         'sales_person_id'
     ];
+
+    protected $appends = ['tag_ids'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($lead) {
+            $lead->tags()->detach();
+        });
+    }
 
     /**
      * @return BelongsTo
@@ -90,4 +102,16 @@ class Client extends Model
             ->withTimestamps();
     }
 
+    /**
+     * @return BelongsToMany
+     */
+    public function tags() : BelongsToMany
+    {
+        return $this->morphToMany(Tag::class, 'taggable', 'taggables', 'taggable_id', 'tag_id');
+    }
+
+    public function getTagIdsAttribute(): array
+    {
+        return $this->tags->pluck('id')->toArray();
+    }
 }

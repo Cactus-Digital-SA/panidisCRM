@@ -169,6 +169,9 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
         $users = $entity->getContacts();
         $visit->contacts()->syncWithoutDetaching($users);
 
+        $assignees = $entity->getAssignees();
+        $visit->assignees()->sync($assignees);
+
         return ObjectSerializer::deserialize($visit?->toJson() ?? "{}",  Visit::class , 'json');
     }
 
@@ -230,6 +233,9 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
 
         $users = $entity->getContacts();
         $visit->contacts()->syncWithoutDetaching($users);
+
+        $assignees = $entity->getAssignees();
+        $visit->assignees()->sync($assignees);
 
         return ObjectSerializer::deserialize($visit?->toJson() ?? "{}",  Visit::class , 'json');
     }

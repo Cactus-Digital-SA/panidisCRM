@@ -6,6 +6,7 @@ use App\Domains\Auth\Models\User;
 use App\Domains\ExtraData\Models\ExtraData;
 use App\Domains\Files\Models\File;
 use App\Domains\Notes\Models\Note;
+use App\Domains\Tags\Models\Tag;
 use App\Models\Enums\EloqMorphEnum;
 use App\Models\CactusEntity;
 use App\Domains\Companies\Models\Company;
@@ -78,6 +79,20 @@ class Lead extends CactusEntity
      * @Serializer\Type("array<App\Domains\Notes\Models\Note>")
      */
     private ?array $notes = null;
+
+    /**
+     * @var int[] $tagIds
+     * @Serializer\SerializedName("tag_ids")
+     * @Serializer\Type("array<int>")
+     */
+    private array $tagIds = [];
+
+    /**
+     * @var Tag[]|null $tags
+     * @Serializer\SerializedName("tags")
+     * @Serializer\Type("array<App\Domains\Tags\Models\Tag>")
+     */
+    private ?array $tags = null;
 
     /**
      * @var array|null $morphables
@@ -223,6 +238,32 @@ class Lead extends CactusEntity
     public function setNotes(?array $notes): Lead
     {
         $this->notes = $notes;
+        return $this;
+    }
+
+    public function getTagIds(): array
+    {
+        return $this->tagIds;
+    }
+
+    public function setTagIds(?array $tagIds): Lead
+    {
+        if(!$tagIds){
+            $tagIds = [];
+        }
+
+        $this->tagIds = $tagIds;
+        return $this;
+    }
+
+    public function getTags(): ?array
+    {
+        return $this->tags;
+    }
+
+    public function setTags(?array $tags): Lead
+    {
+        $this->tags = $tags;
         return $this;
     }
 

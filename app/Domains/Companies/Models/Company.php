@@ -27,11 +27,11 @@ class Company extends CactusEntity
     private int $id;
 
     /**
-     * @var ?int $erpId
+     * @var ?string $erpId
      * @JMS\Serializer\Annotation\SerializedName("erp_id")
-     * @JMS\Serializer\Annotation\Type("int")
+     * @JMS\Serializer\Annotation\Type("string")
      */
-    private ?int $erpId = null;
+    private ?string $erpId = null;
 
     /**
      * @var string $name
@@ -222,12 +222,12 @@ class Company extends CactusEntity
         return $this;
     }
 
-    public function getErpId(): ?int
+    public function getErpId(): ?string
     {
         return $this->erpId;
     }
 
-    public function setErpId(?int $erpId): Company
+    public function setErpId(?string $erpId): Company
     {
         $this->erpId = $erpId;
         return $this;

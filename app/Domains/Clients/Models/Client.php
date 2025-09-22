@@ -8,6 +8,7 @@ use App\Domains\Files\Models\File;
 use App\Domains\Leads\Models\Lead;
 use App\Domains\Notes\Models\Note;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Tags\Models\Tag;
 use App\Models\CactusEntity;
 use App\Models\Enums\EloqMorphEnum;
 use App\Domains\Auth\Models\User;
@@ -85,6 +86,20 @@ class Client extends CactusEntity
      * @Serializer\Type("array<App\Domains\Notes\Models\Note>")
      */
     private ?array $notes = null;
+
+    /**
+     * @var int[] $tagIds
+     * @Serializer\SerializedName("tag_ids")
+     * @Serializer\Type("array<int>")
+     */
+    private array $tagIds = [];
+
+    /**
+     * @var Tag[]|null $tags
+     * @Serializer\SerializedName("tags")
+     * @Serializer\Type("array<App\Domains\Tags\Models\Tag>")
+     */
+    private ?array $tags = null;
 
     /**
      * @var array|null $morphables
@@ -239,6 +254,28 @@ class Client extends CactusEntity
     public function setNotes(?array $notes): Client
     {
         $this->notes = $notes;
+        return $this;
+    }
+
+    public function getTagIds(): array
+    {
+        return $this->tagIds;
+    }
+
+    public function setTagIds(array $tagIds): Client
+    {
+        $this->tagIds = $tagIds;
+        return $this;
+    }
+
+    public function getTags(): ?array
+    {
+        return $this->tags;
+    }
+
+    public function setTags(?array $tags): Client
+    {
+        $this->tags = $tags;
         return $this;
     }
 

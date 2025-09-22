@@ -28,14 +28,12 @@
             <div class="card">
                 <div class="card">
                     <div class="card-body">
-                        <div class="row form-group mb-1 mt-1">
-                            <div class="col-md-12">
+                        <div class="form-group row mb-4 mt-4">
+                            <div class="col-md-6">
                                 <label for="companyName" class="form-label">Όνομα <i class="fa fa-asterisk fa-2xs text-danger"></i></label>
                                 <input name="companyName" id="companyName" class="form-control" placeholder="Όνομα εταιρείας" required>
                                 <div class="invalid-feedback"> Το Όνομα είναι απαραίτητο. </div>
                             </div>
-                        </div>
-                        <div class="form-group row mb-4 mt-4">
                             <div class="col-md-6">
                                 <label for="typeId" class="form-label">Κατηγορία Πελάτη <i class="fa fa-asterisk fa-2xs text-danger"></i></label>
                                 <select name="typeId" id="typeId" class="form-control select2" data-placeholder="Επιλέξτε κατηγορία πελάτη" data-allow-clear="true" required>
@@ -46,6 +44,8 @@
                                 </select>
                                 <div class="invalid-feedback"> Η κατηγορία πελάτη είναι απαραίτητη. </div>
                             </div>
+                        </div>
+                        <div class="form-group row mb-4 mt-4">
                             <div class="col-md-6">
                                 <label for="salesPersonId" class="form-label">Ανάθεση πωλητή <i class="fa fa-asterisk fa-2xs text-danger"></i></label>
                                 <select name="salesPersonId" id="salesPersonId" class="form-control select2 salesPersons" data-placeholder="Επιλέξτε πωλητή" data-allow-clear="true" required>
@@ -55,19 +55,6 @@
                                     @endforeach
                                 </select>
                                 <div class="invalid-feedback"> Η ανάθεση πωλητή είναι απαραίτητη. </div>
-                            </div>
-
-                        </div>
-                        <div class="form-group row mb-4 mt-4">
-                            <div class="col-md-6">
-                                <label for="sector" class="form-label">Τομέας</label>
-                                <select name="sector" id="sector" class="form-control select2" data-placeholder="Επιλέξτε τομέα" data-allow-clear="true">
-                                    <option value=""></option>
-                                    @foreach($sectors ?? [] as $sector)
-                                        <option value="{{$sector->getId()}}" >{{$sector->getName()}}</option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback"> Η ανάθεση τομέα είναι απαραίτητη. </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="sourceId" class="form-label">Source Channel <i class="fa fa-asterisk fa-2xs text-danger"></i></label>
@@ -112,9 +99,9 @@
                         <div class="form-group row mb-3 mt-3 align-items-end">
                             <div class="col-md-6">
                                 <label for="typeId" class="form-label">Tags</label>
-                                <select name="productTags[]" id="productTags" class="form-control select2" data-placeholder="Επιλέξτε tags" data-allow-clear="true" multiple>
+                                <select name="tagIds[]" id="tagIds" class="form-control select2 enable-tag" data-placeholder="Επιλέξτε tags" data-allow-clear="true" multiple>
                                     <option value=""></option>
-                                    @foreach($productTags ?? [] as $productTag)
+                                    @foreach($tags ?? [] as $productTag)
                                         <option value="{{$productTag->getId()}}" >{{$productTag->getName()}}</option>
                                     @endforeach
                                 </select>
@@ -252,6 +239,47 @@
                     }
                 });
             });
+
+            $('#add-user-form').on('submit', function (e) {
+                e.preventDefault();
+
+                let form = $(this);
+                let actionUrl = form.attr('action');
+                let formData = form.serialize();
+
+                $.ajax({
+                    url: actionUrl,
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        $('#add-user').modal('hide');
+
+                        form.trigger("reset");
+
+                        if (response && response.id && response.name) {
+                            let newOption = new Option(response.name, response.id, true, true);
+                            $('#user').append(newOption).trigger('change');
+                        }
+
+                        toastr.success('Η επαφή προστέθηκε με επιτυχία!');
+                    },
+                    error: function (xhr) {
+                        // Αν υπάρχει validation error
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            Object.keys(errors).forEach(function (key) {
+                                toastr.error(errors[key][0]);
+                            });
+                        } else {
+                            toastr.error('Προέκυψε σφάλμα. Προσπάθησε ξανά.');
+                        }
+                    }
+                });
+            });
+
         });
     </script>
 @endsection

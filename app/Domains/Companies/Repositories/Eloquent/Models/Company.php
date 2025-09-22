@@ -11,6 +11,7 @@ use App\Domains\Files\Repositories\Eloquent\Models\File;
 use App\Domains\Leads\Repositories\Eloquent\Models\Lead;
 use App\Domains\Notes\Repositories\Eloquent\Models\Note;
 use App\Domains\Projects\Repositories\Eloquent\Models\Project;
+use App\Domains\Tags\Repositories\Eloquent\Models\Tag;
 use App\Domains\Tickets\Repositories\Eloquent\Models\Ticket;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -112,5 +113,10 @@ class Company extends Model
     {
         return $this->morphToMany(Note::class,'notable', 'notables')->with('user')
             ->withTimestamps();
+    }
+
+    public function tags() : BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'taggables', 'taggable_id', 'tag_id');
     }
 }

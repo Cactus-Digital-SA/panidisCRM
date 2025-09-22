@@ -6,9 +6,13 @@ use App\Domains\Auth\Models\RolesEnum;
 use App\Domains\Companies\Models\Company;
 use App\Domains\CompanySource\Services\CompanySourceService;
 use App\Domains\CountryCodes\Services\CountryCodeService;
+use App\Domains\Leads\Services\ConvertLeadEventService;
+use App\Domains\Tags\Enums\TagTypesEnum;
+use App\Domains\Tags\Services\TagService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Domains\Leads\Models\Lead;
 use App\Http\Controllers\Controller;
@@ -32,6 +36,7 @@ final class LeadController extends Controller
         protected CompanySourceService $companySourceService,
         protected UserService $userService,
         protected CountryCodeService $countryCodeService,
+        protected TagService $tagService
     ){}
 
     /**
@@ -53,21 +58,22 @@ final class LeadController extends Controller
      */
     public function show(EditLeadRequest $request, string $leadId): View | JsonResponse
     {
-        $lead = $this->leadService->getByIdWithMorphsAndRelations($leadId, Lead::morphBuilder() , ['company','company.companyType','company.companySource','company.country']);
+        $lead = $this->leadService->getByIdWithMorphsAndRelations($leadId, Lead::morphBuilder() , ['company','company.companyType','company.companySource','company.country', 'tags']);
+
+        $tags = $this->tagService->getByType(TagTypesEnum::PRODUCT->value);
 
         $company = $this->companyService->getById($lead->getCompanyId());
         $users = $this->userService->getWithoutRole();
 
         $contactsColumns =  $this->companyService->getContactsTableColumns() ?? [];
 
-        // todo add sales role
         $salesPersonsATH = $this->userService->getByRoleId(RolesEnum::SALES_ATH->value);
         $salesPersonsSKG = $this->userService->getByRoleId(RolesEnum::SALES_SKG->value);
 
         $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
         $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
 
-        return view('backend.content.leads.show', compact('lead',  'company', 'contactsColumns', 'users', 'salesPersons'));
+        return view('backend.content.leads.show', compact('lead',  'company', 'contactsColumns', 'users', 'salesPersons', 'tags'));
     }
 
     /**
@@ -80,6 +86,7 @@ final class LeadController extends Controller
         $types = $this->companyTypeService->get();
         $countries = $this->countryCodeService->get();
         $sources = $this->companySourceService->get();
+        $tags = $this->tagService->getByType(TagTypesEnum::PRODUCT->value);
 
         // todo add sales role
         $salesPersonsATH = $this->userService->getByRoleId(RolesEnum::SALES_ATH->value);
@@ -88,7 +95,7 @@ final class LeadController extends Controller
         $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
         $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
 
-        return view('backend.content.leads.create', compact('companies', 'types', 'countries', 'sources', 'salesPersons'));
+        return view('backend.content.leads.create', compact('companies', 'types', 'countries', 'sources', 'salesPersons', 'tags'));
     }
 
     /**
@@ -119,6 +126,7 @@ final class LeadController extends Controller
         $leadDTO  = (new Lead())->fromRequest($request);
         $leadDTO->setCompanyId($company->getId());
         $leadDTO->setSalesPersonId($request->input('salesPersonId'));
+        $leadDTO->setTagIds($request->input('tagIds') ?? []);
 
         $lead = $this->leadService->store($leadDTO);
 
@@ -150,7 +158,10 @@ final class LeadController extends Controller
      */
     public function update(UpdateLeadRequest $request, string $leadId): RedirectResponse
     {
-        $this->leadService->update((new Lead())->fromRequest($request), $leadId);
+        $leadDTO  = (new Lead())->fromRequest($request);
+        $leadDTO->setTagIds($request->input('tagIds') ?? []);
+
+        $this->leadService->update($leadDTO, $leadId);
 
         return redirect()->route('admin.leads.show', ['leadId' => $leadId])->with('success', 'Επιτυχής αποθήκευση!');
     }
@@ -166,6 +177,24 @@ final class LeadController extends Controller
 
         if ($response) {
             return redirect()->route('admin.leads.index')->with('success', 'Επιτυχής διαγραφή!');
+        }
+
+        return redirect()->route('admin.leads.index')->with('error', 'Υπήρξε κάποιο πρόβλημα κατά την διαγραφή!');
+    }
+
+    public function convertLead(\Request $request, string $leadId): RedirectResponse
+    {
+        $lead = $this->leadService->getById($leadId);
+
+        $company = $this->companyService->getById($lead->getCompanyId());
+        $company->setErpId(rand(100000, 999999));
+        $this->companyService->updateErpIdByCompanyId($company, $lead->getCompanyId());
+
+        $convertLeadEventService = app(ConvertLeadEventService::class);
+        $response = $convertLeadEventService->convertEvent($lead);
+
+        if($response){
+            return redirect()->route('admin.clients.index')->with('success', 'Επιτυχής Μετατροπή!');
         }
 
         return redirect()->route('admin.leads.index')->with('error', 'Υπήρξε κάποιο πρόβλημα κατά την διαγραφή!');

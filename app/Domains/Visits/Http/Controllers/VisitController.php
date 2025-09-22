@@ -42,7 +42,7 @@ class VisitController extends Controller
     public function show(Request $request, string $visitId) : \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\View\View
     {
         $visitStatuses = $this->visitStatusService->getVisible();
-        $visit = $this->visitService->getByIdWithMorphsAndRelations($visitId, Visit::morphBuilder(), ['company.companyType', 'company.companySource', 'company.country', 'company.lead','company.client','owner','comments','status', 'contacts']);
+        $visit = $this->visitService->getByIdWithMorphsAndRelations($visitId, Visit::morphBuilder(), ['company.companyType', 'company.companySource', 'company.country', 'company.lead','company.client','owner','comments','status', 'contacts', 'assignees']);
 
         $canEditStatus = false;
         $user = $this->userService->getAuthUser();
@@ -111,7 +111,7 @@ class VisitController extends Controller
 
     public function edit(Request $request, string $visitId): \Illuminate\View\View
     {
-        $visit = $this->visitService->getByIdWithMorphsAndRelations($visitId, Visit::morphBuilder(), ['company.companyType', 'company.companySource', 'company.users', 'company.lead','company.client','owner','comments','status','blockedBy','contacts']);
+        $visit = $this->visitService->getByIdWithMorphsAndRelations($visitId, Visit::morphBuilder(), ['company.companyType', 'company.companySource', 'company.users', 'company.lead','company.client','owner','comments','status','blockedBy','contacts', 'assignees']);
         $visitStatus = $this->visitStatusService->getVisible();
 
         $canEditStatus = false;

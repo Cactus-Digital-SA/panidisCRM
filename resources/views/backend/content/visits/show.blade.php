@@ -151,8 +151,7 @@
                                         <span class="d-block font-small-4"> {{  $visit->getDeadline() ? Carbon::parse($visit->getDeadline())->format('d-m-Y') : '-' }} </span>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label"> {{__('Priority')}} </label>
-                                        <span class="d-block font-small-4"> {{  $visit->getPriority() ?: '-' }} </span>
+
                                     </div>
                                 </div>
 
@@ -198,7 +197,10 @@
                                            class="d-block font-small-4"> {{ $visit->getOwner()->getName() ?: '-'}} </a>
                                     </div>
                                     <div class="col-md-6">
-
+                                        <label class="form-label"> {{__('Assignee')}} </label>
+                                        @foreach($visit->getAssignees() ?? [] as $assignee)
+                                            <span class="d-block font-small-4">  {{$assignee->getName()}} </span>
+                                        @endforeach
                                     </div>
                                 </div>
 
@@ -209,31 +211,30 @@
                 <div class="col">
                     @include('backend.content.companies.includes.showDetails', ['company' => $visit->getCompany()])
 
-                    <div class="card mt-2">
-                        <div class="card-header d-flex justify-content-between">
-                            <h5 class="card-title m-0 me-2 pt-1 mb-2 d-flex align-items-center">
-                                <i class="ti ti-list-details me-3"></i> {{ __('Activity Timeline') }}
-                            </h5>
-                        </div>
-                        <div class="card-body pb-xxl-0">
-                            <ul class="timeline mb-0">
-                                @foreach($visit->getVisitStatuses() as $status)
-                                    <li class="timeline-item timeline-item-transparent">
-                                        <span class="timeline-point timeline-point-{{ $status->getLabel() }}"></span>
-                                        <div class="timeline-event">
-                                            <div class="timeline-header mb-1">
-                                                <h6 class="mb-0"> {{__('Status changed to ')}}
-                                                    "{{ $status->getName() }}"</h6>
-                                                <small class="text-muted"> {{ $status->getPivotDate() }}</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
+{{--                    <div class="card mt-2">--}}
+{{--                        <div class="card-header d-flex justify-content-between">--}}
+{{--                            <h5 class="card-title m-0 me-2 pt-1 mb-2 d-flex align-items-center">--}}
+{{--                                <i class="ti ti-list-details me-3"></i> {{ __('Activity Timeline') }}--}}
+{{--                            </h5>--}}
+{{--                        </div>--}}
+{{--                        <div class="card-body pb-xxl-0">--}}
+{{--                            <ul class="timeline mb-0">--}}
+{{--                                @foreach($visit->getVisitStatuses() as $status)--}}
+{{--                                    <li class="timeline-item timeline-item-transparent">--}}
+{{--                                        <span class="timeline-point timeline-point-{{ $status->getLabel() }}"></span>--}}
+{{--                                        <div class="timeline-event">--}}
+{{--                                            <div class="timeline-header mb-1">--}}
+{{--                                                <h6 class="mb-0"> {{__('Status changed to ')}}--}}
+{{--                                                    "{{ $status->getName() }}"</h6>--}}
+{{--                                                <small class="text-muted"> {{ $status->getPivotDate() }}</small>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </li>--}}
+{{--                                @endforeach--}}
+{{--                            </ul>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
                 </div>
-
             </div>
         </div>
         @foreach($visit->getMorphables() as $morph)

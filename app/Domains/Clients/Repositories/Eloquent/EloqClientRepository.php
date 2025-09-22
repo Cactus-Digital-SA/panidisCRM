@@ -8,6 +8,8 @@ use App\Domains\Clients\Repositories\Eloquent\Models\Client as EloquentClient;
 use App\Domains\ExtraData\Enums\ExtraDataModelsEnum;
 use App\Domains\ExtraData\Enums\VisibilityEnum;
 use App\Domains\ExtraData\Repositories\Eloquent\Models\ExtraData;
+use App\Domains\Tags\Enums\TagTypesEnum;
+use App\Domains\Tags\Repositories\Eloquent\Models\Tag;
 use App\Facades\ObjectSerializer;
 use App\Helpers\EloquentRelationHelper;
 use App\Models\CactusEntity;
@@ -51,12 +53,14 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
 
     public function createOrUpdate(CactusEntity|Client $entity): ?Client
     {
-//        $client = $this->model::updateOrCreate(
-//            ['company_id' => $entity->getCompanyId(),],
-//            [
-//                'status_id' => $entity->getStatusId(),
-//            ]
-//        );
+        $client = $this->model::updateOrCreate(
+            ['company_id' => $entity->getCompanyId(),],
+            [
+                'sales_person_id' => $entity->getSalesPersonId(),
+            ]
+        );
+
+        $client->tags()->syncWithoutDetaching($entity->getTagIds());
 
         return ObjectSerializer::deserialize($client?->toJson() ?? "{}", Client::class, 'json');
     }
@@ -66,12 +70,12 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
      */
     public function getByIdWithMorphsAndRelations(string $modelId, array $morphs = [], array $relations = []): ?Client
     {
-        $lead = $this->model::findOrFail($modelId);
+        $client = $this->model::findOrFail($modelId);
 
-        $lead = $this->modelLoadRelations($lead, $morphs);
-        $lead = $this->modelLoadRelations($lead, $relations);
+        $client = $this->modelLoadRelations($client, $morphs);
+        $client = $this->modelLoadRelations($client, $relations);
 
-        return ObjectSerializer::deserialize($lead?->toJson() ?? "{}",  Client::class , 'json');
+        return ObjectSerializer::deserialize($client?->toJson() ?? "{}",  Client::class , 'json');
     }
 
     /**
@@ -84,6 +88,24 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
             'company_id' => $entity->getCompanyId(),
             'sales_person_id' => $entity->getSalesPersonId(),
         ]);
+
+        $tagIds = [];
+        if (!empty($entity->getTagIds())) {
+            foreach ($entity->getTagIds() as $tag) {
+                if (is_numeric($tag)) {
+                    $tagIds[] = (int) $tag;
+                } else {
+                    // προσθήκη νέου tag
+                    $newTag = Tag::firstOrCreate(['name' => $tag]);
+
+                    $newTag->types()->syncWithoutDetaching([TagTypesEnum::PRODUCT->value]);
+
+                    $tagIds[] = $newTag->id;
+                }
+            }
+        }
+
+        $client->tags()->syncWithoutDetaching($tagIds);
 
         return ObjectSerializer::deserialize($client->toJson() ?? "{}", Client::class, 'json');
     }
@@ -101,6 +123,24 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
             'company_id' => $entity->getCompanyId(),
             'sales_person_id' => $entity->getSalesPersonId(),
         ]);
+
+        $tagIds = [];
+        if (!empty($entity->getTagIds())) {
+            foreach ($entity->getTagIds() as $tag) {
+                if (is_numeric($tag)) {
+                    $tagIds[] = (int) $tag;
+                } else {
+                    // προσθήκη νέου tag
+                    $newTag = Tag::firstOrCreate(['name' => $tag]);
+
+                    $newTag->types()->syncWithoutDetaching([TagTypesEnum::PRODUCT->value]);
+
+                    $tagIds[] = $newTag->id;
+                }
+            }
+        }
+
+        $client->tags()->syncWithoutDetaching($tagIds);
 
         return ObjectSerializer::deserialize($client->toJson() ?? "{}", Client::class, 'json');
     }
@@ -125,7 +165,7 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
      */
     public function dataTableClients(array $filters = []): JsonResponse
     {
-        $clients = $this->model->query()->with('company');
+        $clients = $this->model->query()->with(['company.companyType', 'company.companySource', 'company.country', 'salesPerson']);
 
         $clients = $clients
             ->when($filters['filterName'], function ($query,$searchTerm) {
@@ -135,8 +175,8 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
             });
 
         return DataTables::of($clients)
-            ->editColumn('erpId', function ($lead) {
-                return '# '. $lead?->company?->erp_id ?? ' - ';
+            ->editColumn('erpId', function ($client) {
+                return '# '. $client?->company?->erp_id ?? ' - ';
             })
             ->editColumn('company', function ($client) {
                 return $client?->company?->name;
@@ -150,9 +190,6 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
                 }
                 return $client?->company?->country?->name;
             })
-            ->addColumn('sector', function ($client) {
-                return $client?->company?->sector?->name ?? ' - ';
-            })
             ->addColumn('currentBalance', function ($client) {
                 return $client?->company?->currentBalance ?? ' - ';
             })
@@ -165,13 +202,13 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
             })
             ->addColumn('actions', function ($client) {
                 $deleteUrl = route('admin.clients.destroy', [
-                    'leadId' => $client->id,
+                    'clientId' => $client->id,
                 ]);
 
                 $html = '<div class="btn-group">';
 
                 $html .= '<a href="' . route('admin.clients.show', $client->id) . '" class="btn btn-icon btn-gradient-warning">
-                             <i class="ti ti-edit ti-sm"></i>
+                             <i class="ti ti-eye ti-sm"></i>
                         </a>';
 
                 $html .= '<a href="#" class="btn btn-icon btn-gradient-danger"
@@ -198,7 +235,6 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
             'erpId'=> ['name' => 'ERP ID', 'table' => 'company.erp_id', 'searchable' => 'false', 'orderable' => 'true'],
             'company' => ['name' => 'Εταιρεία', 'table' => 'company.name', 'searchable' => 'true', 'orderable' => 'true'],
             'companyType' => ['name' => 'Κατηγορία Πελάτη', 'table' => 'company.companyType.name', 'searchable' => 'true', 'orderable' => 'true'],
-            'sector' => ['name' => 'Τομέας', 'table' => 'company.sector.name', 'searchable' => 'true', 'orderable' => 'true'],
             'companyRegion' => ['name' => 'Περιοχή', 'table' => 'company.country.name', 'searchable' => 'true', 'orderable' => 'true'],
             'currentBalance' => ['name' => 'Υπόλοιπο', 'table' => 'company.current_balance', 'searchable' => 'true', 'orderable' => 'true'],
             'salesPerson' => ['name' => 'Πωλητής', 'table' => 'salesPerson.name', 'searchable' => 'true', 'orderable' => 'true'],

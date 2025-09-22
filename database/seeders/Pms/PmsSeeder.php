@@ -13,6 +13,6 @@ class PmsSeeder extends Seeder
         $this->call(CompanySourceSeeder::class);
         $this->call(TicketStatusSeeder::class);
         $this->call(VisitStatusSeeder::class);
-
+        $this->call(TagTypeSeeder::class);
     }
 }

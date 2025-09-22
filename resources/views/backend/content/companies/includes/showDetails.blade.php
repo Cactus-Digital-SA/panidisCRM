@@ -41,10 +41,6 @@
                     <td>{{ $company->getCompanyType()?->getName() }}</td>
                 </tr>
                 <tr>
-                    <td style="width: 10%;"><span class="fw-bold">Τομέας</span></td>
-                    <td></td>
-                </tr>
-                <tr>
                     <td style="width: 10%;"><span class="fw-bold">Source Channel</span></td>
                     <td>{{ $company->getCompanySource()?->getName() }}</td>
                 </tr>

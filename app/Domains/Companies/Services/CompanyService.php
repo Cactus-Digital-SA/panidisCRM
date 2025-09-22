@@ -67,6 +67,11 @@ class CompanyService
         return $this->repository->update($company, $id);
     }
 
+    public function updateErpIdByCompanyId(Company $company, string $companyId): ?Company
+    {
+        return $this->repository->updateErpIdByCompanyId($company, $companyId);
+    }
+
     /**
      * @param string $id
      * @return bool
@@ -143,5 +148,10 @@ class CompanyService
     public function getContactsPaginatedByCompanyId(?string $searchTerm, int $offset, int $resultCount, int $companyId): array
     {
         return $this->repository->getContactsPaginatedByCompanyId($searchTerm, $offset, $resultCount, $companyId);
+    }
+
+    public function storeTags(array $tagIds, string $companyId): ?bool
+    {
+        return $this->repository->storeTags($tagIds, $companyId);
     }
 }

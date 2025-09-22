@@ -2,6 +2,7 @@
 
 namespace App\Domains\Clients\Http\Controllers;
 
+use App\Domains\Auth\Models\RolesEnum;
 use App\Domains\Companies\Models\Company;
 use App\Domains\Clients\Http\Requests\DeleteClientRequest;
 use App\Domains\Clients\Http\Requests\ManageClientRequest;
@@ -14,6 +15,7 @@ use App\Domains\Clients\Services\ClientService;
 use App\Domains\CountryCodes\Services\CountryCodeService;
 use App\Domains\ExtraData\Enums\ExtraDataModelsEnum;
 use App\Domains\ExtraData\Services\ExtraDataService;
+use App\Domains\Tags\Enums\TagTypesEnum;
 use App\Domains\Tags\Services\TagService;
 use App\Http\Controllers\Controller;
 use App\Models\ModelMorphEnum;
@@ -30,8 +32,8 @@ final class ClientController extends Controller
         protected CompanyService $companyService,
         protected CompanyTypeService $companyTypeService,
         protected UserService $userService,
-//        private TagService $tagService,
-        private CountryCodeService $countryCodeService,
+        protected CountryCodeService $countryCodeService,
+        protected TagService $tagService
     ){}
 
     /**
@@ -56,7 +58,22 @@ final class ClientController extends Controller
      */
      public function show(ShowClientRequest $request, string $clientId): View
      {
+         $client = $this->clientService->getByIdWithMorphsAndRelations($clientId, Client::morphBuilder() , ['company','company.companyType','company.companySource','company.country', 'tags']);
 
+         $tags = $this->tagService->getByType(TagTypesEnum::PRODUCT->value);
+
+         $company = $this->companyService->getById($client->getCompanyId());
+         $users = $this->userService->getWithoutRole();
+
+         $contactsColumns =  $this->companyService->getContactsTableColumns() ?? [];
+
+         $salesPersonsATH = $this->userService->getByRoleId(RolesEnum::SALES_ATH->value);
+         $salesPersonsSKG = $this->userService->getByRoleId(RolesEnum::SALES_SKG->value);
+
+         $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
+         $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
+
+         return view('backend.content.clients.show', compact('client',  'company', 'contactsColumns', 'users', 'salesPersons', 'tags'));
      }
 
 
@@ -98,7 +115,7 @@ final class ClientController extends Controller
      */
     public function edit(EditClientRequest $request, string $clientId)
     {
-
+        return redirect()->route('admin.clients.show', ['clientId' => $clientId]);
     }
 
     /**
@@ -110,6 +127,12 @@ final class ClientController extends Controller
      */
     public function update(UpdateClientRequest $request, string $clientId): RedirectResponse
     {
+        $clientDTO  = (new Client())->fromRequest($request);
+        $clientDTO->setTagIds($request->input('tagIds') ?? []);
+
+        $this->clientService->update($clientDTO, $clientId);
+
+        return redirect()->route('admin.clients.show', ['clientId' => $clientId])->with('success', 'Επιτυχής αποθήκευση!');
 
     }
 

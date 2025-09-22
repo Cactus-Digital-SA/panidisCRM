@@ -404,18 +404,38 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
             $users = $users->where('name', 'LIKE', '%' . $searchTerm . '%');
         }
 
+        $authUser = Auth::user();
+
         $users = $users->whereDoesntHave('roles', function ($q) {
             $q->where('name', 'super-admin');
         });
 
-        if($onlyContacts){
+        if (!$onlyContacts) {
+            if (!$authUser->hasRole(RolesEnum::Administrator->value) && !$authUser->hasRole(RolesEnum::SuperAdmin->value)) {
+                if ($authUser->hasRole(RolesEnum::RND_DIRECTOR->value)) {
+                    $users = $users->whereHas('roles', function ($q) {
+                        $q->where('id', RolesEnum::RND_DIRECTOR->value)
+                            ->orWhere('id', RolesEnum::RND_ENG->value);
+                    });
+                } else if ($authUser->hasRole(RolesEnum::SALES_DIRECTOR->value)) {
+                    $users = $users->whereHas('roles', function ($q) {
+                        $q->where('id', RolesEnum::SALES_DIRECTOR->value)
+                            ->orWhere('id', RolesEnum::SALES_SKG->value)
+                            ->orWhere('id', RolesEnum::SALES_ATH->value);
+                    });
+                } else {
+                    $users = $users->where('id', $authUser->id);
+                }
+            }
+        }
+
+        if ($onlyContacts) {
             $users = $users->whereDoesntHave('roles');
-        }else{
+        } else {
             $users = $users->whereHas('roles');
         }
 
         $users = $users->skip($offset)->take($resultCount)->get('id');
-
 
         if ($searchTerm == null) {
             $count = $this->model->count();

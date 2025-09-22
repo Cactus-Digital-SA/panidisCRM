@@ -77,18 +77,6 @@
                 </div>
 
                 <div class="form-group row mb-3 mt-1">
-                    <div class="col-lg-6">
-                        <label for="sector" class="col-form-label">Τομέας</label>
-                        <div class="col-md-12">
-                            <select name="sector" id="sector" class="form-control select2" data-placeholder="Επιλέξτε τομέα" data-allow-clear="true">
-                                <option value=""></option>
-                                @foreach($sectors ?? [] as $sector)
-                                    <option value="{{$sector->getId()}}" >{{$sector->getName()}}</option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback"> Η ανάθεση τομέα είναι απαραίτητη. </div>
-                        </div>
-                    </div>
 
                     <div class="col-lg-6">
                         <label for="sourceId" class="col-form-label">Source Channel <i class="fa fa-asterisk fa-2xs text-danger"></i></label>

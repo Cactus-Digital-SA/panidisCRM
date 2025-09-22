@@ -32,6 +32,8 @@ use App\Domains\Leads\Repositories\Eloquent\Models\Lead;
 use App\Domains\Leads\Repositories\LeadRepositoryInterface;
 use App\Domains\Notes\Repositories\Eloquent\EloqNoteRepository;
 use App\Domains\Notes\Repositories\NoteRepositoryInterface;
+use App\Domains\Tags\Repositories\Eloquent\EloqTagRepository;
+use App\Domains\Tags\Repositories\TagRepositoryInterface;
 use App\Domains\Tickets\Repositories\Eloquent\EloqTicketRepository;
 use App\Domains\Tickets\Repositories\Eloquent\EloqTicketStatusRepository;
 use App\Domains\Tickets\Repositories\Eloquent\Models\Ticket;
@@ -71,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind( TicketStatusRepositoryInterface::class, EloqTicketStatusRepository::class);
         $this->app->bind( VisitRepositoryInterface::class, EloqVisitRepository::class);
         $this->app->bind( VisitStatusRepositoryInterface::class, EloqVisitStatusRepository::class);
+        $this->app->bind(TagRepositoryInterface::class, EloqTagRepository::class);
 
         $this->relations();
 

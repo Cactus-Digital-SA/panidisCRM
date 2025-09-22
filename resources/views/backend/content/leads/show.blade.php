@@ -11,6 +11,15 @@
 @endsection
 
 @section('content-header')
+    <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
+        <div class="mb-1 breadcrumb-right">
+            <a href="{{route('admin.leads.convert',$lead->getId())}}" class="btn btn-primary  me-2">
+                <i class="ti ti-refresh me-1"></i>
+                Μετατροπή σε Client
+            </a>
+        </div>
+    </div>
+
     <div class="col-xl-12">
         <div class="nav-align-top mb-4">
             <ul class="nav nav-pills mb-3" role="tablist">
@@ -79,6 +88,19 @@
                                             @endforeach
                                         </select>
                                         <div class="invalid-feedback"> Η ανάθεση πωλητή είναι απαραίτητη. </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3 mt-1 align-items-center">
+                                    <label for="tagIds" class="col-form-label col-md-4">Tags </label>
+                                    <div class="col-md-8">
+                                        <select name="tagIds[]" id="tagIds" class="form-control select2 enable-tag" data-placeholder="Επιλέξτε tags" data-allow-clear="true" multiple>
+                                            <option value=""></option>
+                                            @foreach($tags ?? [] as $productTag)
+                                                <option value="{{$productTag->getId()}}" @if(in_array($productTag->getId(), $lead->getTagIds() ?? [])) selected @endif>
+                                                {{$productTag->getName()}}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-12 text-center mt-4">
@@ -171,20 +193,6 @@
 @section('page-script')
     @parent
     <script type="module">
-        const date = document.querySelector('#estClosingDate');
-
-        if(date){
-            date.flatpickr({
-                altInput: true,
-                altFormat: 'd-m-Y',
-                dateFormat: 'Y-m-d',
-                locale: {
-                    ...flatpickr.l10ns.gr, // Merge Greek locale settings
-                    firstDayOfWeek: 1
-                },
-            });
-        }
-
         $(".companies-select").select2({
             placeholder: 'Αναζήτηση...',
             allowClear: true,
@@ -220,133 +228,11 @@
         });
 
 
-        // Display subsection containers and Tags containers
-        $('.section-select').each(function () {
-            let sectionId = $(this).data('section-id');
-            let selectedOption = $(this).find('option:selected');
-            let hasSubSections = selectedOption.data('has-subsections');
-            let allowTags = selectedOption.data('allow-tag');
-            let tagContainer = $(`#tag-container-${sectionId}`);
-            let subsectionContainer = $(`#subsection-container-${sectionId}`);
-            let allowComment = selectedOption.data('allow-comment');
-            let commentContainer = $(`#comment-container-${sectionId}`);
-
-            if (hasSubSections) {
-                subsectionContainer.show();
-                let selectedOptionId = selectedOption.val();
-
-                $(`#subsection_${sectionId} option`).each(function () {
-                    $(this).toggle($(this).data('option-id') == selectedOptionId);
-                });
-            } else {
-                subsectionContainer.hide();
-            }
-
-            if (allowTags) {
-                tagContainer.show();
-            } else {
-                tagContainer.hide();
-            }
-
-            if (allowComment) {
-                commentContainer.show();
-            } else {
-                commentContainer.hide();
-            }
-        });
-
-        // Event listener for section options
-        $('.section-select').on('change', function () {
-            let sectionId = $(this).data('section-id');
-            let selectedOption = $(this).find('option:selected');
-            let hasSubSections = selectedOption.data('has-subsections');
-            let subsectionContainer = $(`#subsection-container-${sectionId}`);
-            let subsectionSelect = $(`#subsection_${sectionId}`);
-            let allowTags = selectedOption.data('allow-tag');
-            let tagContainer = $(`#tag-container-${sectionId}`);
-            let allowComment = selectedOption.data('allow-comment');
-            let commentContainer = $(`#comment-container-${sectionId}`);
-
-            if (hasSubSections) {
-                // display subsections for the selected option
-                let selectedOptionId = selectedOption.val();
-
-                subsectionSelect.find('option').hide();
-                subsectionSelect.find(`option[data-option-id="${selectedOptionId}"]`).show(); // Show only relevant subsections
-
-                subsectionContainer.show();
-                subsectionSelect.val('').trigger('change');
-            } else {
-                subsectionContainer.hide();
-                subsectionSelect.val('').trigger('change'); // Reset select
-            }
-
-            if (allowTags) {
-                tagContainer.show();
-            } else {
-                tagContainer.hide();
-                $(`#tag_${sectionId}`).val(''); // Clear the tag field if hidden
-            }
-
-            if (allowComment) {
-                commentContainer.show();
-            } else {
-                commentContainer.hide();
-                $(`#comment_${sectionId}`).val(''); // Clear the comment field if hidden
-            }
-
-            /// Display subsection containers and tag containers for preselected subsections
-            $('.subsection-select').each(function () {
-                let subsectionContainer = $(this).closest('.form-group');
-                if ($(this).val()) {
-                    subsectionContainer.show();
-                }
-            });
-        });
-
         $('.enable-tag').select2({
             tags: true,
         });
     </script>
 
-    <script>
-        function fetchContact(contactId)
-        {
-            let form = $('#show-user-form');
-            let action_url = '{{ route('api.internal.contacts.getContact',':id') }}';
-            action_url = action_url.replace(':id', contactId,);
-            $.ajax({
-                url: action_url,
-            })
-            .done(function(response) {
-                form.find('[name="firstName"]').text(response.data.firstName || '-');
-                form.find('[name="lastName"]').text(response.data.lastName || '-');
-                form.find('[name="email"]').text(response.data.email || '-');
-                form.find('[name="phone"]').text(response.data.phone || '-');
-
-                let decisionMakerCheckbox = form.find('[name="decisionMaker"]');
-                if (response.data.decisionMaker) {
-                    decisionMakerCheckbox.prop('checked', true);
-                } else {
-                    decisionMakerCheckbox.prop('checked', false);
-                }
-                if (response.data.extraData) {
-                    populateExtraData(response.data.extraData);
-                }
-
-            });
-
-        }
-
-        function populateExtraData(extraData) {
-            extraData.forEach(function(item) {
-                let field = $(`[name="extra_data[${item.id}]"]`);
-                field.text(item.value);
-            });
-        }
-
-
-    </script>
 
     @include('backend.components.js.select')
 @endsection

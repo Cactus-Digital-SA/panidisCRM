@@ -36,6 +36,13 @@ interface CompanyRepositoryInterface extends RepositoryInterface
     public function update(CactusEntity|Company $entity, string $id): ?Company;
 
     /**
+     * @param CactusEntity|Company $entity
+     * @param string $id
+     * @return Company|null
+     */
+    public function updateErpIdByCompanyId(CactusEntity|Company $entity, string $companyId): ?Company;
+
+    /**
      * @param string $id
      * @return bool
      */
@@ -95,4 +102,11 @@ interface CompanyRepositoryInterface extends RepositoryInterface
      * @return array{data: Collection, count: int} Array contains paginated data and total count.
      */
     public function getContactsPaginatedByCompanyId(?string $searchTerm, int $offset, int $resultCount, int $companyId): array;
+
+    /**
+     * @param array $tagIds
+     * @param string $companyId
+     * @return bool|null
+     */
+    public function storeTags(array $tagIds, string $companyId): ?bool;
 }

@@ -7,7 +7,7 @@ Route::group([
     'prefix' => '/',
     'as' => 'admin.',
 ], function () {
-    Route::resource('visits', VisitController::class);
+    Route::resource('visits', VisitController::class)->except('destroy');
 
     Route::post('/visits/{visitsId}/update-status', [VisitController::class, 'updateStatus'])->name('visits.update-status');
 

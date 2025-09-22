@@ -19,6 +19,7 @@ class HomeController
                 if (Auth::user()->isAdmin()) {
                     return redirect()->route('admin.home');
                 }
+                return redirect()->route('admin.home');
             }
 
             return view('welcome');
