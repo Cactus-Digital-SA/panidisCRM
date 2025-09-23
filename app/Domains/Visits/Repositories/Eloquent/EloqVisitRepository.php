@@ -336,10 +336,14 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
                 $dates[1] = Carbon::parse($searchTerm[1])->endOfDay();
                 $query->whereBetween('deadline', [$dates[0], $dates[1]]);
             })
+            ->when($filters['filterFromDate'] ?? false, function ($query, $searchTerm) {
+                $fromDate = Carbon::parse($searchTerm)->toDate();
+                $query->whereDate('visits.visit_date', '>=', $fromDate);
+            })
             ->when($filters['filterStartDate'] ?? false, function ($query, $searchTerm) {
                 $dates[0] = Carbon::parse($searchTerm[0])->toDate();
                 $dates[1] = Carbon::parse($searchTerm[1])->endOfDay();
-                $query->whereBetween('visits.created_at', [$dates[0], $dates[1]]);
+                $query->whereBetween('visits.visit_date', [$dates[0], $dates[1]]);
             })
             ->when($filters['filterPriority'] ?? false, function ($query,$searchTerm) {
                 $query->where('priority', $searchTerm);
@@ -382,7 +386,7 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
 
         return DataTables::of($visits)
             ->editColumn('company', function ($visit){
-                return  $visit->company_id ? '<a href="'. route('admin.companies.show',$visit->company_id).'" class="badge bg-label-primary">' . $visit->company_name . '</span>' : '-';
+                return  $visit->company_id ? $visit->company_name : '-';
             })
             ->addColumn('date', function ($visit){
                 return $visit->visit_date?->format('d-m-Y') ?? ' - ';
@@ -452,7 +456,9 @@ class EloqVisitRepository extends EloquentRelationHelper implements VisitReposit
             'name' => ['name' => 'Name', 'table' => 'visits.name', 'searchable' => 'true', 'orderable' => 'true'],
             'company' => ['name' => 'Company', 'table' => 'companies.name', 'searchable' => 'false', 'orderable' => 'true'],
             'date' => ['name' => 'date', 'table' => 'visit_date', 'searchable' => 'false', 'orderable' => 'true'],
-            'visit_type' => ['name' => 'Visit Type', 'table' => 'visit_type', 'searchable' => 'false', 'orderable' => 'true'],
+//            'visit_type' => ['name' => 'Visit Type', 'table' => 'visit_type', 'searchable' => 'false', 'orderable' => 'true'],
+            'next_action' => ['name' => 'Next Action', 'table' => 'next_action', 'searchable' => 'false', 'orderable' => 'true'],
+
         ];
     }
 }
