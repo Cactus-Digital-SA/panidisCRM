@@ -16,7 +16,7 @@ class CompanySourceSeeder extends Seeder
         ]);
 
         CompanySource::create([
-            'name' => 'Referal'
+            'name' => 'Referral'
         ]);
 
         CompanySource::create([
