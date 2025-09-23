@@ -12,5 +12,7 @@ Route::group([
 
     Route::post('follow-up/table', [VisitDTController::class, 'dataTableFollowUp'])->name('datatable.followup');
     Route::post('open/table', [VisitDTController::class, 'dataTableOpen'])->name('datatable.open');
+    Route::post('dashboard/table', [VisitDTController::class, 'dataTableDashboard'])->name('datatable.dashboard');
+
 
 });

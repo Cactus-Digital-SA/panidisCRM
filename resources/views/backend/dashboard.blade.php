@@ -75,7 +75,7 @@
                     <h5 class="card-title m-0 me-2">Today's Scheduled Visits</h5>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-borderless border-top datatable-visits-open">
+                    <table class="table table-borderless border-top datatable-visits">
                         <thead class="border-bottom">
                             <tr>
                                 @foreach($visitsColumns ?? [] as $column)
@@ -243,7 +243,7 @@
         }
 
         $(document).ready(function() {
-            dtVisitsOpen = initVisitsDatatable('.datatable-visits-open', "{{ route('api.internal.visits.datatable.open') }}");
+            dtVisitsOpen = initVisitsDatatable('.datatable-visits', "{{ route('api.internal.visits.datatable.dashboard') }}");
             dtVisitsFollowUp = initVisitsDatatable('.datatable-visits-follow-up', "{{ route('api.internal.visits.datatable.followup') }}");
 
             $('#search').on("click", function () {

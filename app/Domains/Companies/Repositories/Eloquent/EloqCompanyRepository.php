@@ -302,6 +302,8 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
             $companies = $companies->where('name', 'LIKE', '%' . $searchTerm . '%');
         }
 
+        $companies = $companies->whereHas('lead')->orWhereHas('client');
+
 
         $companies = $companies->skip($offset)->take($resultCount)->get();
 

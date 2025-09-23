@@ -139,8 +139,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label"> {{__('Company')}} </label>
                                         @if($visit->getCompanyId())
-                                            <a href="{{route('admin.companies.show', $visit->getCompanyId())}}"
-                                           class="d-block font-small-4"> {{ $visit->getCompany()->getName() }} </a>
+                                            {{ $visit->getCompany()->getName() }}
                                         @endif
                                     </div>
                                 </div>

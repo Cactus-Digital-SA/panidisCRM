@@ -6,6 +6,7 @@ use App\Domains\Visits\Enums\VisitNextActionSourceEnum;
 use App\Domains\Visits\Services\VisitService;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -51,6 +52,7 @@ final class VisitDTController extends Controller
     {
         $filters = Helpers::filters($request);
         $filters['nextAction'] = VisitNextActionSourceEnum::FOLLOW_UP->value;
+        $filters['filterFromDate'] = Carbon::today()->toDateString();
 
         return $this->visitService->dataTableVisits($filters);
     }
@@ -59,6 +61,14 @@ final class VisitDTController extends Controller
     {
         $filters = Helpers::filters($request);
         $filters['nextAction'] = VisitNextActionSourceEnum::OPEN->value;
+
+        return $this->visitService->dataTableVisits($filters);
+    }
+
+    public function dataTableDashboard(Request $request): JsonResponse
+    {
+        $filters = Helpers::filters($request);
+        $filters['filterFromDate'] = Carbon::today()->toDateString();
 
         return $this->visitService->dataTableVisits($filters);
     }
