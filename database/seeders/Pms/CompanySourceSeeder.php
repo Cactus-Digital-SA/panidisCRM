@@ -5,35 +5,42 @@ namespace Database\Seeders\Pms;
 
 use App\Domains\CompanySource\Repositories\Eloquent\Models\CompanySource;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CompanySourceSeeder extends Seeder
 {
 
     public function run()
     {
-        CompanySource::create([
-            'name' => 'Exhibition'
-        ]);
+        DB::table('company_source')->updateOrInsert(
+            ['id' => 1],
+            ['name' => 'Exhibition']
+        );
 
-        CompanySource::create([
-            'name' => 'Referral'
-        ]);
+        DB::table('company_source')->updateOrInsert(
+            ['id' => 2],
+            ['name' => 'Referral']
+        );
 
-        CompanySource::create([
-            'name' => 'Cold Call'
-        ]);
+        DB::table('company_source')->updateOrInsert(
+            ['id' => 3],
+            ['name' => 'Cold Call']
+        );
 
-        CompanySource::create([
-            'name' => 'Inbound'
-        ]);
+        DB::table('company_source')->updateOrInsert(
+            ['id' => 4],
+            ['name' => 'Inbound']
+        );
 
-        CompanySource::create([
-            'name' => 'Website'
-        ]);
+        DB::table('company_source')->updateOrInsert(
+            ['id' => 5],
+            ['name' => 'Website']
+        );
 
-        CompanySource::create([
-            'name' => 'E-mail Campaing'
-        ]);
+        DB::table('company_source')->updateOrInsert(
+            ['id' => 6],
+            ['name' => 'E-mail Campaign']
+        );
 
     }
 }
