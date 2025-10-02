@@ -6,6 +6,7 @@ use App\Domains\Auth\Models\RolesEnum;
 use App\Domains\Companies\Models\Company;
 use App\Domains\CompanySource\Services\CompanySourceService;
 use App\Domains\CountryCodes\Services\CountryCodeService;
+use App\Domains\Erp\Services\ErpService;
 use App\Domains\Leads\Services\ConvertLeadEventService;
 use App\Domains\Tags\Enums\TagTypesEnum;
 use App\Domains\Tags\Services\TagService;
@@ -82,7 +83,6 @@ final class LeadController extends Controller
      */
     public function create(): View
     {
-        $companies = $this->companyService->get();
         $types = $this->companyTypeService->get();
         $countries = $this->countryCodeService->get();
         $sources = $this->companySourceService->get();
@@ -95,7 +95,7 @@ final class LeadController extends Controller
         $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
         $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
 
-        return view('backend.content.leads.create', compact('companies', 'types', 'countries', 'sources', 'salesPersons', 'tags'));
+        return view('backend.content.leads.create', compact( 'types', 'countries', 'sources', 'salesPersons', 'tags'));
     }
 
     /**
@@ -186,9 +186,19 @@ final class LeadController extends Controller
     {
         $lead = $this->leadService->getById($leadId);
 
-        $company = $this->companyService->getById($lead->getCompanyId());
-        $company->setErpId(rand(100000, 999999));
-        $this->companyService->updateErpIdByCompanyId($company, $lead->getCompanyId());
+        if(!$lead->getCompany()?->getErpId()){
+            return redirect()->route('admin.leads.index')->with('error', 'Δεν έχει καταχωρηθεί το ERP ID της Εταιρείας!');
+        }
+
+        $erpService = app(ErpService::class);
+        $companyDTO = $erpService->syncCustomer($lead->getCompany()->getErpId());
+
+        if(!$companyDTO){
+            return redirect()->route('admin.leads.index')->with('error', 'Δεν βρέθηκε η εταιρεία στο ERP!');
+        }
+
+        // Sync Company Data with ERP
+        $company = $this->companyService->updateErpData($companyDTO, $lead->getCompanyId());
 
         $convertLeadEventService = app(ConvertLeadEventService::class);
         $response = $convertLeadEventService->convertEvent($lead);
@@ -197,6 +207,6 @@ final class LeadController extends Controller
             return redirect()->route('admin.clients.index')->with('success', 'Επιτυχής Μετατροπή!');
         }
 
-        return redirect()->route('admin.leads.index')->with('error', 'Υπήρξε κάποιο πρόβλημα κατά την διαγραφή!');
+        return redirect()->route('admin.leads.index')->with('error', 'Υπήρξε κάποιο πρόβλημα κατά την μετατροπή!');
     }
 }

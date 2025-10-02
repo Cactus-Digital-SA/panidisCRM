@@ -14,6 +14,13 @@ class CountryCode extends CactusEntity
     private ?int $id;
 
     /**
+     * @var ?string $erpId
+     * @JMS\Serializer\Annotation\SerializedName("erp_id")
+     * @JMS\Serializer\Annotation\Type("string")
+     */
+    private ?string $erpId = null;
+
+    /**
      * @var ?string $code
      * @JMS\Serializer\Annotation\SerializedName("code")
      * @JMS\Serializer\Annotation\Type("string")
@@ -27,6 +34,13 @@ class CountryCode extends CactusEntity
      */
     private ?string $name;
 
+    /**
+     * @var ?string $isoCode
+     * @JMS\Serializer\Annotation\SerializedName("iso_code")
+     * @JMS\Serializer\Annotation\Type("string")
+     */
+    private ?string $isoCode;
+
     public function getValues(bool $withRelations = true): array
     {
         $data = [
@@ -34,7 +48,7 @@ class CountryCode extends CactusEntity
             'code'=> $this->getCode(),
             'name'=> $this->getName(),
         ];
-        
+
         return $data;
     }
 
@@ -46,6 +60,17 @@ class CountryCode extends CactusEntity
     public function setId(?int $id): CountryCode
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function getErpId(): ?string
+    {
+        return $this->erpId;
+    }
+
+    public function setErpId(?string $erpId): CountryCode
+    {
+        $this->erpId = $erpId;
         return $this;
     }
 
@@ -70,4 +95,17 @@ class CountryCode extends CactusEntity
         $this->name = $name;
         return $this;
     }
+
+    public function getIsoCode(): ?string
+    {
+        return $this->isoCode;
+    }
+
+    public function setIsoCode(?string $isoCode): CountryCode
+    {
+        $this->isoCode = $isoCode;
+        return $this;
+    }
+
+
 }

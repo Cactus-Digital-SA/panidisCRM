@@ -34,6 +34,13 @@ interface CountryCodeRepositoryInterface extends RepositoryInterface
     public function update(CactusEntity|CountryCode $entity, string $id): ?CountryCode;
 
     /**
+     * @param string $isoCode
+     * @param string $erpId
+     * @return CountryCode|null
+     */
+    public function updateErpIdByCountryCode(string $isoCode, string $erpId, ?CountryCode $entity = null): ?CountryCode;
+
+    /**
      * @param string $id
      * @return boolean
      */

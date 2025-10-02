@@ -57,6 +57,11 @@ class CompanyService
         return $this->repository->store($company);
     }
 
+    public function storeOrUpdate(Company $company): Company
+    {
+        return $this->repository->storeOrUpdate($company);
+    }
+
     /**
      * @param Company $company
      * @param string $id
@@ -67,9 +72,9 @@ class CompanyService
         return $this->repository->update($company, $id);
     }
 
-    public function updateErpIdByCompanyId(Company $company, string $companyId): ?Company
+    public function updateErpData(Company $company, string $companyId): ?Company
     {
-        return $this->repository->updateErpIdByCompanyId($company, $companyId);
+        return $this->repository->updateErpData($company, $companyId);
     }
 
     /**

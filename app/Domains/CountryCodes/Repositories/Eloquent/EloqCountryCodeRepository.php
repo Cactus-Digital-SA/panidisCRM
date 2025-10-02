@@ -88,6 +88,29 @@ class EloqCountryCodeRepository implements CountryCodeRepositoryInterface
         return ObjectSerializer::deserialize($countryCode->toJson() ?? "{}", CountryCode::class, 'json');
     }
 
+    public function updateErpIdByCountryCode(string $isoCode, string $erpId, ?CountryCode $entity = null): ?CountryCode
+    {
+        $countryCode = $this->model->where('iso_code', $isoCode)->first();
+        if($countryCode){
+            $countryCode->update([
+                'erp_id' => $erpId,
+            ]);
+        }else{
+            $countryCode = $this->model::updateOrCreate(
+                [
+                    'erp_id' => $erpId,
+                ],
+                [
+                    'iso_code' => $isoCode,
+                    'erp_id' => $erpId,
+                    'name' => $entity->getName(),
+                ]
+            );
+        }
+        Cache::forget($this->cacheKey);
+        return ObjectSerializer::deserialize($countryCode?->toJson() ?? "{}", CountryCode::class, 'json');
+    }
+
     /**
      * @inheritDoc
      */

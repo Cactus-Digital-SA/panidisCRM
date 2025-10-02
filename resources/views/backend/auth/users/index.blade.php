@@ -158,12 +158,12 @@
                         }
                     },
                     columns: [
-                        { data: 'id' },
+                        { data: 'id', name: 'users.id' },
                         // { data: 'id' },
                         // { data: 'id' }, // used for sorting so will hide this column
                         { data: 'name' , name: 'users.name'},
                         { data: 'email' , name: 'users.email'},
-                        { data: 'roles' , name: 'roles.name'},
+                        { data: 'roles' , name: 'roles.name', orderable: false },
                         { data: 'online_status' },
                         { data: 'last_login' , name: 'users.last_login_at'},
                             @if($status == 1)
@@ -186,7 +186,7 @@
                         {
                             // For Responsive
                             className: 'control',
-                            orderable: false,
+                            orderable: true,
                             responsivePriority: 2,
                             targets: 0
                         },
@@ -218,7 +218,7 @@
                             targets: 4
                         }
                     ],
-                    order: [[2, 'desc']],
+                    order: [[0, 'desc']],
                     // dom: '<"card-header border-bottom p-1"<"head-label"><"dt-action-buttons text-end"B>><"d-flex justify-content-between align-items-center mx-0 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
                     dom: '<"d-flex justify-content-between align-items-center mx-2 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"dt-action-buttons text-end"B>f>>t<"d-flex justify-content-between mx-0 row"<"d-flex justify-content-center col-12"i><"d-flex justify-content-center col-12"p>>',
                     "oLanguage": {

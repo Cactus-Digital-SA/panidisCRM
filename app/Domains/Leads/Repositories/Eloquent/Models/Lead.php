@@ -58,6 +58,12 @@ class Lead extends Model
 
         static::deleting(function ($lead) {
             $lead->tags()->detach();
+
+            if ($lead->company && $lead->company->leads()->where('id', '!=', $lead->id)->doesntExist() &&
+                $lead->company->clients()->doesntExist() )
+            {
+                $lead->company->delete();
+            }
         });
     }
 

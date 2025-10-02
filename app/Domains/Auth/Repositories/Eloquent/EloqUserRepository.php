@@ -488,12 +488,12 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
                         })
                         ->orWhereDoesntHave('roles');
 
-//        if ($filters['columnName'] && $filters['columnSortOrder']) {
-//            $users = $users->orderBy($filters['columnName'], $filters['columnSortOrder']);
-//        }
+        if ($filters['columnName'] && $filters['columnSortOrder']) {
+            $users = $users->orderBy($filters['columnName'], $filters['columnSortOrder']);
+        }
 
-//        $users = $users->orderBy('users.id','desc')
-//            ->groupBy('users.id');
+        $users = $users->orderBy('users.id','desc')
+            ->groupBy('users.id');
 
         return DataTables::of($users)
             ->editColumn('roles', function(EloquentUser $user) {

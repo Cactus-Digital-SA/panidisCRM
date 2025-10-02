@@ -29,6 +29,12 @@ interface CompanyRepositoryInterface extends RepositoryInterface
     public function store(CactusEntity|Company $entity): ?Company;
 
     /**
+     * @param Company $entity
+     * @return Company|null
+     */
+    public function storeOrUpdate(Company $entity): ?Company;
+
+    /**
      * @param CactusEntity|Company $entity
      * @param string $id
      * @return Company|null
@@ -40,7 +46,7 @@ interface CompanyRepositoryInterface extends RepositoryInterface
      * @param string $id
      * @return Company|null
      */
-    public function updateErpIdByCompanyId(CactusEntity|Company $entity, string $companyId): ?Company;
+    public function updateErpData(CactusEntity|Company $entity, string $companyId): ?Company;
 
     /**
      * @param string $id

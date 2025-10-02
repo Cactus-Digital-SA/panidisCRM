@@ -69,6 +69,11 @@ class Company extends Model
             ->using(UserCompany::class);
     }
 
+    public function leads(): HasMany
+    {
+        return $this->hasMany(Lead::class, 'company_id');
+    }
+
     public function lead(): HasOne
     {
         return $this->hasOne(Lead::class, 'company_id');
@@ -77,6 +82,11 @@ class Company extends Model
     public function client(): HasOne
     {
         return $this->hasOne(Client::class,'company_id');
+    }
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class,'company_id');
     }
 
     public function tickets() : HasMany

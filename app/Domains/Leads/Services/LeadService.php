@@ -2,11 +2,7 @@
 
 namespace App\Domains\Leads\Services;
 
-use App\Domains\Events\Enums\EventTypeEnum;
-use App\Domains\Events\Models\CactusEvent;
-use App\Domains\Events\Services\CactusEventService;
 use App\Domains\Leads\Models\Lead;
-use App\Domains\Leads\Repositories\Eloquent\Models\LeadStatusEnum;
 use App\Domains\Leads\Repositories\LeadRepositoryInterface;
 use App\Models\Enums\EloqMorphEnum;
 use Illuminate\Http\JsonResponse;

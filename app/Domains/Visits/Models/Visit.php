@@ -512,9 +512,9 @@ class Visit extends CactusEntity
      */
     public static function fromRequest(Request $request): Visit
     {
-        $projectDTO = new Visit();
+        $visitDTO = new Visit();
 
-        return $projectDTO
+        return $visitDTO
             ->setName($request['name'])
             ->setDeadline($request['deadline'] ?  Carbon::parse($request['deadline']) : null)
             ->setPriorityAttribute($request['priority'])

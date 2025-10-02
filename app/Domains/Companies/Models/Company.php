@@ -500,4 +500,20 @@ class Company extends CactusEntity
 
 
     }
+
+    public function mapCompanyToDto(array $erpItem): Company
+    {
+        $company = new Company();
+
+        $company->setErpId($erpItem['erp_id'] ?? null)
+            ->setName($erpItem['name'] ?? null)
+            ->setPhone($erpItem['phone'] ?? null)
+            ->setActivity($erpItem['activity'] ?? null)
+            ->setTypeId($erpItem['type_id'] ?? null)
+            ->setCountryId($erpItem['country_id'] ?? null)
+            ->setCity($erpItem['city'] ?? null);
+
+        return $company;
+
+    }
 }

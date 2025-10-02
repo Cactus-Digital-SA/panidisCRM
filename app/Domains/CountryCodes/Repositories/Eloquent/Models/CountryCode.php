@@ -9,6 +9,8 @@ class CountryCode extends Model
     protected $table = 'country_codes';
 
     protected $fillable = [
+        'erp_id',
+        'iso_code',
         'code',
         'name',
     ];

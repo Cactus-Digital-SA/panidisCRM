@@ -27,16 +27,10 @@
                                 <i class="fa-sharp fa-regular fa-file fa-2xl" style="color: cadetblue;"></i>
                             @endif
                         </div>
-                        <div class="{{ $file->getLeadStatus() ? 'col-4' : 'col-6' }} text-center">
+                        <div class="{{ 'col-6' }} text-center">
                             <p class="fw-bolder mb-0">{{$file->getFileName()}}</p>
                             <span>{{$file->getSize()}} kb</span>
                         </div>
-                        @if($file->getLeadStatus())
-                            <div class="col-2 text-center">
-                                <p class="fw-bolder mb-0">Status</p>
-                                <span> {{$file->getLeadStatus()->getName()}}</span>
-                            </div>
-                        @endif
                         <div class="col-2 text-center">
                             <p class="fw-bolder mb-0">Ημ/νια Δημιουργίας</p>
                             <span>{{$file->getCreatedAt()->format('d-m-Y')}}</span>

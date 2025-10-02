@@ -51,6 +51,11 @@ class ClientService
         return $this->repository->store($client);
     }
 
+    public function storeOrUpdate(Client $client): Client
+    {
+        return $this->repository->storeOrUpdate($client);
+    }
+
     /**
      * @param Client $client
      * @param string $id

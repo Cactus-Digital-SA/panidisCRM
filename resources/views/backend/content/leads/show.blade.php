@@ -13,10 +13,12 @@
 @section('content-header')
     <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
         <div class="mb-1 breadcrumb-right">
+            @if($lead->getCompany()?->getErpId())
             <a href="{{route('admin.leads.convert',$lead->getId())}}" class="btn btn-primary  me-2">
                 <i class="ti ti-refresh me-1"></i>
                 Μετατροπή σε Client
             </a>
+            @endif
         </div>
     </div>
 
