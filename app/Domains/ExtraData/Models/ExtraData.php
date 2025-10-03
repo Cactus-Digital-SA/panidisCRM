@@ -3,8 +3,6 @@
 namespace App\Domains\ExtraData\Models;
 
 use App\Domains\ExtraData\Enums\ExtraDataTypesEnum;
-use App\Domains\Prospect\Models\ProspectExtraData;
-use App\Domains\Prospect\Repositories\Eloquent\Models\Prospect;
 use App\Models\CactusEntity;
 use Illuminate\Http\Request;
 use JMS\Serializer\Annotation as Serializer;
@@ -61,20 +59,6 @@ class ExtraData extends CactusEntity
     private bool $multiple = false;
 
     /**
-     * @var ProspectExtraData|null $pivot
-     * @Serializer\SerializedName("pivot")
-     * @Serializer\Type("App\Domains\Prospect\Models\ProspectExtraData")
-     */
-    private ?ProspectExtraData $pivot = null;
-
-    /**
-     * @var Prospect[] $prospects
-     * @Serializer\SerializedName("prospects")
-     * @Serializer\Type("array<App\Domains\Prospect\Repositories\Eloquent\Models\Prospect>")
-     */
-    private ?array $prospects = [];
-
-    /**
      * @var ExtraDataModel[] $models
      * @Serializer\SerializedName("models")
      * @Serializer\Type("array<App\Domains\ExtraData\Models\ExtraDataModel>")
@@ -97,9 +81,9 @@ class ExtraData extends CactusEntity
             'multiple' => $this->multiple
         ];
 
-        if ($withRelations) {
-            $data['prospects'] = $this->getProspects();
-        }
+//        if ($withRelations) {
+//
+//        }
 
         return $data;
     }
@@ -190,28 +174,6 @@ class ExtraData extends CactusEntity
     public function setMultiple(bool $multiple): ExtraData
     {
         $this->multiple = $multiple;
-        return $this;
-    }
-
-    public function getPivot(): ?ProspectExtraData
-    {
-        return $this->pivot;
-    }
-
-    public function setPivot(?ProspectExtraData $pivot): ExtraData
-    {
-        $this->pivot = $pivot;
-        return $this;
-    }
-
-    public function getProspects(): ?array
-    {
-        return $this->prospects;
-    }
-
-    public function setProspects(?array $prospects): ExtraData
-    {
-        $this->prospects = $prospects;
         return $this;
     }
 

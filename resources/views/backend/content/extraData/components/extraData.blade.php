@@ -15,13 +15,13 @@
             @php
                 if($data->isMultiple()){
                     $pivots = [];
-                    if (isset($model) && is_object($model) && method_exists($model, 'getExtraData')) {
-                        foreach ($model?->getExtraData() ?? [] as $modelExtraData) {
-                            if ($modelExtraData->getId() == $data->getId()) {
-                                $pivots[] = $modelExtraData->getPivot();
-                            }
-                        }
-                    }
+//                    if (isset($model) && is_object($model) && method_exists($model, 'getExtraData')) {
+//                        foreach ($model?->getExtraData() ?? [] as $modelExtraData) {
+//                            if ($modelExtraData->getId() == $data->getId()) {
+//                                $pivots[] = $modelExtraData->getPivot();
+//                            }
+//                        }
+//                    }
 
                     $values = [];
                     foreach($pivots as $pivot){
@@ -30,14 +30,14 @@
                 }
                 else{
                     $pivot = null;
-                    if (isset($model) && is_object($model) && method_exists($model, 'getExtraData')) {
-                        foreach ($model?->getExtraData() ?? [] as $modelExtraData) {
-                            if ($modelExtraData->getId() == $data->getId()) {
-                                $pivot = $modelExtraData->getPivot();
-                                break;
-                            }
-                        }
-                    }
+//                    if (isset($model) && is_object($model) && method_exists($model, 'getExtraData')) {
+//                        foreach ($model?->getExtraData() ?? [] as $modelExtraData) {
+//                            if ($modelExtraData->getId() == $data->getId()) {
+//                                $pivot = $modelExtraData->getPivot();
+//                                break;
+//                            }
+//                        }
+//                    }
 
                     $value = $pivot ? $pivot->getValue() : null;
                 }

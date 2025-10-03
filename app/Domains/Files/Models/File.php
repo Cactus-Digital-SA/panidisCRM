@@ -67,13 +67,6 @@ class File extends CactusEntity
     private ?int $uploadedBy;
 
     /**
-     * @var int|null $statusId
-     * @JMS\Serializer\Annotation\SerializedName("lead_status_id")
-     * @JMS\Serializer\Annotation\Type("int")
-     */
-    private ?int $statusId;
-
-    /**
      * @var DateTime|null $createdAt
      * @JMS\Serializer\Annotation\SerializedName("created_at")
      * @JMS\Serializer\Annotation\Type("DateTime<'Y-m-d\TH:i:s.up'>")

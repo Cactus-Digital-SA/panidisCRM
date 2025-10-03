@@ -235,6 +235,26 @@
         });
     </script>
 
+    <script>
+        function fetchContact(contactId)
+        {
+            let form = $('#show-user-form');
+            let action_url = '{{ route('api.internal.contacts.getContact',':id') }}';
+            action_url = action_url.replace(':id', contactId,);
+            $.ajax({
+                url: action_url,
+            })
+                .done(function(response) {
+                    form.find('[name="firstName"]').text(response.data.firstName || '');
+                    form.find('[name="lastName"]').text(response.data.lastName || '');
+                    form.find('[name="email"]').text(response.data.email || '');
+                    form.find('[name="phone"]').text(response.data.phone || '');
+
+                });
+
+        }
+
+    </script>
 
     @include('backend.components.js.select')
 @endsection

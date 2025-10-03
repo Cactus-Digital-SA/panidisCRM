@@ -31,8 +31,6 @@ class File extends Model
         'uploaded_by',
     ];
 
-    protected $appends = ['lead_status'];
-
     /**
      * Summary of guarded
      * @var array
