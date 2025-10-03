@@ -93,6 +93,25 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
         return ObjectSerializer::deserialize($company?->toJson() ?? "{}", Company::class, 'json');
     }
 
+    public function storeOrUpdate(Company $entity): ?Company
+    {
+        $company = $this->model::updateOrCreate(
+            [
+                'erp_id' => $entity->getErpId()
+            ],
+            [
+                'name' => $entity->getName(),
+                'phone' => $entity->getPhone(),
+                'activity' => $entity->getActivity(),
+                'type_id' => $entity->getTypeId(),
+                'country_id' => $entity->getCountryId(),
+                'city' => $entity->getCity(),
+            ]
+        );
+
+        return ObjectSerializer::deserialize($company?->toJson() ?? "{}", Company::class, 'json');
+    }
+
     /**
      * @inheritDoc
      */
@@ -118,13 +137,18 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
         return ObjectSerializer::deserialize($company->toJson() ?? "{}", Company::class, 'json');
     }
 
-    public function updateErpIdByCompanyId(Company|CactusEntity $entity, string $companyId): ?Company
+    public function updateErpData(Company|CactusEntity $entity, string $companyId): ?Company
     {
-        $company = $this->model->find($companyId);
+        $company = $this->model->where('erp_id', $entity->getErpId())->where('id', $companyId)->first();
 
         if($company){
             $company->update([
-                'erp_id' => $entity->getErpId(),
+                'name' => $entity->getName(),
+                'phone' => $entity->getPhone(),
+                'activity' => $entity->getActivity(),
+                'type_id' => $entity->getTypeId(),
+                'country_id' => $entity->getCountryId(),
+                'city' => $entity->getCity(),
             ]);
 
             return ObjectSerializer::deserialize($company->toJson() ?? "{}", Company::class, 'json');

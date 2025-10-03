@@ -2,7 +2,6 @@
 
 namespace App\Domains\Leads\Http\Requests;
 
-use App\Domains\Leads\Repositories\Eloquent\Models\LeadStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;

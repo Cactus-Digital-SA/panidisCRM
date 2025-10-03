@@ -21,14 +21,6 @@ class ContactApiController extends Controller
         $contact->email = $user->getEmail();
         $contact->phone = $user->getUserDetails()->getPhone();
 
-        $contact->extraData = [];
-        foreach($user->getExtraData() as $extraData) {
-            $extraDataDTO = new \stdClass();
-            $extraDataDTO->id = $extraData->getId();
-            $extraDataDTO->value = $extraData->getPivot()->getValue();
-            $contact->extraData[] = $extraDataDTO;
-        }
-
         return response()->json(['success' => true,  'data' => $contact]);
     }
 }

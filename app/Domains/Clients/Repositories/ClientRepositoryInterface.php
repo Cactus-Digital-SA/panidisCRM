@@ -36,6 +36,12 @@ interface ClientRepositoryInterface extends RepositoryInterface
 
     /**
      * @param CactusEntity|Client $entity
+     * @return Client|null
+     */
+    public function storeOrUpdate(CactusEntity|Client $entity): ?Client;
+
+    /**
+     * @param CactusEntity|Client $entity
      * @param string $id
      * @return Client|null
      */

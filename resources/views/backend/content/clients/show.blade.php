@@ -141,35 +141,32 @@
                 </div>
                 <div class="modal-body pb-5 px-sm-5 pt-50">
                     <div class="text-center mb-2">
-                        <h2 class="mb-1">Προβολή Επαφής</h2>
+                        <h3 class="mb-3">Προβολή Επαφής</h3>
                     </div>
                     <div class="col-12">
                         <form action="#" id="show-user-form" method="post" class="row gy-1 pt-75">
                             <div class="form-group row mb-1 mt-1">
                                 <label for="name" class="col-md-2 col-form-label fw-bold">Όνομα</label>
-                                <div class="col-md-10">
-                                    <p name="firstName" class="form-control"></p>
-                                    <div class="invalid-feedback"> Το Όνομα είναι απαραίτητο. </div>
+                                <div class="col-md-10 m-auto">
+                                    <span name="firstName" class=""></span>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="name" class="col-md-2 col-form-label fw-bold">Επώνυμο</label>
-                                <div class="col-md-10">
-                                    <p name="lastName" class="form-control"></p>
-                                    <div class="invalid-feedback"> Το Επώνυμο είναι απαραίτητο. </div>
+                                <div class="col-md-10 m-auto">
+                                    <span name="lastName" class=""></span>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="email" class="col-md-2 col-form-label fw-bold">@lang('E-mail Address')</label>
-                                <div class="col-md-10">
-                                    <p name="email" class="form-control"></p>
-                                    <div class="invalid-feedback"> Το Email είναι απαραίτητο. </div>
+                                <div class="col-md-10 m-auto">
+                                    <span name="email" class=""></span>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="email" class="col-md-2 col-form-label fw-bold">Τηλέφωνο</label>
-                                <div class="col-md-10">
-                                    <p name="phone" class="form-control"></p>
+                                <div class="col-md-10 m-auto">
+                                    <span name="phone" class=""></span>
                                 </div>
                             </div>
                         </form>
@@ -224,6 +221,27 @@
         $('.enable-tag').select2({
             tags: true,
         });
+    </script>
+
+    <script>
+        function fetchContact(contactId)
+        {
+            let form = $('#show-user-form');
+            let action_url = '{{ route('api.internal.contacts.getContact',':id') }}';
+            action_url = action_url.replace(':id', contactId,);
+            $.ajax({
+                url: action_url,
+            })
+                .done(function(response) {
+                    form.find('[name="firstName"]').text(response.data.firstName || '');
+                    form.find('[name="lastName"]').text(response.data.lastName || '');
+                    form.find('[name="email"]').text(response.data.email || '');
+                    form.find('[name="phone"]').text(response.data.phone || '');
+
+                });
+
+        }
+
     </script>
 
     @include('backend.components.js.select')

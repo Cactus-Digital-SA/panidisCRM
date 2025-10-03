@@ -3,7 +3,6 @@
 namespace App\Domains\Files\Repositories\Eloquent\Models;
 
 use App\Domains\Auth\Repositories\Eloquent\Models\User;
-use App\Domains\Leads\Repositories\Eloquent\Models\LeadStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -30,10 +29,7 @@ class File extends Model
         'extension',
         'size',
         'uploaded_by',
-        'lead_status_id'
     ];
-
-    protected $appends = ['lead_status'];
 
     /**
      * Summary of guarded
@@ -59,15 +55,4 @@ class File extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    /**
-     * Summary of getStatusAttribute
-     * @return ?object
-     */
-    public function getLeadStatusAttribute(): ?object
-    {
-        if($this->lead_status_id){
-            return LeadStatusEnum::from($this->lead_status_id)->model();
-        }
-        return null;
-    }
 }

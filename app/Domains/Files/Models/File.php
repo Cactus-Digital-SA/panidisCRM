@@ -2,7 +2,6 @@
 
 namespace App\Domains\Files\Models;
 
-use App\Domains\Leads\Models\LeadStatus;
 use App\Models\CactusEntity;
 use App\Models\User;
 use DateTime;
@@ -68,13 +67,6 @@ class File extends CactusEntity
     private ?int $uploadedBy;
 
     /**
-     * @var int|null $statusId
-     * @JMS\Serializer\Annotation\SerializedName("lead_status_id")
-     * @JMS\Serializer\Annotation\Type("int")
-     */
-    private ?int $statusId;
-
-    /**
      * @var DateTime|null $createdAt
      * @JMS\Serializer\Annotation\SerializedName("created_at")
      * @JMS\Serializer\Annotation\Type("DateTime<'Y-m-d\TH:i:s.up'>")
@@ -87,13 +79,6 @@ class File extends CactusEntity
      * @JMS\Serializer\Annotation\Type("App\Models\User")
      */
     private ?User $user = null;
-
-    /**
-     * @var ?LeadStatus $leadStatus
-     * @JMS\Serializer\Annotation\SerializedName("lead_status")
-     * @JMS\Serializer\Annotation\Type("App\Domains\Leads\Models\LeadStatus")
-     */
-    private ?LeadStatus $leadStatus = null;
 
     /**
      * Summary of getValues
@@ -307,17 +292,6 @@ class File extends CactusEntity
     public function setStatusId(?int $statusId): File
     {
         $this->statusId = $statusId;
-        return $this;
-    }
-
-    public function getLeadStatus(): ?LeadStatus
-    {
-        return $this->leadStatus;
-    }
-
-    public function setLeadStatus(?LeadStatus $leadStatus): File
-    {
-        $this->leadStatus = $leadStatus;
         return $this;
     }
 

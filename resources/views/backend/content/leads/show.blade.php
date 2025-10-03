@@ -13,10 +13,12 @@
 @section('content-header')
     <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
         <div class="mb-1 breadcrumb-right">
+            @if($lead->getCompany()?->getErpId())
             <a href="{{route('admin.leads.convert',$lead->getId())}}" class="btn btn-primary  me-2">
                 <i class="ti ti-refresh me-1"></i>
                 Μετατροπή σε Client
             </a>
+            @endif
         </div>
     </div>
 
@@ -233,6 +235,26 @@
         });
     </script>
 
+    <script>
+        function fetchContact(contactId)
+        {
+            let form = $('#show-user-form');
+            let action_url = '{{ route('api.internal.contacts.getContact',':id') }}';
+            action_url = action_url.replace(':id', contactId,);
+            $.ajax({
+                url: action_url,
+            })
+                .done(function(response) {
+                    form.find('[name="firstName"]').text(response.data.firstName || '');
+                    form.find('[name="lastName"]').text(response.data.lastName || '');
+                    form.find('[name="email"]').text(response.data.email || '');
+                    form.find('[name="phone"]').text(response.data.phone || '');
+
+                });
+
+        }
+
+    </script>
 
     @include('backend.components.js.select')
 @endsection

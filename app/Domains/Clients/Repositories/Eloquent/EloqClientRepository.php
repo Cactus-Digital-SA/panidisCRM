@@ -110,6 +110,18 @@ class EloqClientRepository extends EloquentRelationHelper implements ClientRepos
         return ObjectSerializer::deserialize($client->toJson() ?? "{}", Client::class, 'json');
     }
 
+    public function storeOrUpdate(Client|CactusEntity $entity): ?Client
+    {
+        $client = $this->model::updateOrCreate([
+            'company_id' => $entity->getCompanyId(),
+            ],
+            [
+                'sales_person_id' => $entity->getSalesPersonId(),
+            ]);
+
+        return ObjectSerializer::deserialize($client?->toJson() ?? "{}", Client::class, 'json');
+    }
+
     /**
      * @param CactusEntity|Client $entity
      * @param string $id

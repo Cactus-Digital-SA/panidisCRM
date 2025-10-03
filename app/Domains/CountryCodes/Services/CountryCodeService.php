@@ -59,6 +59,17 @@ class CountryCodeService
     }
 
     /**
+     * @param string $isoCode
+     * @param string $erpId
+     * @param CountryCode|null $entity
+     * @return CountryCode|null
+     */
+    public function updateErpIdByCountryCode(string $isoCode, string $erpId, ?CountryCode $entity = null): ?CountryCode
+    {
+        return $this->repository->updateErpIdByCountryCode($isoCode, $erpId, $entity);
+    }
+
+    /**
      * @param string $id
      * @return boolean
      */

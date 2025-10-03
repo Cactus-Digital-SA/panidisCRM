@@ -84,15 +84,13 @@ final class ClientController extends Controller
      */
     public function create(): View
     {
-        $companies = $this->companyService->get();
-
         $types = $this->companyTypeService->get();
 
 //        $tags = $this->tagService->get();
 
         $countries = $this->countryCodeService->get();
 
-        return view('backend.content.clients.create', compact('companies', 'types', 'countries'));
+        return view('backend.content.clients.create', compact('types', 'countries'));
     }
 
     /**

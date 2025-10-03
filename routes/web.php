@@ -3,6 +3,7 @@
 use App\Domains\Auth\Http\Controllers\Fortify\TwoFactorAuthController;
 use App\Domains\Auth\Http\Controllers\User\ProfileController;
 use App\Domains\Dashboard\Http\Controllers\Frontend\HomeController;
+use App\Domains\Erp\Services\ErpService;
 use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -17,6 +18,10 @@ use Laravel\Fortify\Features;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/syncCountries', [ErpService::class, 'syncCountries'])->name('syncCountries');
+Route::get('/getItems', [ErpService::class, 'getItems'])->name('getItems');
+Route::get('/syncCustomers', [ErpService::class, 'syncCustomers'])->name('syncCustomers');
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

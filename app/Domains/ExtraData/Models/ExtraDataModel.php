@@ -3,8 +3,6 @@
 namespace App\Domains\ExtraData\Models;
 
 use App\Domains\ExtraData\Enums\ExtraDataTypesEnum;
-use App\Domains\Prospect\Models\ProspectExtraData;
-use App\Domains\Prospect\Repositories\Eloquent\Models\Prospect;
 use App\Models\CactusEntity;
 use Illuminate\Http\Request;
 use JMS\Serializer\Annotation as Serializer;

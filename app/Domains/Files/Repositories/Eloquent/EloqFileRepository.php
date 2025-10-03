@@ -95,12 +95,6 @@ class EloqFileRepository implements FileRepositoryInterface
             // Find Relation Model
             $relationModel = $this->relationModel($model, $morphable_id);
 
-            if($model === ModelMorphEnum::LEAD->value) {
-                $file->update([
-                    'lead_status_id' => $relationModel->status_id
-                ]);
-            }
-
             // Attach Note
             $relationModel?->files()?->attach([$file->id]);
 

@@ -27,6 +27,8 @@ use App\Domains\ExtraData\Repositories\Eloquent\EloqExtraDataRepository;
 use App\Domains\ExtraData\Repositories\ExtraDataRepositoryInterface;
 use App\Domains\Files\Repositories\Eloquent\EloqFileRepository;
 use App\Domains\Files\Repositories\FileRepositoryInterface;
+use App\Domains\Items\Repositories\Eloquent\EloqItemRepository;
+use App\Domains\Items\Repositories\ItemRepositoryInterface;
 use App\Domains\Leads\Repositories\Eloquent\EloqLeadRepository;
 use App\Domains\Leads\Repositories\Eloquent\Models\Lead;
 use App\Domains\Leads\Repositories\LeadRepositoryInterface;
@@ -74,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind( VisitRepositoryInterface::class, EloqVisitRepository::class);
         $this->app->bind( VisitStatusRepositoryInterface::class, EloqVisitStatusRepository::class);
         $this->app->bind(TagRepositoryInterface::class, EloqTagRepository::class);
+        $this->app->bind(ItemRepositoryInterface::class, EloqItemRepository::class);
 
         $this->relations();
 
