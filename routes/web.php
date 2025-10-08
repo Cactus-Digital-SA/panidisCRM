@@ -18,8 +18,8 @@ use Laravel\Fortify\Features;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/syncCountries', [ErpService::class, 'syncCountries'])->name('syncCountries');
-Route::get('/getItems', [ErpService::class, 'getItems'])->name('getItems');
+//Route::get('/syncCountries', [ErpService::class, 'syncCountries'])->name('syncCountries');
+//Route::get('/getItems', [ErpService::class, 'getItems'])->name('getItems');
 //Route::get('/syncCustomers', [ErpService::class, 'syncCustomers'])->name('syncCustomers');
 
 

@@ -316,7 +316,7 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
      * @param int $resultCount number of results per page
      * @return array{data: Collection, count: int} Array contains paginated data and total count.
      */
-    public function namesPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    public function namesPaginated(?string $searchTerm, int $offset, int $resultCount, ?string $type = null): array
     {
         $companies = $this->model
             ->with(['lead', 'client'])
@@ -326,7 +326,13 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
             $companies = $companies->where('name', 'LIKE', '%' . $searchTerm . '%');
         }
 
-        $companies = $companies->whereHas('lead')->orWhereHas('client');
+        if($type == 'client'){
+            $companies = $companies->whereHas('client');
+        }elseif($type == 'lead'){
+            $companies = $companies->whereHas('lead');
+        }else{
+            $companies = $companies->whereHas('lead')->orWhereHas('client');
+        }
 
 
         $companies = $companies->skip($offset)->take($resultCount)->get();

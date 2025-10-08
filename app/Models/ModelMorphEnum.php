@@ -11,4 +11,6 @@ enum ModelMorphEnum: string
     case LEAD = 'Lead';
     case COMPANY = 'Company';
     case VISIT = 'Visit';
+
+    case QUOTE = 'Quote';
 }

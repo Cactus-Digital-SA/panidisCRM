@@ -139,9 +139,9 @@ class CompanyService
      * @param int $resultCount number of results per page
      * @return array{data: Collection, count: int} Array contains paginated data and total count.
      */
-    public function namesPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    public function namesPaginated(?string $searchTerm, int $offset, int $resultCount, string $type = null): array
     {
-        return $this->repository->namesPaginated($searchTerm, $offset, $resultCount);
+        return $this->repository->namesPaginated($searchTerm, $offset, $resultCount, $type);
     }
 
     /**

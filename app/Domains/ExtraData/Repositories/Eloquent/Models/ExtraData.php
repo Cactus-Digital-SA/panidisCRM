@@ -3,7 +3,6 @@
 namespace App\Domains\ExtraData\Repositories\Eloquent\Models;
 
 use App\Domains\ExtraData\Enums\ExtraDataTypesEnum;
-use App\Domains\Prospect\Repositories\Eloquent\Models\Prospect;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,11 +25,6 @@ class ExtraData extends Model
         'required' => 'boolean',
         'multiple' => 'boolean',
     ];
-
-    public function prospects(): BelongsToMany
-    {
-        return $this->belongsToMany(Prospect::class, 'prospect_extra_data', 'extra_data_id', 'prospect_id');
-    }
 
     public function models(): HasMany
     {

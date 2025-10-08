@@ -65,8 +65,8 @@
                 </div>
             </a>
         </li>
-        <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
-            <a class="menu-link" href="#">
+        <li class="menu-item {{ Route::currentRouteName() === 'admin.quotes.index' ? 'active' : '' }}">
+            <a class="menu-link" href="{{ route('admin.quotes.index') }}">
                 <i class="menu-icon tf-icons ti ti-file-description"></i>
                 <div>
                     <span class="menu-title" >Quotes</span>
