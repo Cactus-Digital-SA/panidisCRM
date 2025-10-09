@@ -112,7 +112,7 @@ class EloqItemRepository implements ItemRepositoryInterface
             'id',
             DB::raw('name AS text'),
             'erp_id as sku',
-            'price_wholesale AS price',
+            'price_retail AS price',
         );
 
         if ($searchTerm != null) {
