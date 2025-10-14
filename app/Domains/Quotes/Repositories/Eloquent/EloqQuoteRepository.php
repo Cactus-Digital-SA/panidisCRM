@@ -251,7 +251,7 @@ class EloqQuoteRepository extends EloquentRelationHelper implements QuoteReposit
             'title' => ['name' => 'Τίτλος', 'table' => 'quotes.title', 'searchable' => 'false', 'orderable' => 'false'],
             'totalAmount' => ['name' => 'Σύνολο', 'table' => 'quotes.total', 'searchable' => 'true', 'orderable' => 'true'],
             'status' => ['name' => 'Status', 'table' => 'quotes.status', 'searchable' => 'true', 'orderable' => 'true'],
-            'validUntil' => ['name' => 'Αποδοχή έως', 'table' => 'quotes.valid_until', 'searchable' => 'true', 'orderable' => 'true'],
+            'validUntil' => ['name' => 'Valid until', 'table' => 'quotes.valid_until', 'searchable' => 'true', 'orderable' => 'true'],
             'assignees' => ['name' => 'Signed by', 'table' => '', 'searchable' => 'false', 'orderable' => 'false']
         ];
     }

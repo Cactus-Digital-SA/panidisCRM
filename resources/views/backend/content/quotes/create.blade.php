@@ -117,7 +117,7 @@
                     </div>
                     <div class="form-group row mb-4 mt-4">
                         <div class="col-lg-6">
-                            <label for="valid_until" class="col-form-label">Αποδοχή έως <small class="text-danger">*</small></label>
+                            <label for="valid_until" class="col-form-label">Valid until <small class="text-danger">*</small></label>
                             <div class="col-md-12">
                                 <input type="text" name="valid_until" id="valid_until" placeholder="dd-mm-yyyy" autocomplete="off" class="form-control datepicker" required>
                                 <div class="invalid-feedback">Η ημ/νια αποδοχής είναι απαραίτητη.</div>
@@ -390,15 +390,15 @@
                 }
             });
 
-
             $('#valid_until').each(function (i, date) {
                 date.flatpickr({
-                    minDate: new Date(new Date().setDate(new Date().getDate() - 2)),
+                    minDate: "today",
+                    defaultDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
                     locale: 'gr',
                     altInput: true,
                     altFormat: 'd-m-Y',
                     dateFormat: 'Y-m-d',
-                })
+                });
             });
 
             let url = `{{ route('api.internal.companies.namesPaginatedByType', ':type') }}`.replace(':type', 'client');

@@ -121,7 +121,7 @@
                 </div>
                 <div class="form-group row mb-4 mt-4">
                     <div class="col-lg-6">
-                        <label for="valid_until" class="col-form-label">Αποδοχή έως <small class="text-danger">*</small></label>
+                        <label for="valid_until" class="col-form-label">Valid until <small class="text-danger">*</small></label>
                         <div class="col-md-12">
                             <input type="text" name="valid_until" id="valid_until" placeholder="dd-mm-yyyy" autocomplete="off" class="form-control datepicker" required value="{{ old('valid_until', $quote->getValidUntil()?->format('Y-m-d')) }}">
                             <div class="invalid-feedback">Η ημ/νια αποδοχής είναι απαραίτητη.</div>
