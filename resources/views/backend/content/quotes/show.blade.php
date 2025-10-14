@@ -88,7 +88,7 @@
 
 @section('content-header-breadcrumbs')
     <li class="breadcrumb-item"> <a href="{{ route('admin.home') }}" class="">Αρχική</a> </li>
-    <li class="breadcrumb-item"> <a href="{{ route('admin.clients.index') }}" class="">Πελάτες</a> </li>
+    <li class="breadcrumb-item"> <a href="{{ route('admin.quotes.index') }}" class="">Quotes</a> </li>
     <li class="breadcrumb-item active">Δημιουργία</li>
 @endsection
 
@@ -194,7 +194,7 @@
                                         <input type="text" name="items[{{ $i }}][color]" class="form-control" placeholder="Χρώμα" value="{{ $item->getColor() }}">
                                     </td>
                                     <td class="col-md-1">
-                                        <input type="number" name="items[{{ $i }}][quantity]" class="form-control" min="0" step="0.01" onwheel="this.blur()" required value="{{ $item->getQuantity() }}">
+                                        <input type="number" name="items[{{ $i }}][quantity]" class="form-control" min="0" step="0.01" placeholder="Ποσότητα" onwheel="this.blur()" required value="{{ $item->getQuantity() }}">
                                     </td>
                                     <td class="col-md-1">
                                         <select name="items[{{ $i }}][unit_type]" id="unit_type_{{ $i }}" class="form-control select2 unit_type_select" data-placeholder="Τύπος" data-allow-clear="true" required>
@@ -232,7 +232,7 @@
                             <div class="content-header-left text-md-end col-md-auto col-12">
                                 <div class="mb-1 breadcrumb-left">
                                     <button type="button" class="btn btn-success btn-round waves-effect waves-float waves-light add-item">
-                                        <i class="ti ti-plus me-1"></i> Προσθήκη Υπηρεσίας
+                                        <i class="ti ti-plus me-1"></i> Προσθήκη Προϊόντος
                                     </button>
                                 </div>
                             </div>
