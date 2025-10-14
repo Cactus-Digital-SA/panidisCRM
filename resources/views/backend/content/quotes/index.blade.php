@@ -1,6 +1,6 @@
 @extends('backend.layouts.app')
 
-@section('title', 'Leads')
+@section('title', 'Quotes')
 
 @section('vendor-style')
     @include('includes.datatable_styles')
@@ -9,17 +9,25 @@
 
 @section('page-style')
     @vite([])
+    <style>
+        table.dataTable th, table.dataTable td{
+            /*white-space: nowrap;*/
+            min-width: 125px !important;
+            max-width: 125px !important;
+            vertical-align: middle;
+        }
+    </style>
 @endsection
 
 @section('content-header')
     <div class="col-md-5 content-header-right text-md-end">
         <div class="d-flex flex-nowrap mb-md-2 breadcrumb-right d-flex justify-content-center justify-content-md-end">
             <a class="col-6 col-md-auto btn btn-primary d-inline-flex align-items-center waves-effect waves-float waves-light me-2 mb-lg-0"
-               href="{{ route('admin.leads.create') }}" >
+               href="{{ route('admin.quotes.create') }}" >
                 <i class="ti ti-square-plus me-1"></i> Δημιουργία
             </a>
             <button class="col-6 col-md-auto btn btn-info d-inline-flex align-items-center waves-effect waves-float waves-light mb-lg-0"
-                onclick="jQuery('#filters').toggle()">
+                    onclick="jQuery('#filters').toggle()">
                 <i class="ti ti-filter me-1"></i> Φίλτρα
             </button>
         </div>
@@ -29,7 +37,7 @@
 @section('content-header-breadcrumbs')
     <li class="breadcrumb-item"><a href="{{ route('admin.home') }}">Αρχική</a>
     </li>
-    <li class="breadcrumb-item active">Leads
+    <li class="breadcrumb-item active">Quotes
     </li>
 @endsection
 
@@ -41,14 +49,14 @@
             <div class="card-body p-0">
                 <div class="row justify-content-end card-header">
                     <div class="col-md-3 col-12 mb-md-0 mb-2">
-                        <input type="text" class="form-control" placeholder="Όνομα" id="filterName" name="filterName"/>
+                        <input type="text" class="form-control" placeholder="Τίτλος ή ID" id="filterName" name="filterName"/>
                     </div>
                     <div class="col-md-2 col-12">
                         <div class="form-group row p-0 m-0">
                             <div class="col-md-12">
                                 <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                                     <button style="width: 100%;" id="search" name="search"
-                                        class="btn btn-success mb-1 waves-effect waves-light" data-toggle="tooltip">
+                                            class="btn btn-success mb-1 waves-effect waves-light" data-toggle="tooltip">
                                         <i class="fa fa-search me-1"></i> Αναζήτηση
                                     </button>
                                 </div>
@@ -66,14 +74,14 @@
             <div class="row">
                 <section id="column-selectors">
                     <div class="table-responsive">
-                        <table class="table datatable-leads dt-select-table">
+                        <table class="table datatable-quotes dt-select-table">
                             <thead>
-                                <tr class="text-center">
-                                    @foreach($columns as $column)
-                                        <th> {{ __($column['name']) }}</th>
-                                    @endforeach
-                                        <th class="text-end">{{ __('Actions') }}</th>
-                                </tr>
+                            <tr class="text-center">
+                                @foreach($columns as $column)
+                                    <th> {{ __($column['name']) }}</th>
+                                @endforeach
+                                <th class="text-end">{{ __('Actions') }}</th>
+                            </tr>
                             </thead>
                             <tbody class="text-center">
 
@@ -100,14 +108,14 @@
 
 @section('page-script')
     <script type="module">
-        let dt_table = $('.datatable-leads');
+        let dt_table = $('.datatable-quotes');
         let filters = [];
 
         if (dt_table.length) {
             search();
 
             function search() {
-                if ($.fn.DataTable.isDataTable('.datatable-leads')) {
+                if ($.fn.DataTable.isDataTable('.datatable-quotes')) {
                     dt_table.DataTable().destroy();
                 }
                 let export_columns = [0,1,2];
@@ -128,7 +136,7 @@
                     searching: false,
                     serverMethod: 'post',
                     ajax: {
-                        url: "{{ route('api.internal.leads.datatable') }}",
+                        url: "{{ route('api.internal.quotes.datatable') }}",
                         headers: {
                             'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
                         },
@@ -147,14 +155,14 @@
                         ['15', '30', '100']
                     ],
                     columns: [
-                        @foreach($columns as $key => $column)
+                            @foreach($columns as $key => $column)
                         {
                             data: '{{$key}}',
                             name: '{{$column['table']}}',
                             searchable: '{{ $column['searchable'] }}',
                             orderable: {{ $column['orderable'] }}
                         },
-                        @endforeach
+                            @endforeach
                         {data: 'actions', orderable: false, className: 'text-end'}
                     ],
                     columnDefs: [{
@@ -176,11 +184,11 @@
                         className: 'btn btn-outline-secondary dropdown-toggle me-2',
                         text: '<i class="ti ti-logout rotate-n90 me-2"></i>' + '{{ __('locale.Export') }}',
                         buttons: [{
-                                extend: 'print',
-                                text: '<i class="ti ti-printer me-2" ></i>Print',
-                                className: 'dropdown-item',
-                                exportOptions: { columns: export_columns }
-                            },
+                            extend: 'print',
+                            text: '<i class="ti ti-printer me-2" ></i>Print',
+                            className: 'dropdown-item',
+                            exportOptions: { columns: export_columns }
+                        },
                             {
                                 extend: 'csv',
                                 text: '<i class="ti ti-file-text me-2" ></i>Csv',

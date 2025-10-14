@@ -6,6 +6,7 @@ use App\Domains\Items\Models\Item;
 use App\Models\CactusEntity;
 use App\Repositories\RepositoryInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 
 interface ItemRepositoryInterface extends RepositoryInterface
 {
@@ -50,4 +51,12 @@ interface ItemRepositoryInterface extends RepositoryInterface
      * @return JsonResponse
      */
     public function dataTableItems(array $filters = []): JsonResponse;
+
+    /**
+     * @param string|null $searchTerm
+     * @param int $offset
+     * @param int $resultCount number of results per page
+     * @return array{data: Collection, count: int} Array contains paginated data and total count.
+     */
+    public function itemsPaginated(?string $searchTerm, int $offset, int $resultCount): array;
 }

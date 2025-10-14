@@ -375,7 +375,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
             $q->where('name', 'super-admin');
         });
 
-        $users = $users->skip($offset)->take($resultCount)->get('id');
+        $users = $users->orderBy('id','desc')->skip($offset)->take($resultCount)->get('id');
 
 
         if ($searchTerm == null) {
@@ -407,8 +407,8 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
         $authUser = Auth::user();
 
         $users = $users->whereDoesntHave('roles', function ($q) {
-            $q->where('name', 'super-admin');
-        });
+                        $q->where('name', 'super-admin');
+                    })->where('id','!=',1);
 
         if (!$onlyContacts) {
             if (!$authUser->hasRole(RolesEnum::Administrator->value) && !$authUser->hasRole(RolesEnum::SuperAdmin->value)) {
@@ -435,7 +435,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
             $users = $users->whereHas('roles');
         }
 
-        $users = $users->skip($offset)->take($resultCount)->get('id');
+        $users = $users->orderBy('id','desc')->skip($offset)->take($resultCount)->get('id');
 
         if ($searchTerm == null) {
             $count = $this->model->count();

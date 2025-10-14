@@ -4,6 +4,7 @@ namespace App\Domains\Items\Services;
 
 use App\Domains\Items\Models\Item;
 use App\Domains\Items\Repositories\ItemRepositoryInterface;
+use Illuminate\Support\Collection;
 
 class ItemService
 {
@@ -65,6 +66,17 @@ class ItemService
     public function deleteById(string $id): bool
     {
         return $this->repository->deleteById($id);
+    }
+
+    /**
+     * @param string|null $searchTerm
+     * @param int $offset
+     * @param int $resultCount number of results per page
+     * @return array{data: Collection, count: int} Array contains paginated data and total count.
+     */
+    public function itemsPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    {
+        return $this->repository->itemsPaginated($searchTerm, $offset, $resultCount);
     }
 
 }

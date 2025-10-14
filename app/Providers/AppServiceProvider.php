@@ -34,6 +34,9 @@ use App\Domains\Leads\Repositories\Eloquent\Models\Lead;
 use App\Domains\Leads\Repositories\LeadRepositoryInterface;
 use App\Domains\Notes\Repositories\Eloquent\EloqNoteRepository;
 use App\Domains\Notes\Repositories\NoteRepositoryInterface;
+use App\Domains\Quotes\Repositories\Eloquent\EloqQuoteRepository;
+use App\Domains\Quotes\Repositories\Eloquent\Models\Quote;
+use App\Domains\Quotes\Repositories\QuoteRepositoryInterface;
 use App\Domains\Tags\Repositories\Eloquent\EloqTagRepository;
 use App\Domains\Tags\Repositories\TagRepositoryInterface;
 use App\Domains\Tickets\Repositories\Eloquent\EloqTicketRepository;
@@ -77,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind( VisitStatusRepositoryInterface::class, EloqVisitStatusRepository::class);
         $this->app->bind(TagRepositoryInterface::class, EloqTagRepository::class);
         $this->app->bind(ItemRepositoryInterface::class, EloqItemRepository::class);
+        $this->app->bind(QuoteRepositoryInterface::class, EloqQuoteRepository::class);
 
         $this->relations();
 
@@ -95,6 +99,7 @@ class AppServiceProvider extends ServiceProvider
             ModelMorphEnum::LEAD->value => Lead::class,
             ModelMorphEnum::COMPANY->value => Company::class,
             ModelMorphEnum::VISIT->value => Visit::class,
+            ModelMorphEnum::QUOTE->value => Quote::class,
         ]);
     }
 

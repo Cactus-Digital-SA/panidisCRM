@@ -8,6 +8,7 @@ use App\Domains\Items\Repositories\ItemRepositoryInterface;
 use App\Facades\ObjectSerializer;
 use App\Models\CactusEntity;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class EloqItemRepository implements ItemRepositoryInterface
 {
@@ -103,5 +104,33 @@ class EloqItemRepository implements ItemRepositoryInterface
     public function dataTableItems(array $filters = []): JsonResponse
     {
         // TODO: Implement dataTableItems() method.
+    }
+
+    public function itemsPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    {
+        $items = EloquentItem::select(
+            'id',
+            DB::raw('name AS text'),
+            'erp_id as sku',
+            'price_retail AS price',
+        );
+
+        if ($searchTerm != null) {
+            $items = $items->where('name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('erp_id', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        $items = $items->skip($offset)->take($resultCount)->get('id');
+
+        if ($searchTerm == null) {
+            $count = EloquentItem::count();
+        } else {
+            $count = $items->count();
+        }
+
+        return array(
+            "data" => $items,
+            "count" => $count
+        );
     }
 }
