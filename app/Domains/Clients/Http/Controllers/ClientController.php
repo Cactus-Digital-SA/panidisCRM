@@ -56,14 +56,14 @@ final class ClientController extends Controller
      * @param string $clientId
      * @return View
      */
-     public function show(ShowClientRequest $request, string $clientId): View
+     public function show(ShowClientRequest $request, string $clientId)
      {
          $client = $this->clientService->getByIdWithMorphsAndRelations($clientId, Client::morphBuilder() , ['company','company.companyType','company.companySource','company.country', 'tags']);
 
          $tags = $this->tagService->getByType(TagTypesEnum::PRODUCT->value);
 
          $company = $this->companyService->getById($client->getCompanyId());
-         $users = $this->userService->getWithoutRole();
+//         $users = $this->userService->getWithoutRole();
 
          $contactsColumns =  $this->companyService->getContactsTableColumns() ?? [];
 
@@ -73,7 +73,7 @@ final class ClientController extends Controller
          $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
          $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
 
-         return view('backend.content.clients.show', compact('client',  'company', 'contactsColumns', 'users', 'salesPersons', 'tags'));
+         return view('backend.content.clients.show', compact('client',  'company', 'contactsColumns', 'salesPersons', 'tags'));
      }
 
 

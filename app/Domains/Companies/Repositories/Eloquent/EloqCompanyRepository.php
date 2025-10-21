@@ -117,7 +117,7 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
      */
     public function update(CactusEntity|Company $entity, string $id): ?Company
     {
-        $company = $this->model->find($id);
+        $company = $this->model->with(['lead','client'])->find($id);
 
         $company->update([
             'erp_id' => $entity->getErpId(),
@@ -135,6 +135,21 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
 
 
         return ObjectSerializer::deserialize($company->toJson() ?? "{}", Company::class, 'json');
+    }
+
+    public function updateErpId(Company|CactusEntity $entity, string $companyId): ?Company
+    {
+        $company = $this->model->with(['lead','client'])->find($companyId);
+
+        if($company){
+            $company->update([
+                'erp_id' => $entity->getErpId(),
+            ]);
+
+            return ObjectSerializer::deserialize($company->toJson() ?? "{}", Company::class, 'json');
+        }
+
+        return null;
     }
 
     public function updateErpData(Company|CactusEntity $entity, string $companyId): ?Company

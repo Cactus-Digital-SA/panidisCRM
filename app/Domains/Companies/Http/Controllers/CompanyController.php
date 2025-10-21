@@ -62,7 +62,13 @@ final class CompanyController extends Controller
         $companyDTO = $companyDTO->fromRequest($request);
         $companyDTO = $companyDTO->setErpId($request->erpId);
 
-        $this->companyService->update($companyDTO, $companyId);
+        $company = $this->companyService->update($companyDTO, $companyId);
+
+        if($company->getClient()){
+            return redirect()->route('admin.clients.show',$company->getClient()->getId())->with('success', 'Η εταιρεία ενημερώθηκε με επιτυχία!');
+        }elseif($company->getLead()){
+            return redirect()->route('admin.leads.show',$company->getLead()->getId())->with('success', 'Η εταιρεία ενημερώθηκε με επιτυχία!');
+        }
 
         return redirect()->back()->with('success', 'Η εταιρεία ενημερώθηκε με επιτυχία!');
     }

@@ -24,6 +24,7 @@ class ContactController extends Controller
     {
         $user = $this->userService->getById($contactId);
         $extraData = $this->extraDataService->getByModel(ExtraDataModelsEnum::USER);
+        session(['previous_url' => url()->previous()]);
 
         return view('backend.content.contacts.edit', compact('user', 'extraData'));
     }
@@ -43,6 +44,12 @@ class ContactController extends Controller
         $userDetailsDTO = UserDetails::fromRequest($request);
 
         $this->userDetailsService->createOrUpdateByUserId($userDetailsDTO, $contactId);
+
+        $redirectUrl = session('previous_url');
+
+        if($redirectUrl){
+            return redirect()->to($redirectUrl)->with('success', 'Η επαφή ενημερώθηκε με επιτυχία!');
+        }
 
         return redirect()->back()->with('success', 'Η επαφή ενημερώθηκε με επιτυχία!');
     }

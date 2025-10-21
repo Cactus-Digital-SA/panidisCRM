@@ -72,6 +72,11 @@ class CompanyService
         return $this->repository->update($company, $id);
     }
 
+    public function updateErpId(Company $company, string $companyId)
+    {
+        return $this->repository->updateErpId($company, $companyId);
+    }
+
     public function updateErpData(Company $company, string $companyId): ?Company
     {
         return $this->repository->updateErpData($company, $companyId);

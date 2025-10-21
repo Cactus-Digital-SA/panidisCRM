@@ -50,7 +50,6 @@ final class NotesController extends Controller
 
        $noteDTO = Note::fromRequest($request);
 
-       //dd($noteDTO);
        $this->noteService->store($noteDTO);
 
        return redirect()->back()->with('success', 'Η σημείωση δημιουργήθηκε');

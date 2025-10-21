@@ -147,26 +147,26 @@
                         <form action="#" id="show-user-form" method="post" class="row gy-1 pt-75">
                             <div class="form-group row mb-1 mt-1">
                                 <label for="name" class="col-md-2 col-form-label fw-bold">Όνομα</label>
-                                <div class="col-md-10 m-auto">
-                                    <span name="firstName" class=""></span>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="firstName" class="m-auto"></p>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="name" class="col-md-2 col-form-label fw-bold">Επώνυμο</label>
-                                <div class="col-md-10 m-auto">
-                                    <span name="lastName" class=""></span>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="lastName" class="m-auto"></p>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="email" class="col-md-2 col-form-label fw-bold">@lang('E-mail Address')</label>
-                                <div class="col-md-10 m-auto">
-                                    <span name="email" class=""></span>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="email" class="m-auto"></p>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="email" class="col-md-2 col-form-label fw-bold">Τηλέφωνο</label>
-                                <div class="col-md-10 m-auto">
-                                    <span name="phone" class=""></span>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="phone" class="m-auto"></p>
                                 </div>
                             </div>
                         </form>
