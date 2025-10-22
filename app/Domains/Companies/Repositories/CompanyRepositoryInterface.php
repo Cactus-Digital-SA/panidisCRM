@@ -43,7 +43,14 @@ interface CompanyRepositoryInterface extends RepositoryInterface
 
     /**
      * @param CactusEntity|Company $entity
-     * @param string $id
+     * @param string $companyId
+     * @return Company|null
+     */
+    public function updateErpId(CactusEntity|Company $entity, string $companyId): ?Company;
+
+    /**
+     * @param CactusEntity|Company $entity
+     * @param string $companyId
      * @return Company|null
      */
     public function updateErpData(CactusEntity|Company $entity, string $companyId): ?Company;

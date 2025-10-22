@@ -173,7 +173,6 @@ class UserApiController extends Controller
      */
     public function getUserById(Request $request): JsonResponse
     {
-        //dd($request->all());
         if(!$request->json()){
             return response()->json(['message' => 'Invalid request'], 400);
         }

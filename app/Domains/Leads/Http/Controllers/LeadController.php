@@ -13,6 +13,7 @@ use App\Domains\Tags\Services\TagService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use App\Domains\Leads\Models\Lead;
@@ -64,7 +65,7 @@ final class LeadController extends Controller
         $tags = $this->tagService->getByType(TagTypesEnum::PRODUCT->value);
 
         $company = $this->companyService->getById($lead->getCompanyId());
-        $users = $this->userService->getWithoutRole();
+//        $users = $this->userService->getWithoutRole();
 
         $contactsColumns =  $this->companyService->getContactsTableColumns() ?? [];
 
@@ -74,7 +75,7 @@ final class LeadController extends Controller
         $mergedSalesPersons = array_merge($salesPersonsATH, $salesPersonsSKG);
         $salesPersons = array_unique($mergedSalesPersons, SORT_REGULAR);
 
-        return view('backend.content.leads.show', compact('lead',  'company', 'contactsColumns', 'users', 'salesPersons', 'tags'));
+        return view('backend.content.leads.show', compact('lead',  'company', 'contactsColumns', 'salesPersons', 'tags'));
     }
 
     /**
@@ -182,23 +183,32 @@ final class LeadController extends Controller
         return redirect()->route('admin.leads.index')->with('error', 'Υπήρξε κάποιο πρόβλημα κατά την διαγραφή!');
     }
 
-    public function convertLead(\Request $request, string $leadId): RedirectResponse
+    public function convertLead(Request $request, string $leadId): RedirectResponse
     {
         $lead = $this->leadService->getById($leadId);
 
-        if(!$lead->getCompany()?->getErpId()){
+        $companyDTO  = new Company();
+        $companyDTO->setErpId($request->input('erpId'));
+
+        $company = $this->companyService->updateErpId($companyDTO, $lead->getCompany()->getId());
+        if(!$company){
+            return redirect()->route('admin.leads.index')->with('error', 'Δεν βρέθηκε η εταιρεία!');
+        }
+
+
+        if(!$company?->getErpId()){
             return redirect()->route('admin.leads.index')->with('error', 'Δεν έχει καταχωρηθεί το ERP ID της Εταιρείας!');
         }
 
         $erpService = app(ErpService::class);
-        $companyDTO = $erpService->syncCustomer($lead->getCompany()->getErpId());
+        $companyDTO = $erpService->syncCustomer($company->getErpId());
 
         if(!$companyDTO){
             return redirect()->route('admin.leads.index')->with('error', 'Δεν βρέθηκε η εταιρεία στο ERP!');
         }
 
         // Sync Company Data with ERP
-        $company = $this->companyService->updateErpData($companyDTO, $lead->getCompanyId());
+        $company = $this->companyService->updateErpData($companyDTO, $company->getId());
 
         $convertLeadEventService = app(ConvertLeadEventService::class);
         $response = $convertLeadEventService->convertEvent($lead);

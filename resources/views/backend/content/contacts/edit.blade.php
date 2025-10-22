@@ -31,8 +31,7 @@
 
     <div class="col-md-10 offset-md-1">
 
-    <form id="form" method="POST" action="{{ route('admin.contacts.update', $user->getId()) }}" class="form-horizontal needs-validation"
-          enctype="multipart/form-data" novalidate>
+    <form id="form" method="POST" action="{{ route('admin.contacts.update', $user->getId()) }}" class="form-horizontal needs-validation" enctype="multipart/form-data" novalidate>
         @method('PATCH')
         @csrf
         <div class="card">
@@ -66,8 +65,7 @@
                 </div>
 
                 <div class="col-12 text-center mt-2 pt-50">
-                    <button type="submit" class="btn btn-primary me-1">Αποθήκευση <i
-                            class="ms-2 fa fa-save"></i></button>
+                    <button type="submit" class="btn btn-primary me-1">Αποθήκευση <i class="ms-2 fa fa-save"></i></button>
                 </div>
             </div>
         </div>

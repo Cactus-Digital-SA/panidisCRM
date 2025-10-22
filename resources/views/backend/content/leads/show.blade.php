@@ -13,12 +13,16 @@
 @section('content-header')
     <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
         <div class="mb-1 breadcrumb-right">
-            @if($lead->getCompany()?->getErpId())
-            <a href="{{route('admin.leads.convert',$lead->getId())}}" class="btn btn-primary  me-2">
+            <a href="javascript:void(0)" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#convertToClientModal">
                 <i class="ti ti-refresh me-1"></i>
                 Μετατροπή σε Client
             </a>
-            @endif
+{{--            @if($lead->getCompany()?->getErpId())--}}
+{{--            <a href="{{route('admin.leads.convert',$lead->getId())}}" class="btn btn-primary  me-2">--}}
+{{--                <i class="ti ti-refresh me-1"></i>--}}
+{{--                Μετατροπή σε Client--}}
+{{--            </a>--}}
+{{--            @endif--}}
         </div>
     </div>
 
@@ -149,39 +153,59 @@
                 </div>
                 <div class="modal-body pb-5 px-sm-5 pt-50">
                     <div class="text-center mb-2">
-                        <h2 class="mb-1">Προβολή Επαφής</h2>
+                        <h3 class="mb-3">Προβολή Επαφής</h3>
                     </div>
                     <div class="col-12">
                         <form action="#" id="show-user-form" method="post" class="row gy-1 pt-75">
                             <div class="form-group row mb-1 mt-1">
                                 <label for="name" class="col-md-2 col-form-label fw-bold">Όνομα</label>
-                                <div class="col-md-10">
-                                    <p name="firstName" class="form-control"></p>
-                                    <div class="invalid-feedback"> Το Όνομα είναι απαραίτητο. </div>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="firstName" class="m-auto"></p>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="name" class="col-md-2 col-form-label fw-bold">Επώνυμο</label>
-                                <div class="col-md-10">
-                                    <p name="lastName" class="form-control"></p>
-                                    <div class="invalid-feedback"> Το Επώνυμο είναι απαραίτητο. </div>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="lastName" class="m-auto"></p>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="email" class="col-md-2 col-form-label fw-bold">@lang('E-mail Address')</label>
-                                <div class="col-md-10">
-                                    <p name="email" class="form-control"></p>
-                                    <div class="invalid-feedback"> Το Email είναι απαραίτητο. </div>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="email" class="m-auto"></p>
                                 </div>
                             </div>
                             <div class="form-group row mb-1 mt-1">
                                 <label for="email" class="col-md-2 col-form-label fw-bold">Τηλέφωνο</label>
-                                <div class="col-md-10">
-                                    <p name="phone" class="form-control"></p>
+                                <div class="col-md-10 align-content-center">
+                                    <p name="phone" class="m-auto"></p>
                                 </div>
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="convertToClientModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-transparent">
+                    <h5 class="modal-title">Μετατροπή σε Client</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Κλείσιμο"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="convertForm" method="POST" action="{{ route('admin.leads.convert', $lead->getId()) }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="erpId" class="form-label">ERP ID</label>
+                            <input type="text" class="form-control" id="erpId" name="erpId" placeholder="Πληκτρολογήστε ERP ID" value="{{ $lead->getCompany()?->getErpId() }}" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

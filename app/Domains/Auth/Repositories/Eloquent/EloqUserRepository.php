@@ -202,7 +202,6 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
                 throw new GeneralException('Υπάρχει χρήστης με το ίδιο email. Δοκιμάστε ενα διαφορετικό.');
             }else{
                 Log::error($e);
-                dd($e);
                 throw new GeneralException(__('Υπήρξε κάποιο πρόβλημα κατά την αποθήκευση. Προσπαθήστε ξανά.'));
             }
 
