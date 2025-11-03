@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Domains\Erp\Services\ErpService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class SyncItems extends Command
 {
@@ -19,6 +20,8 @@ class SyncItems extends Command
 
     public function handle()
     {
+        $startTime = microtime(true);
+
         $limit = "";
         $customerERPId = null;
 
@@ -30,5 +33,11 @@ class SyncItems extends Command
         } catch (\Throwable $e) {
             $this->error('Error syncing ERP items: ' . $e->getMessage());
         }
+
+        $duration = round(microtime(true) - $startTime, 2);
+
+        Log::info('Sync Items from ERP', [
+            'duration_sec' => $duration,
+        ]);
     }
 }

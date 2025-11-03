@@ -57,6 +57,7 @@
                 </div>
             </a>
         </li>
+        @if(Auth::user()->can('visits.view'))
         <li class="menu-item {{ Route::currentRouteName() === 'admin.visits.index' ? 'active' : '' }}">
             <a class="menu-link" href="{{ route('admin.visits.index') }}">
                 <i class="menu-icon tf-icons ti ti-phone"></i>
@@ -65,6 +66,8 @@
                 </div>
             </a>
         </li>
+        @endif
+        @if(Auth::user()->can('quotes.view'))
         <li class="menu-item {{ Route::currentRouteName() === 'admin.quotes.index' ? 'active' : '' }}">
             <a class="menu-link" href="{{ route('admin.quotes.index') }}">
                 <i class="menu-icon tf-icons ti ti-file-description"></i>
@@ -73,6 +76,7 @@
                 </div>
             </a>
         </li>
+        @endif
         <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
             <a class="menu-link" href="#">
                 <i class="menu-icon tf-icons ti ti-flask"></i>

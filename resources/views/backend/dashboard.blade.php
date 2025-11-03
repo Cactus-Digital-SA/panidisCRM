@@ -1,6 +1,6 @@
 @extends('backend.layouts.app')
 
-@section('title', 'Dashboard - CRM')
+@section('title', 'BPMS')
 
 @section('vendor-style')
     @include('includes.datatable_styles')

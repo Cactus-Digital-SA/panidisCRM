@@ -207,9 +207,9 @@ class UserService
      * @param int $resultCount number of results per page
      * @return array{data: Collection, count: int} Array contains paginated data and total count.
      */
-    public function emailsPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    public function emailsPaginated(?string $searchTerm, int $offset, int $resultCount, bool $onlyContacts = false): array
     {
-        return $this->repository->emailsPaginated($searchTerm, $offset, $resultCount);
+        return $this->repository->emailsPaginated($searchTerm, $offset, $resultCount, $onlyContacts);
     }
 
     /**

@@ -66,6 +66,13 @@ class QuoteItem extends CactusEntity
     private float $price = 0;
 
     /**
+     * @var float $discount
+     * @JMS\Serializer\Annotation\SerializedName("discount")
+     * @JMS\Serializer\Annotation\Type("float")
+     */
+    private float $discount = 0;
+
+    /**
      * @var float $quantity
      * @JMS\Serializer\Annotation\SerializedName("quantity")
      * @JMS\Serializer\Annotation\Type("float")
@@ -185,6 +192,17 @@ class QuoteItem extends CactusEntity
         return $this;
     }
 
+    public function getDiscount(): float
+    {
+        return $this->discount;
+    }
+
+    public function setDiscount(float $discount): QuoteItem
+    {
+        $this->discount = $discount;
+        return $this;
+    }
+
     public function getQuantity(): float
     {
         return $this->quantity;
@@ -231,6 +249,7 @@ class QuoteItem extends CactusEntity
             ->setColor($request['color'])
             ->setUnitTypeAttribute($request['unit_type'])
             ->setPrice($request['price'])
+            ->setDiscount($request['discount'])
             ->setQuantity($request['quantity'])
             ->setTotal($request['item_total_price']);
     }

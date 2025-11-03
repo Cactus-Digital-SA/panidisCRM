@@ -363,7 +363,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
      * @param int $resultCount number of results per page
      * @return array{data: Collection, count: int} Array contains paginated data and total count.
      */
-    public function emailsPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    public function emailsPaginated(?string $searchTerm, int $offset, int $resultCount, bool $onlyContacts = false): array
     {
         $users = $this->model->select('id', DB::raw('email AS text'));
         if ($searchTerm != null) {
@@ -373,6 +373,12 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
         $users = $users->whereDoesntHave('roles', function ($q) {
             $q->where('name', 'super-admin');
         });
+
+        if($onlyContacts){
+            $users = $users->whereDoesntHave('roles');
+        }else{
+            $users = $users->whereHas('roles');
+        }
 
         $users = $users->orderBy('id','desc')->skip($offset)->take($resultCount)->get('id');
 
@@ -484,8 +490,12 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
 
         $users = $users->whereHas('roles',function ($q){
                             $q->where('id' ,'!=', RolesEnum::SuperAdmin->value);
-                        })
-                        ->orWhereDoesntHave('roles');
+                        });
+
+
+        if($filters['filterRole'] == 'contacts'){
+            $users = $users->orWhereDoesntHave('roles');
+        }
 
         if ($filters['columnName'] && $filters['columnSortOrder']) {
             $users = $users->orderBy($filters['columnName'], $filters['columnSortOrder']);

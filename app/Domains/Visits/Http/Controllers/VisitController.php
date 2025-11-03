@@ -8,6 +8,7 @@ use App\Domains\Files\Services\FileService;
 use App\Domains\Notes\Models\Note;
 use App\Domains\Notes\Services\NoteService;
 use App\Domains\Visits\Http\Requests\DeleteVisitRequest;
+use App\Domains\Visits\Http\Requests\ManageVisitRequest;
 use App\Domains\Visits\Http\Requests\StoreVisitRequest;
 use App\Domains\Visits\Http\Requests\UpdateStatusRequest;
 use App\Domains\Visits\Http\Requests\UpdateVisitRequest;
@@ -31,7 +32,7 @@ class VisitController extends Controller
     )
     {}
 
-    public function index()
+    public function index(ManageVisitRequest $request)
     {
         $visitStatus = $this->visitStatusService->getVisible();
         $columns = $this->visitService->getTableColumns();
@@ -39,7 +40,7 @@ class VisitController extends Controller
         return view('backend.content.visits.index',compact('visitStatus','columns'));
     }
 
-    public function show(Request $request, string $visitId) : \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\View\View
+    public function show(ManageVisitRequest $request, string $visitId) : \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\View\View
     {
         $visitStatuses = $this->visitStatusService->getVisible();
         $visit = $this->visitService->getByIdWithMorphsAndRelations($visitId, Visit::morphBuilder(), ['company.companyType', 'company.companySource', 'company.country', 'company.lead','company.client','owner','comments','status', 'contacts', 'assignees']);
@@ -65,7 +66,7 @@ class VisitController extends Controller
         ]);
     }
 
-    public function create(Request $request, ?string $type = null )
+    public function create(ManageVisitRequest $request, ?string $type = null )
     {
         return view('backend.content.visits.create');
     }
@@ -109,7 +110,7 @@ class VisitController extends Controller
         return redirect()->back()->with('error','Υπήρξε κάποιο πρόβλημα κατά την δημιουργία');
     }
 
-    public function edit(Request $request, string $visitId): \Illuminate\View\View
+    public function edit(ManageVisitRequest $request, string $visitId): \Illuminate\View\View
     {
         $visit = $this->visitService->getByIdWithMorphsAndRelations($visitId, Visit::morphBuilder(), ['company.companyType', 'company.companySource', 'company.users', 'company.lead','company.client','owner','comments','status','blockedBy','contacts', 'assignees']);
         $visitStatus = $this->visitStatusService->getVisible();

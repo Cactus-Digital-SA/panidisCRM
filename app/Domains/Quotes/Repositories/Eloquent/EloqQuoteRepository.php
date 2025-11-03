@@ -77,6 +77,7 @@ class EloqQuoteRepository extends EloquentRelationHelper implements QuoteReposit
             'payment_terms' => $entity->getPaymentTerms(),
             'delivery_terms' => $entity->getDeliveryTerms(),
             'subtotal' => $entity->getSubtotal(),
+            'total_discount' => $entity->getTotalDiscount(),
             'tax_rate' => $entity->getTaxRate(),
             'tax' => $entity->getTax(),
             'total' => $entity->getTotal(),
@@ -91,6 +92,7 @@ class EloqQuoteRepository extends EloquentRelationHelper implements QuoteReposit
                 'unit_type' => $item->getUnitType(),
                 'quantity' => $item->getQuantity(),
                 'price' => $item->getPrice(),
+                'discount' => $item->getDiscount(),
                 'total' => $item->getTotal()
             ]);
         }
@@ -117,6 +119,7 @@ class EloqQuoteRepository extends EloquentRelationHelper implements QuoteReposit
             'payment_terms' => $entity->getPaymentTerms(),
             'delivery_terms' => $entity->getDeliveryTerms(),
             'subtotal' => $entity->getSubtotal(),
+            'total_discount' => $entity->getTotalDiscount(),
             'tax_rate' => $entity->getTaxRate(),
             'tax' => $entity->getTax(),
             'total' => $entity->getTotal(),
@@ -133,6 +136,7 @@ class EloqQuoteRepository extends EloquentRelationHelper implements QuoteReposit
                 'unit_type' => $item->getUnitType(),
                 'quantity' => $item->getQuantity(),
                 'price' => $item->getPrice(),
+                'discount' => $item->getDiscount(),
                 'total' => $item->getTotal()
             ]);
         }

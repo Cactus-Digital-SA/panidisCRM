@@ -5,18 +5,16 @@ namespace App\Domains\Visits\Http\Requests;
 use App\Domains\Auth\Models\RolesEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteVisitRequest extends FormRequest
+class ManageVisitRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return \Auth::user()->hasRole(RolesEnum::Administrator->value) || \Auth::user()->can('visits.delete');
+        return \Auth::user()->hasRole(RolesEnum::Administrator->value) || $this->user()->can('visits.view');
     }
 
     public function rules(): array
     {
-        return [
-
-        ];
+        return [];
     }
 
     public function messages(): array

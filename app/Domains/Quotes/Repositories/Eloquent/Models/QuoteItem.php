@@ -20,6 +20,7 @@ class QuoteItem extends Model
         'color',
         'unit_type',
         'price',
+        'discount',
         'quantity',
         'total',
     ];
@@ -27,6 +28,7 @@ class QuoteItem extends Model
     protected $casts = [
         'unit_type' => UnitTypeEnum::class,
         'price' => 'float',
+        'discount' => 'float',
         'quantity' => 'float',
         'total' => 'float',
     ];

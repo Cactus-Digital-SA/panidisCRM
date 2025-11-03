@@ -2,6 +2,7 @@
 
 namespace App\Domains\Visits\Http\Requests;
 
+use App\Domains\Auth\Models\RolesEnum;
 use App\Domains\Visits\Enums\VisitNextActionSourceEnum;
 use App\Domains\Visits\Enums\VisitProductDiscussedSourceEnum;
 use App\Domains\Visits\Enums\VisitTypeSourceEnum;
@@ -12,7 +13,7 @@ class UpdateVisitRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return \Auth::user()->hasRole(RolesEnum::Administrator->value) || \Auth::user()->can('visits.update');
     }
 
     public function rules(): array
