@@ -59,7 +59,7 @@
             -webkit-overflow-scrolling: touch;
         }
         #itemsTable {
-            min-width: 1200px;
+            min-width: 1400px;
         }
         #tax_rate {
             border-top-right-radius: 0;
@@ -163,28 +163,29 @@
                         <table class="table" id="itemsTable">
                             <thead>
                             <tr id="table-header">
-                                <th class="text-center col-md-2">Product / Service</th>
-                                <th class="text-center col-md-2">Όνομα προϊόντος</th>
+                                <th class="text-center col-md-1-5">Product / Service</th>
+                                <th class="text-center col-md-1-5">Όνομα προϊόντος</th>
                                 <th class="text-center col-md-1-5">SKU</th>
                                 <th class="text-center col-md-1">Χρώμα</th>
-                                <th class="text-center col-md-1">Ποσότητα</th>
+                                <th class="text-center col-md-1 ">Ποσότητα</th>
                                 <th class="text-center col-md-1">Τύπος Ποσότητας</th>
-                                <th class="text-center col-md-2">Τιμή</th>
-                                <th class="text-center col-md-2">Τελική Τιμή</th>
+                                <th class="text-center col-md-1-5">Τιμή</th>
+                                <th class="text-center col-md-1-5">Έκπτωση (€)</th>
+                                <th class="text-center col-md-1-5">Τελική Τιμή</th>
                                 <th class="text-center col-md-1" style="width: 65px;"></th>
                             </tr>
                             </thead>
                             <tbody id="routes-table-body">
                             @foreach($quote->getItems() as $i => $item)
                                 <tr class="item-row">
-                                    <td class="col-md-2 items-select-column">
+                                    <td class="col-md-1-5 items-select-column">
                                         <select name="items[{{ $i }}][item_id]" id="item_{{ $i }}_id" class="form-control select2 items-select" data-placeholder="Product/Service" data-allow-clear="true" required>
                                             <option value="{{ $item->getItemId() }}" selected>
                                                 {{ $item->getProductName() ?? '' }}
                                             </option>
                                         </select>
                                     </td>
-                                    <td class="col-md-2">
+                                    <td class="col-md-1-5">
                                         <input type="text" name="items[{{ $i }}][product_name]" class="form-control" placeholder="Όνομα προϊόντος" required value="{{ $item->getProductName() }}">
                                     </td>
                                     <td class="col-md-1-5">
@@ -199,17 +200,23 @@
                                     <td class="col-md-1">
                                         <select name="items[{{ $i }}][unit_type]" id="unit_type_{{ $i }}" class="form-control select2 unit_type_select" data-placeholder="Τύπος" data-allow-clear="true" required>
                                             @foreach(\App\Domains\Quotes\Enums\UnitTypeEnum::cases() as $unitType)
-                                                <option value="{{ $unitType->value }}" @selected($unitType->value == $item->getUnitType()?->value)>{{ $unitType->name }}</option>
+                                                <option value="{{ $unitType->value }}" @selected($unitType->value == $item->getUnitType()?->value)>{{ $unitType->label() }}</option>
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td class="col-md-2">
+                                    <td class="col-md-1-5">
                                         <div class="input-group">
                                             <input type="number" name="items[{{ $i }}][price]" class="form-control" min="0" step="0.01" placeholder="€" onwheel="this.blur()" required value="{{ $item->getPrice() }}">
                                             <span class="input-group-text">€</span>
                                         </div>
                                     </td>
-                                    <td class="col-md-2">
+                                    <td class="col-md-1-5">
+                                        <div class="input-group">
+                                            <input type="number" name="items[{{ $i }}][discount]" class="form-control" min="0" step="0.01" placeholder="€" onwheel="this.blur()" value="{{ $item->getDiscount() }}">
+                                            <span class="input-group-text">€</span>
+                                        </div>
+                                    </td>
+                                    <td class="col-md-1-5">
                                         <div class="input-group">
                                             <input type="number" name="items[{{ $i }}][item_total_price]" class="form-control" placeholder="€" onwheel="this.blur()" readonly value="{{ $item->getTotal() }}">
                                             <span class="input-group-text">€</span>
@@ -275,6 +282,12 @@
                                 <td class="col-3 text-start text-xl-end"><strong>Subtotal:</strong></td>
                                 <td class="text-end">
                                     <input type="number" id="subtotal" name="subtotal" class="form-control text-end" value="{{ $quote->getSubtotal() }}" readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-start text-xl-end"><strong>Discount:</strong></td>
+                                <td class="text-end">
+                                    <input type="number" id="total_discount" name="total_discount" class="form-control text-end" value="{{ $quote->getTotalDiscount() }}" readonly>
                                 </td>
                             </tr>
                             <tr>
@@ -394,7 +407,7 @@
 
             });
 
-            $(document).on('input', 'input[name*="[quantity]"], input[name*="[price]"]', function () {
+            $(document).on('input', 'input[name*="[quantity]"], input[name*="[price]"], input[name*="[discount]"]', function () {
                 const row = $(this).closest('tr');
                 calculateItemTotal(row);
             });
@@ -403,7 +416,9 @@
             function calculateItemTotal(row){
                 const quantity = parseFloat(row.find('input[name*="[quantity]"]').val()) || 0;
                 const price = parseFloat(row.find('input[name*="[price]"]').val()) || 0;
-                const total = quantity * price;
+                const discount = parseFloat(row.find('input[name*="[discount]"]').val()) || 0;
+                const discountedPrice = Math.max(price - discount, 0);
+                const total = quantity * discountedPrice;
                 row.find('input[name*="[item_total_price]"]').val(total.toFixed(2));
             }
 
@@ -552,9 +567,15 @@
             // Totals calculation
             function updateTotal() {
                 let subtotal = 0;
+                let totalDiscount = 0;
                 $('input[name*="[item_total_price]"]').each(function () {
                     subtotal += parseFloat($(this).val()) || 0;
+                    const quantity = parseFloat($(this).closest('tr').find('input[name*="[quantity]"]').val()) || 0;
+                    const discount = parseFloat($(this).closest('tr').find('input[name*="[discount]"]').val()) || 0;
+                    totalDiscount += quantity * discount;
                 });
+
+                $('#total_discount').val(totalDiscount.toFixed(2));
 
                 const taxRate = (parseFloat($('#tax_rate').val()) || 0) / 100;
                 const tax = subtotal * taxRate;
@@ -571,8 +592,8 @@
             });
 
 
-            // Update total when changing any price/quantity
-            $(document).on('input', 'input[name*="[quantity]"], input[name*="[price]"]', function () {
+            // Update total when changing any price/quantity/discount
+            $(document).on('input', 'input[name*="[quantity]"], input[name*="[price]"], input[name*="[discount]"]', function () {
                 updateTotal();
             });
 

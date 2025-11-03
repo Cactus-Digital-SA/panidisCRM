@@ -9,6 +9,7 @@ use App\Domains\Companies\Services\CompanyService;
 use App\Domains\Erp\Endpoints\CustomersEndpoint;
 use App\Domains\Erp\Services\MapperService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class SyncCustomers extends Command
 {
@@ -27,6 +28,8 @@ class SyncCustomers extends Command
 
     public function handle()
     {
+        $startTime = microtime(true);
+
         $response = $this->customers->getCustomers()->getResponseBody();
         $customers = json_decode($response, true);
 
@@ -51,5 +54,11 @@ class SyncCustomers extends Command
                 \Log::error('ERP syncCustomers : '. $e->getMessage());
             }
         }
+
+        $duration = round(microtime(true) - $startTime, 2);
+
+        Log::info('Sync Customers from ERP', [
+            'duration_sec' => $duration,
+        ]);
     }
 }

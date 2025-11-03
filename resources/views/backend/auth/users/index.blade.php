@@ -59,6 +59,7 @@
                             @foreach($roles as $role)
                                 <option value="{{$role->getId()}}" @if(isset($selectedRole) && $selectedRole == $role->getName()) selected @endif>{{$role->getName()}}</option>
                             @endforeach
+                            <option value="contacts">Χωρίς Ρόλο</option>
                         </select>
                     </div>
                     <div class="col-md-2-5 col-12">

@@ -3,6 +3,10 @@
 namespace App\Domains\Quotes\Http\Controllers;
 
 use App\Domains\Quotes\Enums\QuoteStatusEnum;
+use App\Domains\Quotes\Http\Requests\DeleteQuoteRequest;
+use App\Domains\Quotes\Http\Requests\ManageQuoteRequest;
+use App\Domains\Quotes\Http\Requests\StoreQuoteRequest;
+use App\Domains\Quotes\Http\Requests\UpdateQuoteRequest;
 use App\Domains\Quotes\Models\Quote;
 use App\Domains\Quotes\Models\QuoteItem;
 use App\Domains\Quotes\Services\QuoteService;
@@ -20,14 +24,14 @@ class QuoteController extends Controller
     )
     {}
 
-    public function index()
+    public function index(ManageQuoteRequest $request)
     {
         $columns = $this->quoteService->getTableColumns();
 
         return view('backend.content.quotes.index', compact('columns'));
     }
 
-    public function show(Request $request, string $quoteId)
+    public function show(ManageQuoteRequest $request, string $quoteId)
     {
         $quote = $this->quoteService->getById($quoteId);
 
@@ -39,7 +43,7 @@ class QuoteController extends Controller
         return view('backend.content.quotes.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreQuoteRequest $request)
     {
         $quoteDTO = new Quote();
         $quoteDTO = $quoteDTO->fromRequest($request);
@@ -68,7 +72,7 @@ class QuoteController extends Controller
         return redirect()->route('admin.quotes.show', $quoteId);
     }
 
-    public function update(Request $request, string $quoteId)
+    public function update(UpdateQuoteRequest $request, string $quoteId)
     {
         $quoteDTO = new Quote();
         $quoteDTO = $quoteDTO->fromRequest($request);
@@ -92,7 +96,7 @@ class QuoteController extends Controller
         return redirect()->route('admin.quotes.index')->with('success','Επιτυχής αποθήκευση!');
     }
 
-    public function destroy(Request $request, string $id): JsonResponse|RedirectResponse
+    public function destroy(DeleteQuoteRequest $request, string $id): JsonResponse|RedirectResponse
     {
         $response = $this->quoteService->deleteById($id);
 
@@ -109,7 +113,7 @@ class QuoteController extends Controller
 
     }
 
-    public function generatePdf($slug)
+    public function generatePdf(ManageQuoteRequest $request, $slug)
     {
         $quote = $this->quoteService->getByUuid($slug);
 

@@ -85,6 +85,13 @@ class Quote extends CactusEntity
     private float $subtotal = 0;
 
     /**
+     * @var float $totalDiscount
+     * @JMS\Serializer\Annotation\SerializedName("total_discount")
+     * @JMS\Serializer\Annotation\Type("float")
+     */
+    private float $totalDiscount = 0;
+
+    /**
      * @var TaxRatesEnum|null $taxRate
      * @JMS\Serializer\Annotation\SerializedName("tax_rate")
      * @JMS\Serializer\Annotation\Type("enum<'App\Domains\Quotes\Enums\TaxRatesEnum'>")
@@ -264,6 +271,17 @@ class Quote extends CactusEntity
         return $this;
     }
 
+    public function getTotalDiscount(): float
+    {
+        return $this->totalDiscount;
+    }
+
+    public function setTotalDiscount(float $totalDiscount): Quote
+    {
+        $this->totalDiscount = $totalDiscount;
+        return $this;
+    }
+
     public function setTaxRateAttribute(?string $value): ?Quote
     {
         $this->setTaxRate($value ? TaxRatesEnum::from($value) : null);
@@ -364,6 +382,7 @@ class Quote extends CactusEntity
             ->setPaymentTermsAttribute($request['payment_terms'])
             ->setDeliveryTerms($request['delivery_terms'])
             ->setSubtotal($request['subtotal'])
+            ->setTotalDiscount($request['total_discount'])
             ->setTaxRateAttribute($request['tax_rate'])
             ->setTax($request['tax'])
             ->setTotal($request['total']);

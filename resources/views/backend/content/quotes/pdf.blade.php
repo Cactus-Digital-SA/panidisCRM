@@ -94,6 +94,7 @@
             <th style="width:15%;">COLOR</th>
             <th style="width:10%;">UNIT</th>
             <th style="width:15%;">UNIT NET</th>
+            <th style="width:15%;">DISCOUNT</th>
             <th style="width:15%; border-top-right-radius: 8px;">COMMENT</th>
         </tr>
     </thead>
@@ -109,6 +110,7 @@
             <td>{{ $item->getColor() }}</td>
             <td>{{ $item->getUnitType()->value }}</td>
             <td>{{ number_format($item->getPrice(), 2) }} €</td>
+            <td>{{ number_format($item->getDiscount(), 2) }} €</td>
             <td> </td>
         </tr>
     @endforeach
@@ -121,6 +123,10 @@
         <tr>
             <td class="text-right bold">Subtotal:</td>
             <td class="text-right column-cell-200">€ {{ number_format($quote->getSubtotal(), 2) }}</td>
+        </tr>
+        <tr>
+            <td class="text-right bold">Total Discount:</td>
+            <td class="text-right column-cell-200">€ {{ number_format($quote->getTotalDiscount(), 2) }}</td>
         </tr>
         <tr>
             <td class="text-right bold">Tax {{$quote->getTaxRate()->label()}}:</td>
