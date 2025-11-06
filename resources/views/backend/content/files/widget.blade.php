@@ -38,7 +38,7 @@
                                     <input type="hidden" name="filePath" value="{{ $file->getPath() }}">
                                     <button class="btn btn-icon btn-outline-info waves-effect" type="submit"><i class="fa fa-download"></i></button>
                                 </form>
-                                <a href="" class="btn btn-icon btn-outline-danger waves-effect delete-file-submit" role="button" data-path="{{$file->getPath()}}" data-bs-toggle="modal" data-bs-target="#deleteFileModal"><i class="fa fa-trash"></i></a>
+                                <a href="" class="btn btn-icon btn-outline-danger waves-effect delete-file-submit align-content-center" role="button" data-path="{{$file->getPath()}}" data-bs-toggle="modal" data-bs-target="#deleteFileModal"><i class="fa fa-trash"></i></a>
                             </div>
                         </div>
                     </div>

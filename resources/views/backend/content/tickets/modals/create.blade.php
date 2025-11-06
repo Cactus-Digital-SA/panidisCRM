@@ -30,6 +30,10 @@
         text-overflow: ellipsis;
     }
 
+    .flatpickr-calendar {
+        z-index: 99999 !important;
+    }
+
     @media (max-width: 998px) {
         .file-name, .file-input-label {
             text-align: start;
@@ -70,7 +74,7 @@
                         <label class="form-label">{{__('Deadline') }}
 {{--                            <i class="fa fa-asterisk fa-2xs text-danger"></i>--}}
                         </label>
-                        <input type="text" placeholder="{{__('Deadline')}}" name="deadline" class="form-control datepicker" autocomplete="off" required>
+                        <input type="text" data-flatpickr="date" id="deadline" name="deadline" placeholder="{{__('Deadline')}}" autocomplete="off">
                     </div>
 
 
@@ -155,14 +159,16 @@
 @push('after-scripts')
     <script type="module">
 
-        $('.datepicker').each(function (i, obj) {
-            obj.flatpickr({
-                minDate: new Date(),
-                locale: 'gr',
-                altInput: true,
-                altFormat: 'd-m-Y',
-                dateFormat: 'Y-m-d',
-            })
+        $('#deadline').flatpickr({
+            altInput: true,
+            altFormat: 'd-m-Y',
+            dateFormat: 'Y-m-d',
+            minDate: new Date(),
+            locale: {
+                ...flatpickr.l10ns.gr,
+                firstDayOfWeek: 1
+            },
+            static: true,
         });
 
 
@@ -170,16 +176,8 @@
         const fileNameDisplay = document.getElementById('file-name');
 
         fileInput.addEventListener('change', function () {
-            // if (fileInput.files.length === 1) {
-            //     fileNameDisplay.textContent = '1 αρχείο';
-            // } else if (fileInput.files.length > 1) {
-            //     fileNameDisplay.textContent = `${fileInput.files.length} αρχεία`;
-            // } else {
-            //     fileNameDisplay.textContent = 'Δεν έχει επιλεχθεί αρχείο';
-            // }
             if (fileInput.files.length > 0) {
-                const names = Array.from(fileInput.files).map(file => file.name).join(', ');
-                fileNameDisplay.textContent = names;
+                fileNameDisplay.textContent = Array.from(fileInput.files).map(file => file.name).join(', ');
             } else {
                 fileNameDisplay.textContent = 'Δεν έχει επιλεχθεί αρχείο';
             }

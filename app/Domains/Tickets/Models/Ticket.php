@@ -18,6 +18,7 @@ use App\Models\Enums\EloqMorphEnum;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
+use JMS\Serializer\Annotation as Serializer;
 
 class Ticket extends CactusEntity
 {
