@@ -27,10 +27,10 @@
 
     <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
         <div class="mb-1 breadcrumb-right">
-{{--            <button data-bs-target="#createTicket" data-bs-toggle="modal" class="btn btn-primary  me-2">--}}
-{{--                <i class="ti ti-plus me-1"></i>--}}
-{{--                Δημιουργία Ticket--}}
-{{--            </button>--}}
+            <button data-bs-target="#createTicket" data-bs-toggle="modal" class="btn btn-primary  me-2">
+                <i class="ti ti-plus me-1"></i>
+                Δημιουργία Ticket
+            </button>
             <button class="btn btn-info btn-round waves-effect waves-float waves-light" onclick="jQuery('#filters').toggle()">
                 <i class="ti ti-filter"></i> Φίλτρα
             </button>
@@ -139,7 +139,7 @@
         </div>
     </section>
     @include('backend.components.delete_modal')
-{{--    @include('backend.content.tickets.modals.create')--}}
+    @include('backend.content.tickets.modals.create')
 @endsection
 
 
@@ -213,7 +213,7 @@
                                 data: '{{$key}}',
                                 name: '{{$column['table']}}',
                                 searchable: '{{ $column['searchable'] }}',
-                                orderable: '{{ $column['orderable'] }}'
+                                orderable: {{ $column['orderable'] ?? false }}
                             },
                                 @endforeach
 
@@ -230,7 +230,7 @@
                                 targets: 0
                             }
                         ],
-                        order: [[1, 'desc']],
+                        order: [[3, 'desc']],
                         dom: '<"d-flex justify-content-between align-items-center mx-2 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"dt-action-buttons text-end"B>f>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
                         displayLength: 10,
                         lengthMenu: [10, 25, 50, 100],

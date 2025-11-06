@@ -321,7 +321,7 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
      */
     public function dataTableTickets(array $filters = []): JsonResponse
     {
-        $tickets = $this->model->with('owner')->select('tickets.*');
+        $tickets = $this->model->with(['owner','company'])->select('tickets.*');
 
         $tickets = $tickets
             ->when($filters['filterName'], function ($query,$searchTerm) {
@@ -375,15 +375,30 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
         }
 
         if ($filters['columnName'] && $filters['columnSortOrder']) {
-            $tickets = $tickets->orderBy($filters['columnName'], $filters['columnSortOrder']);
+
+            if ($filters['columnName'] === 'active_status') {
+                $tickets = $tickets
+                    ->leftJoin('tickets_statuses as ts', function ($join) {
+                        $join->on('ts.ticket_id', '=', 'tickets.id')
+                            ->whereRaw('ts.date = (SELECT MAX(date) FROM tickets_statuses WHERE ticket_id = tickets.id)');
+                    })
+                    ->leftJoin('ticket_status as s', 's.id', '=', 'ts.ticket_status_id')
+                    ->orderBy('s.name', $filters['columnSortOrder'])
+                    ->select('tickets.*');
+            } else {
+                $tickets = $tickets->orderBy($filters['columnName'], $filters['columnSortOrder']);
+            }
         }
 
         return DataTables::of($tickets)
+            ->orderColumn('active_status', function($query, $order) {
+                $query->orderBy('s.name', $order);
+            })
             ->editColumn('deadline', function ($ticket) {
                 return $ticket->deadline ? Carbon::parse($ticket->deadline)->format('d-m-Y'): '-';
             })
             ->editColumn('owner', function ($ticket){
-                return  '<a href="'. route('admin.users.show',$ticket->owner_id).'" class="badge bg-label-dark">' . $ticket->owner->name . '</span>';
+                return  '<a href="'. route('admin.users.show',$ticket->owner_id).'" class="badge bg-label-dark">' . $ticket->owner?->name . '</span>';
             })
             ->editColumn('billable', function ($ticket){
                 return  '<span class="badge bg-label-'. ($ticket->billable ? 'success' : 'danger') . '">' . ($ticket->billable ? __('Yes') : __('No') ). '</span>';
@@ -446,14 +461,14 @@ class EloqTicketRepository extends EloquentRelationHelper implements TicketRepos
             'id'=> ['name' => 'id', 'table' => 'tickets.id', 'searchable' => 'false', 'orderable' => 'true'],
 
             'name' => ['name' => 'Name', 'table' => 'tickets.name', 'searchable' => 'true', 'orderable' => 'true'],
-            'company' => ['name' => 'Company', 'table' => '', 'searchable' => 'true', 'orderable' => 'true'],
-            'billable' =>  ['name' => 'Billable', 'table' => 'tickets.billable', 'searchable' => 'false', 'orderable' => 'true'],
+            'company' => ['name' => 'Company', 'table' => 'company.name', 'searchable' => 'true', 'orderable' => 'true'],
+//            'billable' =>  ['name' => 'Billable', 'table' => 'tickets.billable', 'searchable' => 'false', 'orderable' => 'true'],
             'deadline' => ['name' => 'Deadline', 'table' => 'tickets.deadline', 'searchable' => 'true', 'orderable' => 'true'],
-            'active_status' => ['name' => 'Status', 'table' => '', 'searchable' => '', 'orderable' => ''],
-            'public' => ['name' => 'Public', 'table' => 'tickets.public', 'searchable' => 'true', 'orderable' => 'true'],
-            'est_time_array' => ['name' => 'Estimation Time', 'table' => 'tickets.est_time', 'searchable' => 'true', 'orderable' => 'true'],
-            'owner' => ['name' => 'Manager', 'table' => '', 'searchable' => 'true', 'orderable' => 'true'],
-            'assignees' => ['name' => 'Assignees', 'table' => '', 'searchable' => 'true', 'orderable' => 'true'],
+            'active_status' => ['name' => 'Status', 'table' => 'active_status', 'searchable' => 'true', 'orderable' => 'true'],
+//            'public' => ['name' => 'Public', 'table' => 'tickets.public', 'searchable' => 'true', 'orderable' => 'true'],
+//            'est_time_array' => ['name' => 'Estimation Time', 'table' => 'tickets.est_time', 'searchable' => 'true', 'orderable' => 'true'],
+            'owner' => ['name' => 'Manager', 'table' => 'owner.name', 'searchable' => 'true', 'orderable' => 'true'],
+            'assignees' => ['name' => 'Assignees', 'table' => '', 'searchable' => 'false', 'orderable' => 'false'],
             'source' => ['name' => 'Source', 'table' => 'tickets.source', 'searchable' => 'true', 'orderable' => 'true'],
             'priority' => ['name' => 'Priority', 'table' => 'tickets.priority', 'searchable' => 'true', 'orderable' => 'true'],
         ];

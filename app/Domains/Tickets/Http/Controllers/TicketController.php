@@ -91,8 +91,7 @@ final class TicketController extends Controller
             $canEditStatus = true;
         }
 
-        return view('backend.content.tickets.' . strtolower($type->value) .'.show', [
-            'type' => $type,
+        return view('backend.content.tickets.show', [
             'ticket' => $ticket,
             'ticketStatuses' => $ticketStatuses,
             'canEditStatus' => $canEditStatus
@@ -109,7 +108,7 @@ final class TicketController extends Controller
     {
         $ticketDTO = Ticket::fromRequest($request);
         $ticketDTO->setAssignees($request['assignees']);
-        $ticketDTO->setContacts($request['contacts']);
+        $ticketDTO->setContacts($request['contacts'] ?? []);
 
         $ticketDTO = $this->ticketService->store($ticketDTO);
 

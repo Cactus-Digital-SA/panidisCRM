@@ -8,7 +8,6 @@ use App\Domains\Files\Repositories\Eloquent\Models\File;
 use App\Domains\Notes\Repositories\Eloquent\Models\Note;
 use App\Domains\Projects\Repositories\Eloquent\Models\Project;
 use App\Domains\Tickets\Enums\TicketSourceEnum;
-use App\Domains\Visits\Repositories\Eloquent\Models\VisitsContact;
 use App\Helpers\Casts\ActiveStatus;
 use App\Helpers\Casts\SecondsToTime;
 use App\Helpers\Enums\PriorityEnum;
