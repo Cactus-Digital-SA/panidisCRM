@@ -77,6 +77,14 @@
             </a>
         </li>
         @endif
+        <li class="menu-item {{ Route::currentRouteName() === 'admin.tickets.index' ? 'active' : '' }}">
+            <a class="menu-link" href="{{ route('admin.tickets.index') }}">
+                <i class="menu-icon tf-icons ti ti-ticket"></i>
+                <div>
+                    <span class="menu-title" >Tickets</span>
+                </div>
+            </a>
+        </li>
         <li class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}">
             <a class="menu-link" href="#">
                 <i class="menu-icon tf-icons ti ti-flask"></i>

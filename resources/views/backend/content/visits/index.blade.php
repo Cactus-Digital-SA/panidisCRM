@@ -404,11 +404,11 @@
                     $('.column-toggle:checked').each(function () {
                         selectedColumns.push($(this).val());
                     });
-                    setCookie('selectedColumns_tickets', JSON.stringify(selectedColumns), 365); // Store for 7 days
+                    setCookie('selectedColumns_visits', JSON.stringify(selectedColumns), 365); // Store for 7 days
                 }
 
                 function loadColumnsState() {
-                    const selectedColumns = JSON.parse(getCookie('selectedColumns_tickets'));
+                    const selectedColumns = JSON.parse(getCookie('selectedColumns_visits'));
                     if (selectedColumns) {
                         selectedColumns.forEach(function (value) {
                             $('#toggleColumn' + value).prop('checked', true).trigger('change');
