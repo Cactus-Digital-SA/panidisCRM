@@ -122,17 +122,17 @@ class ErpService
         return $this->customers->getReport($report)->getResponseBody();
     }
 
-    public function getItems(?string $limit = "", ?string $customerERPId = null): void
+    public function getItems(?string $limit = "", ?string $itemERPId = null): void
     {
-        // στην πρώτη κλήση παίρνω το totalCount και ξανακαλώ την συνάρτηση με το limit
+        // στην πρώτη κλήση παίρνω το totalCount και ξανακαλώ τη συνάρτηση με το limit
         // αν μου επιστρέψει ολα τα data χωρίς το limit συνεχίζει χωρίς δεύτερη κλήση
-        $response = $this->customers->getItems($limit, $customerERPId)->getResponseBody();
+        $response = $this->customers->getItems($limit, $itemERPId)->getResponseBody();
 
         $data = json_decode($response, true);
 
         if (!$data || !isset($data['fields'], $data['rows'])) {
             if(!isset($data['rows']) && isset($data['totalcount']) && $data['totalcount'] > 1){
-                $this->getItems($data['totalcount'], $customerERPId);
+                $this->getItems($data['totalcount'], $itemERPId);
                 return ;
             }
             throw new \RuntimeException('Invalid ERP response for items');

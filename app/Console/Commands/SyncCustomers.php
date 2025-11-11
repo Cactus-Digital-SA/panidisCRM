@@ -51,7 +51,7 @@ class SyncCustomers extends Command
 
             }
             catch (\Exception $e) {
-                \Log::error('ERP syncCustomers : '. $e->getMessage());
+                \Log::error('ERP syncCustomers : '. $e->getMessage(). ' - '. $customer['CUSTCODE']);
             }
         }
 

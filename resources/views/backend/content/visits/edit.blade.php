@@ -161,112 +161,69 @@
 
 @section('page-script')
     <script type="module">
+        $(document).ready(function () {
+            $('#visit_date').each(function (i, date) {
+                date.flatpickr({
+                    minDate: new Date(new Date().setDate(new Date().getDate() - 2)),
+                    locale: 'gr',
+                    altInput: true,
+                    altFormat: 'd-m-Y',
+                    dateFormat: 'Y-m-d',
+                })
+            });
 
-        $('#visit_date').each(function (i, date) {
-            date.flatpickr({
-                minDate: new Date(new Date().setDate(new Date().getDate() - 2)),
-                locale: 'gr',
-                altInput: true,
-                altFormat: 'd-m-Y',
-                dateFormat: 'Y-m-d',
-            })
-        });
 
+            const date = document.querySelector('#deadline');
+            if (date) {
+                date.flatpickr({
+                    altInput: true,
+                    altFormat: 'd-m-Y',
+                    dateFormat: 'Y-m-d',
+                    locale: {
+                        ...flatpickr.l10ns.gr,
+                        firstDayOfWeek: 1
+                    }
+                });
+            }
 
-        const date = document.querySelector('#deadline');
-        if (date) {
-            date.flatpickr({
-                altInput: true,
-                altFormat: 'd-m-Y',
-                dateFormat: 'Y-m-d',
-                locale: {
-                    ...flatpickr.l10ns.gr,
-                    firstDayOfWeek: 1
+            $(".filter_assignees").select2({
+                placeholder: 'Assignees',
+                allowClear: true,
+                ajax: {
+                    type: 'POST',
+                    delay: 500,
+                    url: "{{ route('api.internal.users.namesPaginated') }}",
+                    dataType: 'json',
+                    headers: {
+                        'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: function (params) {
+                        return {
+                            term: params.term || '',
+                            page: params.page || 1
+                        }
+                    },
+                    // processResults: function (data, params) {
+                    //     return data
+                    // },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data.results, function (obj) {
+                                return {id: obj.id, text: obj.text}; // Use id and name
+                            })
+                        };
+                    },
+                    cache: true
                 }
             });
-        }
 
-        $(".filter_assignees").select2({
-            placeholder: 'Assignees',
-            allowClear: true,
-            ajax: {
-                type: 'POST',
-                delay: 500,
-                url: "{{ route('api.internal.users.namesPaginated') }}",
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
-                },
-                data: function (params) {
-                    return {
-                        term: params.term || '',
-                        page: params.page || 1
-                    }
-                },
-                // processResults: function (data, params) {
-                //     return data
-                // },
-                processResults: function (data) {
-                    return {
-                        results: $.map(data.results, function (obj) {
-                            return {id: obj.id, text: obj.text}; // Use id and name
-                        })
-                    };
-                },
-                cache: true
-            }
-        });
-
-        $(".companies_select").select2({
-            placeholder: 'Αναζήτηση...',
-            allowClear: true,
-            ajax: {
-                type: 'POST',
-                delay: 500,
-                url: "{{ route('api.internal.companies.namesPaginated') }}",
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: function (params) {
-                    return {
-                        term: params.term || '',
-                        page: params.page || 1
-                    }
-                },
-                processResults: function (data, params) {
-                    return {
-                        results: $.map(data.results, function (obj) {
-                            return {
-                                id: obj.id,
-                                text: obj.text + (obj.status ? ' (' + obj.status + ')' : '')
-                            }; // Use id and name
-                        }),
-                        pagination: {
-                            more: data.pagination.more
-                        }
-                    };
-                },
-                cache: true
-            }
-        });
-
-
-        $('#company_id').on('change', function () {
-            let companyId = $('#company_id').val();
-
-            let contacts = $("#contacts");
-            contacts.val(null).trigger('change');
-            contacts.empty();
-
-            let url = `{{ route('api.internal.companies.getContactsByCompanyId', ':companyId') }}`.replace(':companyId', companyId);
-            $(".select_contacts").select2({
+            $(".companies_select").select2({
                 placeholder: 'Αναζήτηση...',
                 allowClear: true,
                 ajax: {
                     type: 'POST',
                     delay: 500,
-                    url: url,
+                    url: "{{ route('api.internal.companies.namesPaginated') }}",
                     dataType: 'json',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -282,7 +239,7 @@
                             results: $.map(data.results, function (obj) {
                                 return {
                                     id: obj.id,
-                                    text: obj.text
+                                    text: obj.text + (obj.status ? ' (' + obj.status + ')' : '')
                                 }; // Use id and name
                             }),
                             pagination: {
@@ -293,19 +250,62 @@
                     cache: true
                 }
             });
+
+
+            $('#company_id').on('change', function () {
+                let companyId = $('#company_id').val();
+
+                let contacts = $("#contacts");
+                contacts.val(null).trigger('change');
+                contacts.empty();
+
+                let url = `{{ route('api.internal.companies.getContactsByCompanyId', ':companyId') }}`.replace(':companyId', companyId);
+                $(".select_contacts").select2({
+                    placeholder: 'Αναζήτηση...',
+                    allowClear: true,
+                    ajax: {
+                        type: 'POST',
+                        delay: 500,
+                        url: url,
+                        dataType: 'json',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: function (params) {
+                            return {
+                                term: params.term || '',
+                                page: params.page || 1
+                            }
+                        },
+                        processResults: function (data, params) {
+                            return {
+                                results: $.map(data.results, function (obj) {
+                                    return {
+                                        id: obj.id,
+                                        text: obj.text
+                                    }; // Use id and name
+                                }),
+                                pagination: {
+                                    more: data.pagination.more
+                                }
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            });
+
+            $('#form').on('submit', function (e) {
+                let visitDate = $('#visit_date').val();
+
+                if (!visitDate) {
+                    e.preventDefault();
+                    $('#visit_date').addClass('is-invalid');
+                    return false;
+                } else {
+                    $('#visit_date').removeClass('is-invalid');
+                }
+            });
         });
-
-        $('#form').on('submit', function (e) {
-            let visitDate = $('#visit_date').val();
-
-            if (!visitDate) {
-                e.preventDefault();
-                $('#visit_date').addClass('is-invalid');
-                return false;
-            } else {
-                $('#visit_date').removeClass('is-invalid');
-            }
-        });
-
     </script>
 @endsection
