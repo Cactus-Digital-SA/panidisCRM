@@ -103,6 +103,41 @@
             </a>
         </li>
 
+        @if(Auth::user()->can('projects.view'))
+            @foreach($projectsTypes ?? [] as $type)
+                <li class="menu-item has-sub {{ activeClass(request()->is('admin/projects/'. $type->slug .'*'),'open') }}">
+                    <a class="menu-link menu-toggle" href="#">
+                        <i class="menu-icon tf-icons ti ti-{{$type->icon}}"></i>
+                        <div>
+                            <span class="menu-title">{{ $type->name }}</span>
+                        </div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item {{ activeClass(request()->is('admin/projects/'. $type->slug),'active') }}">
+                            <a class="menu-link" href="{{ route('admin.projects.index', $type->slug) }}">
+                                <span class="menu-title">Λίστα</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {{ activeClass(request()->is('admin/projects/'. $type->slug. '/mine'),'active') }}">
+                            <a class="menu-link" href="{{ route('admin.projects.mine', $type->slug) }}">
+                                <span class="menu-title">Τα δικά μου</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {{ activeClass(request()->is('admin/projects/'. $type->slug.'/create'),'active') }}">
+                            <a class="menu-link" href="{{ route('admin.projects.create', $type->slug) }}">
+                                <span class="menu-title">Δημιουργία</span>
+                            </a>
+                        </li>
+                        <li class="menu-item {{ activeClass(request()->is('admin/projects/'. $type->slug.'/cancelled'),'active') }}">
+                            <a class="menu-link" href="{{ route('admin.projects.indexCancelled', $type->slug) }}">
+                                <span class="menu-title">Ακυρωμένα</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            @endforeach
+        @endif
+
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text"> {{__('Settings')}} </span>
         </li>

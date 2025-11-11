@@ -250,7 +250,7 @@ final class ProjectController extends Controller
 
         $this->projectService->update($projectDTO, $projectId);
 
-        return redirect()->back()->with('status', 'Το Project έχει ενημερωθεί');
+        return redirect()->route('admin.projects.show', ['type' => $typeSlug, 'id' => $projectId])->with('status', 'Το Project έχει ενημερωθεί');
     }
 
     /**
