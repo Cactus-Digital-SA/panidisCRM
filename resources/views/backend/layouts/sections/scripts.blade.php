@@ -38,6 +38,20 @@
 <!-- BEGIN: Sweet Alert JS-->
 @include('includes.flash')
 <!-- END: Sweet Alert JS-->
+
+<script type="module">
+    $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+    $('.select2').each(function() {
+        $(this).select2({ dropdownParent: $(this).parent()});
+    })
+
+    $('.modal').each(function () {
+        $(this).modal({
+            backdrop: 'static',
+        });
+    });
+</script>
+
 @stack('modals')
 
 @stack('scripts')

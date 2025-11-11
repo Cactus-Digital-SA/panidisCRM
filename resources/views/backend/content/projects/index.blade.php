@@ -1,17 +1,19 @@
-@php use App\Domains\Tickets\Models\TicketStatus as TicketStatus; @endphp
+@php use App\Domains\Projects\Enums\ProjectPriorityEnum;use App\Domains\Projects\Models\Project;use App\Domains\Projects\Models\ProjectStatus;use App\Domains\Projects\Models\ProjectType; @endphp
 @php
     /**
-    * @var array<TicketStatus> $ticketStatus
+    * @var ProjectType $projectType
+    * @var array<ProjectStatus> $projectStatus
     * */
 @endphp
 
 @extends('backend.layouts.app')
 
-@section('title', __('Tickets'))
+@section('title', $projectType->getName())
 
 @section('content-header-breadcrumbs')
     <li class="breadcrumb-item"><a href="{{route('admin.home')}}">Αρχική</a></li>
-    <li class="breadcrumb-item active"><a href=" {{ route('admin.tickets.index') }} ">{{ __('List') }}</a></li>
+    <li class="breadcrumb-item">{{ __($projectType->getName()) }}</li>
+    <li class="breadcrumb-item active"> <a href="{{route('admin.projects.index', $projectType->getSlug())}}">@if(isset($title)) {{$title}} @else {{ __('List') }} @endif</a></li>
 @endsection
 
 @section('vendor-style')
@@ -27,15 +29,18 @@
 
     <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
         <div class="mb-1 breadcrumb-right">
-            <button data-bs-target="#createTicket" data-bs-toggle="modal" class="btn btn-primary  me-2">
-                <i class="ti ti-plus me-1"></i>
-                Δημιουργία Ticket
+            <a class="btn btn-success waves-effect waves-float waves-light me-2"
+               href="{{route('admin.projects.create', $projectType->getSlug())}}"><i
+                    class="ti ti-user-plus ti-xs me-1"></i>
+                {{ __("Create Project") }}
+            </a>
+            <button class="btn btn-info btn-round waves-effect waves-float waves-light"
+                    onclick="jQuery('#filters').toggle()">
+                <i class="ti ti-filter"></i> {{ __('Filters') }}
             </button>
-            <button class="btn btn-info btn-round waves-effect waves-float waves-light" onclick="jQuery('#filters').toggle()">
-                <i class="ti ti-filter"></i> Φίλτρα
-            </button>
-            <button class="btn btn-dark btn-round waves-effect waves-float waves-light" onclick="jQuery('#columns').toggle()">
-                <i class="ti ti-folder"></i> Στήλες Πίνακα
+            <button class="btn btn-dark btn-round waves-effect waves-float waves-light"
+                    onclick="jQuery('#columns').toggle()">
+                <i class="ti ti-folder"></i> {{ __('Columns') }}
             </button>
         </div>
     </div>
@@ -44,7 +49,7 @@
 @section('content')
     <!-- Search Bar -->
     <div class="col-12 mb-4">
-        <div id="filters" class="col-12 card card-accent-info mt-card-accent" >
+        <div id="filters" style="display: none;" class="col-12 card card-accent-info mt-card-accent">
             <div class="card-body p-0">
                 <div class="row justify-content-end card-header">
                     <div class="col-md-12 col-12">
@@ -111,7 +116,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -124,7 +128,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <table class="datatables-basic tickets-datatable table">
+                    <table class="datatables-basic projects-datatable table">
                         <thead>
                         <tr>
                             @foreach($columns as $column)
@@ -139,13 +143,13 @@
         </div>
     </section>
     @include('backend.components.delete_modal')
-    @include('backend.content.tickets.modals.create')
 @endsection
 
 
 @section('vendor-script')
     @vite([
     'resources/assets/vendor/libs/moment/moment.js',
+    'resources/assets/vendor/libs/flatpickr/flatpickr.js',
     'resources/assets/vendor/libs/jquery-timepicker/jquery-timepicker.js',
     'resources/assets/vendor/libs/pickr/pickr.js'
   ])
@@ -156,10 +160,58 @@
     @vite([])
 
     <script type="module">
-        jQuery('#filters').toggle()
-
         $(function () {
-            let dt_basic_table = $('.tickets-datatable');
+            const initPicker = {
+                altInput: true,
+                altFormat: 'd-m-Y',
+                dateFormat: 'Y-m-d',
+                locale: { ...flatpickr.l10ns.gr, firstDayOfWeek: 1 }
+            };
+
+            // Ημ/νια Εισαγωγής
+            linkRange('#filter_start_date_start', '#filter_start_date_end');
+
+            // Deadline
+            linkRange('#filter_deadline_start', '#filter_deadline_end');
+
+            function linkRange(startSelector, endSelector) {
+                const startEl = document.querySelector(startSelector);
+                const endEl   = document.querySelector(endSelector);
+                if (!startEl || !endEl) return null;
+
+                const endPicker = flatpickr(endEl, {
+                    ...initPicker
+                });
+
+                const startPicker = flatpickr(startEl, {
+                    ...initPicker,
+                    onChange(selectedDates) {
+                        const start = selectedDates?.[0] ?? null;
+
+                        if (start) {
+                            // Έλεγχος end < start
+                            endPicker.set('minDate', start);
+
+                            // Αν το end είναι κενό βάζουμε ίδια ημ/νια
+                            const end = endPicker.selectedDates?.[0] ?? null;
+                            if ( !end ) {
+                                endPicker.setDate(start, true);
+                            }
+                        } else {
+                            // Αν καθαρίσει το start, διαγράφουμε και το minDate
+                            endPicker.set('minDate', null);
+                        }
+                    }
+                });
+
+                return { startPicker, endPicker };
+            }
+        });
+    </script>
+    <script type="module">
+        $(function () {
+            let dt_basic_table = $('.projects-datatable');
+
             if (dt_basic_table.length) {
                 loadColumnsState();
 
@@ -171,23 +223,27 @@
                 mySearch(filters);
 
                 function mySearch(filters) {
-                    if ($.fn.DataTable.isDataTable('.tickets-datatable')) {
+                    if ($.fn.DataTable.isDataTable('.projects-datatable')) {
                         dt_basic_table.DataTable().destroy();
                     }
 
                     let currentFilters = filters;
 
                     let dt_basic = dt_basic_table.DataTable({
+                        scrollX: true, // Ενεργοποίηση οριζόντιας κύλισης
+                        responsive: false,
                         processing: true,
                         serverSide: true,
                         searching: false,
                         serverMethod: 'post',
                         ajax: {
-                            url: "{{ route('admin.datatable.tickets') }}",
+                            url: "{{ route('admin.datatable.projects') }}",
                             headers: {
                                 'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
                             },
                             data: function (data) {
+                                data.projectTypeSlug = '{{$projectType->getSlug()}}';
+                                data.projectTypeId = '{{$projectType->getId()}}';
                                 if (currentFilters && typeof currentFilters === 'object') {
                                     Object.keys(currentFilters).forEach(function (key) {
                                         data[key] = currentFilters[key];
@@ -195,15 +251,7 @@
                                 }
 
                                 @isset($mine)
-                                    data.ticketMine = '{{$mine}}';
-                                @endisset
-                                @isset($assignedBy)
-                                    data.assignedBy = '{{$assignedBy}}';
-                                @endisset
-
-
-                                @isset($company)
-                                    data.filterCompany = '{{$company->getId()}}';
+                                    data.projectMine = '{{$mine}}';
                                 @endisset
                             }
                         },
@@ -224,17 +272,30 @@
                         columnDefs: [
                             {
                                 // For Responsive
+
                                 className: 'control',
                                 orderable: false,
                                 responsivePriority: 2,
-                                targets: 0
+                                targets: 0,
+                                // visible: false
                             }
                         ],
-                        order: [[3, 'desc']],
+                        order: [[0, "desc"]],
                         dom: '<"d-flex justify-content-between align-items-center mx-2 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"dt-action-buttons text-end"B>f>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
                         displayLength: 10,
                         lengthMenu: [10, 25, 50, 100],
                         buttons: [
+                                {{--{--}}
+                                {{--    text: feather.icons['upload'].toSvg({ class: 'me-50 font-small-4' }) + '{{ __('Upload') }}',--}}
+                                {{--    className: 'create-new mx-50 btn btn-dark',--}}
+                                {{--    attr: {--}}
+                                {{--        'data-bs-toggle': 'modal',--}}
+                                {{--        'data-bs-target': '#upload'--}}
+                                {{--    },--}}
+                                {{--    init: function (api, node, config) {--}}
+                                {{--        $(node).removeClass('btn-secondary');--}}
+                                {{--    }--}}
+                                {{--},--}}
                             {
                                 extend: 'collection',
                                 className: 'btn btn-outline-secondary dropdown-toggle me-2',
@@ -290,39 +351,50 @@
                                     }, 50);
                                 }
                             },
+                            {{--{--}}
+                            {{--    text: feather.icons['plus'].toSvg({ class: 'me-50 font-small-4' }) + '{{ __('locale.New Record')  }}',--}}
+                            {{--    className: 'create-new btn btn-primary',--}}
+                            {{--    attr: {--}}
+                            {{--        'data-bs-toggle': 'modal',--}}
+                            {{--        'data-bs-target': '#add-user'--}}
+                            {{--    },--}}
+                            {{--    init: function (api, node, config) {--}}
+                            {{--        $(node).removeClass('btn-secondary');--}}
+                            {{--    }--}}
+                            {{--}--}}
                         ],
-                        responsive: {
-                            details: {
-                                display: $.fn.dataTable.Responsive.display.modal({
-                                    header: function (row) {
-                                        var data = row.data();
-                                        return 'Details of ' + data['name'];
-                                    }
-                                }),
-                                type: 'column',
-                                renderer: function (api, rowIdx, columns) {
-                                    var data = $.map(columns, function (col) {
-                                        return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
-                                            ? '<tr data-dt-row="' +
-                                            col.rowIdx +
-                                            '" data-dt-column="' +
-                                            col.columnIndex +
-                                            '">' +
-                                            '<td>' +
-                                            col.title +
-                                            ':' +
-                                            '</td> ' +
-                                            '<td>' +
-                                            col.data +
-                                            '</td>' +
-                                            '</tr>'
-                                            : '';
-                                    }).join('');
-
-                                    return data ? $('<table class="table"/>').append('<tbody>' + data + '</tbody>') : false;
-                                }
-                            }
-                        },
+                        // responsive: {
+                        //     details: {
+                        //         display: $.fn.dataTable.Responsive.display.modal({
+                        //             header: function (row) {
+                        //                 var data = row.data();
+                        //                 return 'Details of ' + data['name'];
+                        //             }
+                        //         }),
+                        //         type: 'column',
+                        //         renderer: function (api, rowIdx, columns) {
+                        //             var data = $.map(columns, function (col) {
+                        //                 return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
+                        //                     ? '<tr data-dt-row="' +
+                        //                     col.rowIdx +
+                        //                     '" data-dt-column="' +
+                        //                     col.columnIndex +
+                        //                     '">' +
+                        //                     '<td>' +
+                        //                     col.title +
+                        //                     ':' +
+                        //                     '</td> ' +
+                        //                     '<td>' +
+                        //                     col.data +
+                        //                     '</td>' +
+                        //                     '</tr>'
+                        //                     : '';
+                        //             }).join('');
+                        //
+                        //             return data ? $('<table class="table"/>').append('<tbody>' + data + '</tbody>') : false;
+                        //         }
+                        //     }
+                        // },
                         language: {
                             paginate: {
                                 next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',
@@ -399,11 +471,11 @@
                     $('.column-toggle:checked').each(function () {
                         selectedColumns.push($(this).val());
                     });
-                    setCookie('selectedColumns_tickets', JSON.stringify(selectedColumns), 365); // Store for 7 days
+                    setCookie('selectedColumns_{{$projectType->getSlug()}}', JSON.stringify(selectedColumns), 365); // Store for 7 days
                 }
 
                 function loadColumnsState() {
-                    const selectedColumns = JSON.parse(getCookie('selectedColumns_tickets'));
+                    const selectedColumns = JSON.parse(getCookie('selectedColumns_{{$projectType->getSlug()}}'));
                     if (selectedColumns) {
                         selectedColumns.forEach(function (value) {
                             $('#toggleColumn' + value).prop('checked', true).trigger('change');
@@ -426,14 +498,18 @@
                     mySearch(filters);
                 });
 
-                function getFiltersFromInputs() {
+                function getFiltersFromInputs(){
                     filters = [];
                     filters.filterName = $('#filter_name').val();
                     filters.filterOwner = $('#filter_owner').val();
                     filters.filterAssignees = $('#filter_assignees').val();
                     filters.filterStatus = $('#filter_status').val();
                     filters.filterPriority = $('#filter_priority').val();
-                    filters.filterCompany = $('#filter_company').val();
+                    filters.filterClient = $('#filter_client').val();
+
+                    @if(isset($selectedStatus))
+                        filters.filterStatus = [{{ $selectedStatus?->getId() }}];
+                    @endif
 
                     let start_date_start = $('#filter_start_date_start').val();
                     let start_date_end = $('#filter_start_date_end').val();
@@ -457,7 +533,7 @@
 
                     // Append filters to the search parameters
                     Object.keys(filters).forEach(function (key) {
-                        if (filters[key] && filters[key] != '') { // Only append if the filter is not empty or null
+                        if (filters[key] && filters[key]!='') { // Only append if the filter is not empty or null
                             searchParams.set(key, filters[key]);
                         } else {
                             searchParams.delete(key); // Remove empty filters from URL
@@ -468,7 +544,6 @@
                     const newUrl = window.location.pathname + '?' + searchParams.toString();
                     history.pushState(null, '', newUrl);
                 }
-
                 function checkUrlParamsAndSetInputs() {
                     let searchParams = new URLSearchParams(window.location.search);
 
@@ -496,7 +571,7 @@
 
                         let assignees = searchParams.get('filterAssignees').split(',');
 
-                        $.each(assignees, function (index, id) {
+                        $.each( assignees, function( index ,id ) {
                             $.ajax({
                                 type: 'POST',
                                 url: "{{ route('api.internal.users.getUserById') }}", // Your API endpoint to fetch owner details
@@ -516,13 +591,13 @@
                         });
                     }
 
-                    if (searchParams.has('filterCompany')) {
-                        let companies = searchParams.get('filterCompany').split(',');
+                    if (searchParams.has('filterClient')) {
+                        let clients = searchParams.get('filterClient').split(',');
 
-                        $.each(companies, function (index, id) {
+                        $.each( clients, function( index ,id ) {
                             $.ajax({
                                 type: 'POST',
-                                url: "{{ route('api.internal.companies.getCompanyById') }}", // Your API endpoint to fetch owner details
+                                url: "{{ route('api.internal.clients.getClientWithCompanyByClientId') }}", // Your API endpoint to fetch owner details
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
@@ -531,8 +606,8 @@
                                 },
                                 success: function (data) {
                                     if (data) {
-                                        let newOption = new Option(data.company.name, data.company.id, true, true);
-                                        $('#filter_company').append(newOption).trigger('change');
+                                        let newOption = new Option(data.company.name, data.client.id, true, true);
+                                        $('#filter_client').append(newOption).trigger('change');
                                     }
                                 }
                             });
@@ -572,57 +647,12 @@
                         }
                     });
                 });
+
+
             }
+
+
         });
-
-
-        const initPicker = {
-            altInput: true,
-            altFormat: 'd-m-Y',
-            dateFormat: 'Y-m-d',
-            locale: { ...flatpickr.l10ns.gr, firstDayOfWeek: 1 }
-        };
-
-        // Ημ/νια Εισαγωγής
-        linkRange('#filter_start_date_start', '#filter_start_date_end');
-
-        // Deadline
-        linkRange('#filter_deadline_start', '#filter_deadline_end');
-
-        function linkRange(startSelector, endSelector) {
-            const startEl = document.querySelector(startSelector);
-            const endEl   = document.querySelector(endSelector);
-            if (!startEl || !endEl) return null;
-
-            const endPicker = flatpickr(endEl, {
-                ...initPicker
-            });
-
-            const startPicker = flatpickr(startEl, {
-                ...initPicker,
-                onChange(selectedDates) {
-                    const start = selectedDates?.[0] ?? null;
-
-                    if (start) {
-                        // Έλεγχος end < start
-                        endPicker.set('minDate', start);
-
-                        // Αν το end είναι κενό βάζουμε ίδια ημ/νια
-                        const end = endPicker.selectedDates?.[0] ?? null;
-                        if ( !end ) {
-                            endPicker.setDate(start, true);
-                        }
-                    } else {
-                        // Αν καθαρίσει το start, διαγράφουμε και το minDate
-                        endPicker.set('minDate', null);
-                    }
-                }
-            });
-
-            return { startPicker, endPicker };
-        }
-
-
     </script>
 
     @include('backend.components.js.select')

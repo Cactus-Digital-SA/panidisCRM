@@ -1,163 +1,41 @@
-@php use App\Domains\Tickets\Models\TicketStatus as TicketStatus; @endphp
+@php use App\Domains\Tickets\Models\Ticket;use App\Models\CactusEntity; @endphp
 @php
-    /**
-    * @var array<TicketStatus> $ticketStatus
-    * */
+    /** @var CactusEntity $model */
+    /** @var Ticket $ticket */
+
+    $ticketService = new \App\Domains\Tickets\Services\TicketService((new \App\Domains\Tickets\Repositories\Eloquent\EloqTicketRepository(new \App\Domains\Tickets\Repositories\Eloquent\Models\Ticket())));
+    $columns = $ticketService->getTableColumns();
 @endphp
-
-@extends('backend.layouts.app')
-
-@section('title', __('Tickets'))
-
-@section('content-header-breadcrumbs')
-    <li class="breadcrumb-item"><a href="{{route('admin.home')}}">Αρχική</a></li>
-    <li class="breadcrumb-item active"><a href=" {{ route('admin.tickets.index') }} ">{{ __('List') }}</a></li>
-@endsection
-
-@section('vendor-style')
+@push('after-styles')
     @include('includes.datatable_styles')
-    @vite([
-        'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
-        'resources/assets/vendor/libs/jquery-timepicker/jquery-timepicker.scss',
-        'resources/assets/vendor/libs/pickr/pickr-themes.scss'
-    ])
-@endsection
+    @vite(['resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.scss'])
+@endpush
 
-@section('content-header')
-
-    <div class="col-md-5 content-header-right text-md-end col-md-auto d-md-block d-none mb-2">
-        <div class="mb-1 breadcrumb-right">
-            <button data-bs-target="#createTicket" data-bs-toggle="modal" class="btn btn-primary  me-2">
-                <i class="ti ti-plus me-1"></i>
-                Δημιουργία Ticket
-            </button>
-            <button class="btn btn-info btn-round waves-effect waves-float waves-light" onclick="jQuery('#filters').toggle()">
-                <i class="ti ti-filter"></i> Φίλτρα
-            </button>
-            <button class="btn btn-dark btn-round waves-effect waves-float waves-light" onclick="jQuery('#columns').toggle()">
-                <i class="ti ti-folder"></i> Στήλες Πίνακα
-            </button>
-        </div>
-    </div>
-@endsection
-
-@section('content')
-    <!-- Search Bar -->
-    <div class="col-12 mb-4">
-        <div id="filters" class="col-12 card card-accent-info mt-card-accent" >
-            <div class="card-body p-0">
-                <div class="row justify-content-end card-header">
-                    <div class="col-md-12 col-12">
-                        <div class="row">
-                            <div class="col-md-2 col-12 ">
-                                <label for="filter_name">Όνομα</label>
-                                <input type="text" id="filter_name" class="form-control project_name enter_filter" autocomplete="off" placeholder="Όνομα"/>
-                            </div>
-                            <div class="col-md-2 col-12">
-                                <label for="filter_owner">Manager</label>
-                                <select name="filter_owner" id="filter_owner" class="form-control select2 filter_owner" data-placeholder="Manager">
-                                </select>
-                            </div>
-                            <div class="col-md-3-5 col-12">
-                                <label for="filter_assignees">Ανάθεση Χρήστη</label>
-                                <select name="filter_assignees[]" id="filter_assignees" class="form-control select2 filter_assignees" data-placeholder="Ανάθεση Χρήστη" data-allow-clear="true" multiple>
-                                </select>
-                            </div>
-                            <div class="col-md-2-5 col-12">
-                                <label for="filter_status">{{ __('Status') }}</label>
-                                <select name="filter_status[]" id="filter_status" class="form-control select2" data-placeholder="{{ __('Status') }}" data-allow-clear="true" multiple>
-                                    @foreach($ticketStatus ?? [] as $status)
-                                        <option value="{{ $status->getId() }}"> {{$status->getName()}} </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2 col-12" style="display: flex; align-items: end;">
-                                <button style="width: 90%;" id="search" name="search" class="btn btn-success waves-effect waves-light" data-toggle="tooltip">
-                                    <i class="fa fa-search mx-2"></i>
-                                    {{__('Search')}}
-                                </button>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-2 col-12">
-                                <label for="filter_priority">Προτεραιότητα</label>
-                                <select name="filter_priority" id="filter_priority" class="form-control select2"
-                                        data-placeholder="Προτεραιότητα">
-                                    <option></option>
-                                    @foreach(\App\Helpers\Enums\PriorityEnum::cases() as $priority)
-                                        <option value="{{ $priority->value }}"> {{ $priority->value }} </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2 col-12">
-                                <label for="filter_company">Εταιρεία</label>
-                                <select name="filter_company" id="filter_company" class="form-control select2 select_companies" data-placeholder="Εταιρεία">
-                                    <option></option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 col-12">
-                                <label for="filter_start_date_start">Ημ/νια Εισαγωγής</label>
-                                <div class="input-group" id="filter_start_date">
-                                    <input type="text" data-flatpickr="date" id="filter_start_date_start" placeholder="Απο" autocomplete="off">
-                                    <input type="text" data-flatpickr="date" id="filter_start_date_end" placeholder="Έως" autocomplete="off" data-flatpickr-end-for="#filter_start_date_start">
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-12">
-                                <label for="filter_deadline_start">Ημ/νια Deadline</label>
-                                <div class="input-group" id="filter_deadline">
-                                    <input type="text" id="filter_deadline_start" placeholder="Απο" class="form-control" autocomplete="off">
-                                    <input type="text" id="filter_deadline_end" placeholder="Έως" class="form-control" autocomplete="off" data-flatpickr-end-for="#filter_deadline_start">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
+<section id="basic-datatable">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <table class="datatables-basic tickets-datatable table">
+                    <thead>
+                    <tr>
+                        @foreach($columns as $column)
+                            <th> {{ __($column['name']) }}</th>
+                        @endforeach
+                        <th> {{ __('Actions') }}</th>
+                    </tr>
+                    </thead>
+                </table>
             </div>
         </div>
-        @include('backend.components.column_select')
     </div>
-    <!--/ Search Bar -->
+</section>
+
+@include('backend.content.projects.modals.create_ticket')
 
 
-    <section id="basic-datatable">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <table class="datatables-basic tickets-datatable table">
-                        <thead>
-                        <tr>
-                            @foreach($columns as $column)
-                                <th> {{ __($column['name']) }}</th>
-                            @endforeach
-                            <th> {{ __('Actions') }}</th>
-                        </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-    @include('backend.components.delete_modal')
-    @include('backend.content.tickets.modals.create')
-@endsection
-
-
-@section('vendor-script')
-    @vite([
-    'resources/assets/vendor/libs/moment/moment.js',
-    'resources/assets/vendor/libs/jquery-timepicker/jquery-timepicker.js',
-    'resources/assets/vendor/libs/pickr/pickr.js'
-  ])
-@endsection
-
-@section('page-script')
+@push('after-scripts')
     @include('includes.datatable_scripts')
-    @vite([])
-
     <script type="module">
-        jQuery('#filters').toggle()
-
         $(function () {
             let dt_basic_table = $('.tickets-datatable');
             if (dt_basic_table.length) {
@@ -188,23 +66,13 @@
                                 'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
                             },
                             data: function (data) {
+                                data.morphableType = '{{ lcfirst(class_basename($model).'s') }}';
+                                data.morphableId = '{{ $model->getId() }}';
                                 if (currentFilters && typeof currentFilters === 'object') {
                                     Object.keys(currentFilters).forEach(function (key) {
                                         data[key] = currentFilters[key];
                                     });
                                 }
-
-                                @isset($mine)
-                                    data.ticketMine = '{{$mine}}';
-                                @endisset
-                                @isset($assignedBy)
-                                    data.assignedBy = '{{$assignedBy}}';
-                                @endisset
-
-
-                                @isset($company)
-                                    data.filterCompany = '{{$company->getId()}}';
-                                @endisset
                             }
                         },
                         columns: [
@@ -213,7 +81,7 @@
                                 data: '{{$key}}',
                                 name: '{{$column['table']}}',
                                 searchable: '{{ $column['searchable'] }}',
-                                orderable: {{ $column['orderable'] ?? false }}
+                                sortable: '{{ $column['sortable'] ?? false }}'
                             },
                                 @endforeach
 
@@ -230,11 +98,22 @@
                                 targets: 0
                             }
                         ],
-                        order: [[3, 'desc']],
-                        dom: '<"d-flex justify-content-between align-items-center mx-2 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"dt-action-buttons text-end"B>f>>t<"d-flex justify-content-between mx-0 row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+                        order: [[1, 'desc']],
+                        dom: '<"d-flex justify-content-between align-items-center mx-2 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"dt-action-buttons text-end"B>f>>t<"d-flex justify-content-between mx-0 row"<"d-flex justify-content-center col-12"i><"d-flex justify-content-center col-12"p>>',
                         displayLength: 10,
                         lengthMenu: [10, 25, 50, 100],
                         buttons: [
+                            {
+                                text: '<i class="ti ti-plus me-md-1"></i><span class="d-md-inline-block d-none">{{ __('Create') }}',
+                                className: 'create-new mx-1 btn btn-primary',
+                                attr: {
+                                    'data-bs-toggle': 'modal',
+                                    'data-bs-target': '#createTicket'
+                                },
+                                init: function (api, node) {
+                                    $(node).removeClass('btn-secondary');
+                                }
+                            },
                             {
                                 extend: 'collection',
                                 className: 'btn btn-outline-secondary dropdown-toggle me-2',
@@ -399,11 +278,11 @@
                     $('.column-toggle:checked').each(function () {
                         selectedColumns.push($(this).val());
                     });
-                    setCookie('selectedColumns_tickets', JSON.stringify(selectedColumns), 365); // Store for 7 days
+                    setCookie('selectedColumns_{{ class_basename($model) }}_{{ $model->getId() }}', JSON.stringify(selectedColumns), 365); // Store for 7 days
                 }
 
                 function loadColumnsState() {
-                    const selectedColumns = JSON.parse(getCookie('selectedColumns_tickets'));
+                    const selectedColumns = JSON.parse(getCookie('selectedColumns_{{ class_basename($model) }}_{{ $model->getId() }}'));
                     if (selectedColumns) {
                         selectedColumns.forEach(function (value) {
                             $('#toggleColumn' + value).prop('checked', true).trigger('change');
@@ -426,14 +305,14 @@
                     mySearch(filters);
                 });
 
-                function getFiltersFromInputs() {
+                function getFiltersFromInputs(){
                     filters = [];
                     filters.filterName = $('#filter_name').val();
                     filters.filterOwner = $('#filter_owner').val();
                     filters.filterAssignees = $('#filter_assignees').val();
                     filters.filterStatus = $('#filter_status').val();
                     filters.filterPriority = $('#filter_priority').val();
-                    filters.filterCompany = $('#filter_company').val();
+                    filters.filterClient = $('#filter_client').val();
 
                     let start_date_start = $('#filter_start_date_start').val();
                     let start_date_end = $('#filter_start_date_end').val();
@@ -468,7 +347,6 @@
                     const newUrl = window.location.pathname + '?' + searchParams.toString();
                     history.pushState(null, '', newUrl);
                 }
-
                 function checkUrlParamsAndSetInputs() {
                     let searchParams = new URLSearchParams(window.location.search);
 
@@ -496,7 +374,7 @@
 
                         let assignees = searchParams.get('filterAssignees').split(',');
 
-                        $.each(assignees, function (index, id) {
+                        $.each( assignees, function( index ,id ) {
                             $.ajax({
                                 type: 'POST',
                                 url: "{{ route('api.internal.users.getUserById') }}", // Your API endpoint to fetch owner details
@@ -516,13 +394,13 @@
                         });
                     }
 
-                    if (searchParams.has('filterCompany')) {
-                        let companies = searchParams.get('filterCompany').split(',');
+                    if (searchParams.has('filterClient')) {
+                        let clients = searchParams.get('filterClient').split(',');
 
-                        $.each(companies, function (index, id) {
+                        $.each( clients, function( index ,id ) {
                             $.ajax({
                                 type: 'POST',
-                                url: "{{ route('api.internal.companies.getCompanyById') }}", // Your API endpoint to fetch owner details
+                                url: "{{ route('api.internal.clients.getClientWithCompanyByClientId') }}", // Your API endpoint to fetch owner details
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                 },
@@ -531,8 +409,8 @@
                                 },
                                 success: function (data) {
                                     if (data) {
-                                        let newOption = new Option(data.company.name, data.company.id, true, true);
-                                        $('#filter_company').append(newOption).trigger('change');
+                                        let newOption = new Option(data.company.name, data.client.id, true, true);
+                                        $('#filter_client').append(newOption).trigger('change');
                                     }
                                 }
                             });
@@ -574,56 +452,5 @@
                 });
             }
         });
-
-
-        const initPicker = {
-            altInput: true,
-            altFormat: 'd-m-Y',
-            dateFormat: 'Y-m-d',
-            locale: { ...flatpickr.l10ns.gr, firstDayOfWeek: 1 }
-        };
-
-        // Ημ/νια Εισαγωγής
-        linkRange('#filter_start_date_start', '#filter_start_date_end');
-
-        // Deadline
-        linkRange('#filter_deadline_start', '#filter_deadline_end');
-
-        function linkRange(startSelector, endSelector) {
-            const startEl = document.querySelector(startSelector);
-            const endEl   = document.querySelector(endSelector);
-            if (!startEl || !endEl) return null;
-
-            const endPicker = flatpickr(endEl, {
-                ...initPicker
-            });
-
-            const startPicker = flatpickr(startEl, {
-                ...initPicker,
-                onChange(selectedDates) {
-                    const start = selectedDates?.[0] ?? null;
-
-                    if (start) {
-                        // Έλεγχος end < start
-                        endPicker.set('minDate', start);
-
-                        // Αν το end είναι κενό βάζουμε ίδια ημ/νια
-                        const end = endPicker.selectedDates?.[0] ?? null;
-                        if ( !end ) {
-                            endPicker.setDate(start, true);
-                        }
-                    } else {
-                        // Αν καθαρίσει το start, διαγράφουμε και το minDate
-                        endPicker.set('minDate', null);
-                    }
-                }
-            });
-
-            return { startPicker, endPicker };
-        }
-
-
     </script>
-
-    @include('backend.components.js.select')
-@endsection
+@endpush

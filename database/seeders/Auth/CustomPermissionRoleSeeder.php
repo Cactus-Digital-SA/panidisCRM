@@ -122,6 +122,16 @@ class CustomPermissionRoleSeeder extends Seeder
             ]
         );
 
+        // Projects permissions
+        updateOrCreatePermissions(
+            ['id' => 110, 'name' => 'projects', 'description' => 'Διαχείριση Έργων'],
+            [
+                ['id' => 111, 'name' => 'projects.view', 'description' => 'Προβολή Έργων'],
+                ['id' => 112, 'name' => 'projects.create', 'description' => 'Δημιουργία Έργων', 'sort' => 2],
+                ['id' => 113, 'name' => 'projects.update', 'description' => 'Επεξεργασία Έργων', 'sort' => 3],
+                ['id' => 114, 'name' => 'projects.delete', 'description' => 'Διαγραφή Έργων', 'sort' => 4],
+            ]
+        );
 
         // Assign Permissions to other Roles
         $this->enableForeignKeys();
