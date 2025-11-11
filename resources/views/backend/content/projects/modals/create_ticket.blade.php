@@ -1,3 +1,9 @@
+@php use App\Domains\Tickets\Models\Ticket;use App\Models\CactusEntity; @endphp
+@php
+    /** @var CactusEntity $model */
+    /** @var Ticket $ticket */
+
+@endphp
 <style>
     .file-input-label {
         display: inline-block;
@@ -30,10 +36,6 @@
         text-overflow: ellipsis;
     }
 
-    .flatpickr-calendar {
-        z-index: 99999 !important;
-    }
-
     @media (max-width: 998px) {
         .file-name, .file-input-label {
             text-align: start;
@@ -51,7 +53,6 @@
         }
     }
 </style>
-
 <div class="modal fade" id="createTicket" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl two-factor-auth-apps">
         <div class="modal-content">
@@ -61,9 +62,12 @@
             <div class="modal-body pb-5 px-sm-5 mx-50">
                 <div class="text-center mb-6">
                     <h4 class="modal-title">@lang('Create Ticket')</h4>
+                    <p>Add all the following information and details to create a new ticket.</p>
                 </div>
-                <form id="form" method="POST" action="{{ route('admin.tickets.store') }}" class="row g-3" enctype="multipart/form-data">
+                <form id="form" method="POST" action="{{ route('admin.projects.assign.ticket', $model->getTypeId()) }}" class="row g-3"
+                      enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="morphId" value="{{$model->getId()}}">
 
                     <div class="col-12 col-md-6">
                         <label class="form-label"> {{ __("Name") }} <i class="fa fa-asterisk fa-2xs text-danger"></i></label>
@@ -77,6 +81,11 @@
 
                     <div class="col-12 col-md-6 @if(isset($hideCompany) ?? false) d-none @endif">
                         <label class="form-label">{{__('Company') }}</label>
+                        @php
+                            if(!isset($company)){
+                                $company = $model->getClient()?->getCompany();
+                            }
+                        @endphp
                         <select name="company_id" id="company_id" class="form-control select2 select_companies" data-placeholder="{{ __('Company Selection') }}" >
                             <option></option>
                             @if(isset($company) ?? false)
@@ -87,7 +96,7 @@
 
                     <div class="col-12 col-md-6">
                         <label class="form-label">{{__('Assignees') }}
-{{--                            <i class="fa fa-asterisk fa-2xs text-danger"></i>--}}
+                            {{--                            <i class="fa fa-asterisk fa-2xs text-danger"></i>--}}
                         </label>
                         <select multiple name="assignees[]" class="form-select select2 select_assignees" data-placeholder="{{ __('Assignees Selection') }}" data-allow-clear="true">
                         </select>
@@ -124,7 +133,7 @@
                             <div class="wrapper row ">
                                 <div class="col-auto px-1">
                                     <label for="file-upload" class="file-input-label">Επιλογή Αρχείου <i
-                                                class="ti ti-file"></i></label>
+                                            class="ti ti-file"></i></label>
                                     <input id="file-upload" type="file" name="files[]" multiple>
                                 </div>
                                 <div class="col-auto d-flex align-items-center justify-content-center px-1">
@@ -150,7 +159,6 @@
 
 @push('after-scripts')
     <script type="module">
-
         $('#deadline').flatpickr({
             altInput: true,
             altFormat: 'd-m-Y',
@@ -168,11 +176,20 @@
         const fileNameDisplay = document.getElementById('file-name');
 
         fileInput.addEventListener('change', function () {
+            // if (fileInput.files.length === 1) {
+            //     fileNameDisplay.textContent = '1 αρχείο';
+            // } else if (fileInput.files.length > 1) {
+            //     fileNameDisplay.textContent = `${fileInput.files.length} αρχεία`;
+            // } else {
+            //     fileNameDisplay.textContent = 'Δεν έχει επιλεχθεί αρχείο';
+            // }
             if (fileInput.files.length > 0) {
-                fileNameDisplay.textContent = Array.from(fileInput.files).map(file => file.name).join(', ');
+                const names = Array.from(fileInput.files).map(file => file.name).join(', ');
+                fileNameDisplay.textContent = names;
             } else {
                 fileNameDisplay.textContent = 'Δεν έχει επιλεχθεί αρχείο';
             }
         });
     </script>
+    @include('backend.components.js.select')
 @endpush

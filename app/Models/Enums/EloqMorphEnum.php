@@ -11,6 +11,7 @@ enum EloqMorphEnum : string
     case NOTES = 'notes';
     case FILES = 'files';
     case ASSIGNEES = 'assignees';
+    case TICKETS = 'tickets';
 
     /**
      * @return array

@@ -34,6 +34,13 @@ use App\Domains\Leads\Repositories\Eloquent\Models\Lead;
 use App\Domains\Leads\Repositories\LeadRepositoryInterface;
 use App\Domains\Notes\Repositories\Eloquent\EloqNoteRepository;
 use App\Domains\Notes\Repositories\NoteRepositoryInterface;
+use App\Domains\Projects\Repositories\Eloquent\EloqProjectRepository;
+use App\Domains\Projects\Repositories\Eloquent\EloqProjectStatusRepository;
+use App\Domains\Projects\Repositories\Eloquent\EloqProjectTypeRepository;
+use App\Domains\Projects\Repositories\Eloquent\Models\Project;
+use App\Domains\Projects\Repositories\ProjectRepositoryInterface;
+use App\Domains\Projects\Repositories\ProjectStatusRepositoryInterface;
+use App\Domains\Projects\Repositories\ProjectTypeRepositoryInterface;
 use App\Domains\Quotes\Repositories\Eloquent\EloqQuoteRepository;
 use App\Domains\Quotes\Repositories\Eloquent\Models\Quote;
 use App\Domains\Quotes\Repositories\QuoteRepositoryInterface;
@@ -82,6 +89,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ItemRepositoryInterface::class, EloqItemRepository::class);
         $this->app->bind(QuoteRepositoryInterface::class, EloqQuoteRepository::class);
 
+        $this->app->bind(ProjectRepositoryInterface::class, EloqProjectRepository::class);
+        $this->app->bind(ProjectTypeRepositoryInterface::class, EloqProjectTypeRepository::class);
+        $this->app->bind(ProjectStatusRepositoryInterface::class, EloqProjectStatusRepository::class);
+
         $this->relations();
 
     }
@@ -94,7 +105,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             ModelMorphEnum::USER->value => User::class,
             ModelMorphEnum::CLIENT->value => Client::class,
-//            ModelMorphEnum::PROJECT->value => Project::class,
+            ModelMorphEnum::PROJECT->value => Project::class,
             ModelMorphEnum::TICKET->value => Ticket::class,
             ModelMorphEnum::LEAD->value => Lead::class,
             ModelMorphEnum::COMPANY->value => Company::class,
