@@ -23,12 +23,12 @@ class SyncItems extends Command
         $startTime = microtime(true);
 
         $limit = "";
-        $customerERPId = null;
+        $itemERPId = null;
 
         $this->info('Starting ERP items sync...');
 
         try {
-            $this->erpService->getItems($limit, $customerERPId);
+            $this->erpService->getItems($limit, $itemERPId);
             $this->info('ERP items sync completed successfully!');
         } catch (\Throwable $e) {
             $this->error('Error syncing ERP items: ' . $e->getMessage());

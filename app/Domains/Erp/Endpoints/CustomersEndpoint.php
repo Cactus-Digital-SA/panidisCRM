@@ -104,7 +104,7 @@ class CustomersEndpoint
         return $this->erpClient->post("/s1services", $options);
     }
 
-    public function getItems(string $limit = "100", ?string $customerERPId = null): ErpResponse
+    public function getItems(string $limit = "100", ?string $itemERPId = null): ErpResponse
     {
         $options = [
             "service" => "getBrowserInfo",
@@ -114,8 +114,8 @@ class CustomersEndpoint
             "LIMIT" => $limit,
         ];
 
-        if ($customerERPId) {
-            $options["FILTERS"] = "CUSTOMER.CODE=" . $customerERPId . "*";
+        if ($itemERPId) {
+            $options["FILTERS"] = "ITEM.CODE=" . $itemERPId . "*";
         }
 
         return $this->erpClient->post("/s1services", $options);
