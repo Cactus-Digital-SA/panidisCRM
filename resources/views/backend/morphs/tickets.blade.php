@@ -56,6 +56,8 @@
                     let currentFilters = filters;
 
                     let dt_basic = dt_basic_table.DataTable({
+                        // scrollX: true,
+                        responsive: false,
                         processing: true,
                         serverSide: true,
                         searching: false,
@@ -95,10 +97,11 @@
                                 className: 'control',
                                 orderable: false,
                                 responsivePriority: 2,
-                                targets: 0
+                                targets: 0,
+                                visible: false
                             }
                         ],
-                        order: [[1, 'desc']],
+                        order: [[0, 'desc']],
                         dom: '<"d-flex justify-content-between align-items-center mx-2 row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"<"dt-action-buttons text-end"B>f>>t<"d-flex justify-content-between mx-0 row"<"d-flex justify-content-center col-12"i><"d-flex justify-content-center col-12"p>>',
                         displayLength: 10,
                         lengthMenu: [10, 25, 50, 100],
@@ -170,38 +173,38 @@
                                 }
                             },
                         ],
-                        responsive: {
-                            details: {
-                                display: $.fn.dataTable.Responsive.display.modal({
-                                    header: function (row) {
-                                        var data = row.data();
-                                        return 'Details of ' + data['name'];
-                                    }
-                                }),
-                                type: 'column',
-                                renderer: function (api, rowIdx, columns) {
-                                    var data = $.map(columns, function (col) {
-                                        return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
-                                            ? '<tr data-dt-row="' +
-                                            col.rowIdx +
-                                            '" data-dt-column="' +
-                                            col.columnIndex +
-                                            '">' +
-                                            '<td>' +
-                                            col.title +
-                                            ':' +
-                                            '</td> ' +
-                                            '<td>' +
-                                            col.data +
-                                            '</td>' +
-                                            '</tr>'
-                                            : '';
-                                    }).join('');
-
-                                    return data ? $('<table class="table"/>').append('<tbody>' + data + '</tbody>') : false;
-                                }
-                            }
-                        },
+                        // responsive: {
+                        //     details: {
+                        //         display: $.fn.dataTable.Responsive.display.modal({
+                        //             header: function (row) {
+                        //                 var data = row.data();
+                        //                 return 'Details of ' + data['name'];
+                        //             }
+                        //         }),
+                        //         type: 'column',
+                        //         renderer: function (api, rowIdx, columns) {
+                        //             var data = $.map(columns, function (col) {
+                        //                 return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
+                        //                     ? '<tr data-dt-row="' +
+                        //                     col.rowIdx +
+                        //                     '" data-dt-column="' +
+                        //                     col.columnIndex +
+                        //                     '">' +
+                        //                     '<td>' +
+                        //                     col.title +
+                        //                     ':' +
+                        //                     '</td> ' +
+                        //                     '<td>' +
+                        //                     col.data +
+                        //                     '</td>' +
+                        //                     '</tr>'
+                        //                     : '';
+                        //             }).join('');
+                        //
+                        //             return data ? $('<table class="table"/>').append('<tbody>' + data + '</tbody>') : false;
+                        //         }
+                        //     }
+                        // },
                         language: {
                             paginate: {
                                 next: '<i class="icon-base ti ti-chevron-right scaleX-n1-rtl icon-18px"></i>',

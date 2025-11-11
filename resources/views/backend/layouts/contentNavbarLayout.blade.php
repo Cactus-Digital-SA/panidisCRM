@@ -29,6 +29,8 @@ $menuCollapsed = (isset($configData['menuCollapsed']) ? $configData['menuCollaps
 /* Content classes */
 $container = (isset($configData['contentLayout']) && $configData['contentLayout'] === 'compact') ? 'container-xxl' : 'container-fluid';
 
+$projectsTypes = \App\Domains\Projects\Repositories\Eloquent\Models\ProjectType::where('visibility',true)->get();
+
 @endphp
 
 @section('layoutContent')
