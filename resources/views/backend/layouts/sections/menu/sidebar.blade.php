@@ -138,6 +138,44 @@
             @endforeach
         @endif
 
+        @if(Auth::user()->hasRole(\App\Domains\Auth\Models\RolesEnum::Administrator->value))
+            <li class="menu-item has-sub {{ activeClass(request()->is('admin/sales*'), 'open') }}">
+                <a class="menu-link menu-toggle" href="#">
+                    <i class="menu-icon tf-icons ti ti-chart-bar"></i>
+                    <div>
+                        <span class="menu-title">Sales</span>
+                    </div>
+                </a>
+                <ul class="menu-sub">
+
+                    <li class="menu-item {{ Route::currentRouteName() === 'admin.sales.widget' ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('admin.sales.widget') }}">
+                            <span class="menu-title">Sales Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ Route::currentRouteName() === 'admin.sales.customerSalesReport' ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('admin.sales.customerSalesReport') }}">
+                            <span class="menu-title">Customer Sales Report</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ Route::currentRouteName() === 'admin.sales.customerCard' ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('admin.sales.customerCard') }}">
+                            <span class="menu-title">Customer Card</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-item {{ Route::currentRouteName() === 'admin.sales.customerRevenue' ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('admin.sales.customerRevenue') }}">
+                            <span class="menu-title">Customer Revenue</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+        @endif
+
         <li class="menu-header small text-uppercase">
             <span class="menu-header-text"> {{__('Settings')}} </span>
         </li>
@@ -165,6 +203,16 @@
                 </li>
             </ul>
         </li>
+        @endif
+        @if(Auth::user()->hasRole(\App\Domains\Auth\Models\RolesEnum::Administrator->value))
+            <li class="menu-item {{ Route::currentRouteName() === 'admin.widgets.indexUsers' ? 'active' : '' }}">
+                <a class="menu-link" href="{{ route('admin.widgets.indexUsers') }}">
+                    <i class="menu-icon tf-icons ti ti-list-check"></i>
+                    <div>
+                        <span class="menu-title" >Widgets</span>
+                    </div>
+                </a>
+            </li>
         @endif
 
         @if(Auth::user()->can('admin.access.user'))

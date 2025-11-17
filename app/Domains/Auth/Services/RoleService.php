@@ -72,4 +72,9 @@ class RoleService
     {
         return $this->repository->rolesDatatable($filters);
     }
+
+    public function rolesDatatableForWidgets(array $filters = []): JsonResponse
+    {
+        return $this->repository->rolesDatatableForWidgets($filters);
+    }
 }

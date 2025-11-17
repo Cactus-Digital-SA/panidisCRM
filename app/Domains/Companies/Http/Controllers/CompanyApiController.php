@@ -150,4 +150,40 @@ final class CompanyApiController extends Controller
         return response()->json($results);
 
     }
+
+    public function getCustomers(Request $request){
+        $validated = $request->validate([
+            'page' => 'required|integer',
+            'term' => 'nullable|string',
+        ]);
+
+        $page = $validated['page'];
+        $resultCount = 25;
+
+        $offset = ($page - 1) * $resultCount;
+
+        /**
+         * result['data']
+         * result['count']
+         */
+        $result = $this->companyService->getCustomers($validated['term'], $offset, $resultCount);
+
+
+        $subSections = $result['data'];
+        $count = $result['count'];
+
+
+        $endCount = $offset + $resultCount;
+        $morePages = $count > $endCount;
+
+
+        $results = array(
+            "results" => $subSections,
+            "pagination" => array(
+                "more" => $morePages
+            )
+        );
+
+        return response()->json($results);
+    }
 }

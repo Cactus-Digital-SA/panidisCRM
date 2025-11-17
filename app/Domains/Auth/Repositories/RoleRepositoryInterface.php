@@ -35,4 +35,6 @@ interface RoleRepositoryInterface extends RepositoryInterface
      */
     public function rolesDatatable(array $filters = []): JsonResponse;
 
+    public function rolesDatatableForWidgets(array $filters = []): JsonResponse;
+
 }

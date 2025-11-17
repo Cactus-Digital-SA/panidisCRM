@@ -410,6 +410,47 @@ class EloqCompanyRepository implements CompanyRepositoryInterface
         );
     }
 
+    /**
+     * @param string|null $searchTerm
+     * @param int $offset
+     * @param int $resultCount number of results per page
+     * @return array{data: Collection, count: int} Array contains paginated data and total count.
+     */
+    public function getCustomers(?string $searchTerm, int $offset, int $resultCount): array
+    {
+        $companies = $this->model
+            ->with(['client'])
+            ->select('companies.erp_id', 'companies.name');
+
+        if ($searchTerm != null) {
+            $companies = $companies->where('name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('erp_id', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        $companies = $companies->whereNotNull('erp_id')->whereHas('client');
+
+        $companies = $companies->skip($offset)->take($resultCount)->get();
+
+        // map για προσθήκη status
+        $results = $companies->map(function ($company) {
+            return [
+                'id' => $company->erp_id,
+                'text' => $company->name,
+            ];
+        });
+
+        if ($searchTerm == null) {
+            $count = $this->model->count();
+        } else {
+            $count = $companies->count();
+        }
+
+        return array(
+            "data" => $results,
+            "count" => $count
+        );
+    }
+
     public function storeTags(array $tagIds, string $companyId): ?bool
     {
         $company = \App\Domains\Companies\Repositories\Eloquent\Models\Company::find($companyId);

@@ -79,4 +79,9 @@ class ItemService
         return $this->repository->itemsPaginated($searchTerm, $offset, $resultCount);
     }
 
+    public function categoriesPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    {
+        return $this->repository->categoriesPaginated($searchTerm, $offset, $resultCount);
+    }
+
 }

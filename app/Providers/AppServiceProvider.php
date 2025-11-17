@@ -23,6 +23,8 @@ use App\Domains\CompanyTypes\Repositories\CompanyTypeRepositoryInterface;
 use App\Domains\CompanyTypes\Repositories\Eloquent\EloqCompanyTypeRepository;
 use App\Domains\CountryCodes\Repositories\CountryCodeRepositoryInterface;
 use App\Domains\CountryCodes\Repositories\Eloquent\EloqCountryCodeRepository;
+use App\Domains\ErpSales\Repositories\Eloquent\EloqSalesmanRepository;
+use App\Domains\ErpSales\Repositories\SalesManRepositoryInterface;
 use App\Domains\ExtraData\Repositories\Eloquent\EloqExtraDataRepository;
 use App\Domains\ExtraData\Repositories\ExtraDataRepositoryInterface;
 use App\Domains\Files\Repositories\Eloquent\EloqFileRepository;
@@ -44,6 +46,8 @@ use App\Domains\Projects\Repositories\ProjectTypeRepositoryInterface;
 use App\Domains\Quotes\Repositories\Eloquent\EloqQuoteRepository;
 use App\Domains\Quotes\Repositories\Eloquent\Models\Quote;
 use App\Domains\Quotes\Repositories\QuoteRepositoryInterface;
+use App\Domains\Sectors\Repositories\Eloquent\EloqSectorRepository;
+use App\Domains\Sectors\Repositories\SectorRepositoryInterface;
 use App\Domains\Tags\Repositories\Eloquent\EloqTagRepository;
 use App\Domains\Tags\Repositories\TagRepositoryInterface;
 use App\Domains\Tickets\Repositories\Eloquent\EloqTicketRepository;
@@ -56,6 +60,8 @@ use App\Domains\Visits\Repositories\Eloquent\EloqVisitStatusRepository;
 use App\Domains\Visits\Repositories\Eloquent\Models\Visit;
 use App\Domains\Visits\Repositories\VisitRepositoryInterface;
 use App\Domains\Visits\Repositories\VisitStatusRepositoryInterface;
+use App\Domains\Widgets\Repositories\Eloquent\EloqWidgetRepository;
+use App\Domains\Widgets\Repositories\WidgetRepositoryInterface;
 use App\Models\ModelMorphEnum;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -92,6 +98,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProjectRepositoryInterface::class, EloqProjectRepository::class);
         $this->app->bind(ProjectTypeRepositoryInterface::class, EloqProjectTypeRepository::class);
         $this->app->bind(ProjectStatusRepositoryInterface::class, EloqProjectStatusRepository::class);
+
+        $this->app->bind(SectorRepositoryInterface::class, EloqSectorRepository::class);
+        $this->app->bind(WidgetRepositoryInterface::class, EloqWidgetRepository::class);
+        $this->app->bind(SalesmanRepositoryInterface::class, EloqSalesmanRepository::class);
 
         $this->relations();
 

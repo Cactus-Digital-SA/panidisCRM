@@ -59,4 +59,12 @@ interface ItemRepositoryInterface extends RepositoryInterface
      * @return array{data: Collection, count: int} Array contains paginated data and total count.
      */
     public function itemsPaginated(?string $searchTerm, int $offset, int $resultCount): array;
+
+    /**
+     * @param string|null $searchTerm
+     * @param int $offset
+     * @param int $resultCount number of results per page
+     * @return array{data: Collection, count: int} Array contains paginated data and total count.
+     */
+    public function categoriesPaginated(?string $searchTerm, int $offset, int $resultCount): array;
 }
