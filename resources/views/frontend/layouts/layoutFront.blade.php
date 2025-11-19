@@ -13,5 +13,5 @@ $isFront = true;
 @yield('content')
 <!-- / Sections:End -->
 
-{{--@include('frontend/layouts/sections/footer/footer-front')--}}
+<div class="small text-muted">S/N: {{ config('app.serial_number') }}</div>
 @endsection
