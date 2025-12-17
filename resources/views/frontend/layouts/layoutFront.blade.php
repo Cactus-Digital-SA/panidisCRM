@@ -13,5 +13,10 @@ $isFront = true;
 @yield('content')
 <!-- / Sections:End -->
 
-{{--@include('frontend/layouts/sections/footer/footer-front')--}}
+<div class="container d-flex flex-wrap flex-center flex-md-column flex-column text-center text-md-start">
+    <div class="mb-2 mb-md-0">
+        <span class="footer-text">S/N: {{ config('app.serial_number') }} </span>
+    </div>
+</div>
+
 @endsection

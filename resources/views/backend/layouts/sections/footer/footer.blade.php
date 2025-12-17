@@ -11,6 +11,7 @@ $containerFooter = (isset($configData['contentLayout']) && $configData['contentL
       </script>
           <a class="ms-25" href="https://www.cactusweb.gr/" target="_blank">Cactus</a>
           <span class="d-none d-sm-inline-block">All rights Reserved</span>
+          <span class="d-none d-sm-inline-block">S/N: {{ config('app.serial_number') }} </span>
       </div>
       <div class="d-none d-lg-inline-block">
           Hand-crafted & Made with <i class="ti ti-heart" style="color: red;"></i>
