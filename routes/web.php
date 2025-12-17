@@ -21,6 +21,8 @@ use Laravel\Fortify\Features;
 //Route::get('/syncCountries', [ErpService::class, 'syncCountries'])->name('syncCountries');
 //Route::get('/getItems', [ErpService::class, 'getItems'])->name('getItems');
 //Route::get('/syncCustomers', [ErpService::class, 'syncCustomers'])->name('syncCustomers');
+Route::get('/getAreas', [ErpService::class, 'getAreas'])->name('getAreas');
+Route::get('/getSalesmen', [ErpService::class, 'getSalesmen'])->name('getSalesmen');
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');

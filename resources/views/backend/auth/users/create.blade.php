@@ -75,7 +75,36 @@
                     </div><!--form-group-->
 
                 </div>
-                @include('backend.content.extraData.components.extraData', ['extraData' => $extraData])
+
+                <div class="form-group row mb-2 mt-2">
+                    <label for="email" class="col-md-2 col-form-label">Sectors</label>
+                    <div class="col-md-10">
+                        <select name="sectors[]" id="sectors" class="form-control select2" multiple data-placeholder="Sectors" >
+                            @foreach($sectors ?? [] as $sector)
+                                <option value="{{$sector->getId()}}" >{{$sector->getName()}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-2 mt-2">
+                    <label for="email" class="col-md-2 col-form-label">Σύνδεση με πωλητή ERP</label>
+                    <div class="col-md-10">
+                        <select name="salesman_id" class="form-control select2" data-placeholder="Σύνδεση με πωλητή ERP">
+                            <option value="">----</option>
+                            @foreach($salesmen ?? [] as $salesman)
+                                <option value="{{ $salesman->getId() }}">
+                                    {{ $salesman->getName() }} ({{ $salesman->getErpId() }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+
+
+
+                @include('backend.content.extraData.components.extraData', ['extraData' => $extraData, 'labelCol' => 'col-md-2', 'fieldCol' => 'col-md-10'])
 
                 @include('backend.auth.includes.roles')
 

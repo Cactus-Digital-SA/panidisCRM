@@ -170,4 +170,20 @@ class EloqRoleRepository implements RoleRepositoryInterface
             ->rawColumns(['actions'])
             ->toJson();
     }
+
+    public function rolesDatatableForWidgets(array $filters = []): JsonResponse
+    {
+        $roles = EloquentRole::with('widgets')->where('name' ,'!=', 'super-admin');
+
+        return Datatables::of($roles)
+            ->addColumn('actions', function (EloquentRole $role){
+                return '
+                <div class="d-flex align-items-center">
+                <a href="'.route("admin.roles.editWidgets", $role->id).'") data-type="edit" class="btn-sm btn item-edit">'
+                    .'<i class="fas fa-pen"></i>'.
+                    '</a>';
+            })
+            ->rawColumns(['actions'])
+            ->toJson();
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Domains\Auth\Models;
 
+use App\Domains\ErpSales\Models\Salesman;
 use App\Domains\ExtraData\Models\ExtraData;
 use App\Domains\Files\Models\File;
 use App\Domains\Notes\Models\Note;
@@ -181,6 +182,27 @@ class User extends CactusEntity
      * @Serializer\Type("array<App\Domains\Files\Models\File>")
      */
     private ?array $files = null;
+
+    /**
+     * @var array|null $sectors
+     * @Serializer\SerializedName("sectors")
+     * @Serializer\Type("array<App\Domains\Sectors\Models\Sector>")
+     */
+    private ?array $sectors = [];
+
+    /**
+     * @var string|null $salesmanId
+     * @Serializer\SerializedName("salesman_id")
+     * @Serializer\Type("string")
+     */
+    private ?string $salesmanId = null;
+
+    /**
+     * @var Salesman|null $salesman
+     * @Serializer\SerializedName("salesman")
+     * @Serializer\Type("App\Domains\ErpSales\Models\Salesman")
+     */
+    private ?Salesman $salesman = null;
 
     /**
      * @var array|null $morphables
@@ -544,6 +566,39 @@ class User extends CactusEntity
         return $this;
     }
 
+    public function getSectors(): ?array
+    {
+        return $this->sectors;
+    }
+
+    public function setSectors(?array $sectors): User
+    {
+        $this->sectors = $sectors;
+        return $this;
+    }
+
+    public function getSalesmanId(): ?string
+    {
+        return $this->salesmanId;
+    }
+
+    public function setSalesmanId(?string $salesmanId): User
+    {
+        $this->salesmanId = $salesmanId;
+        return $this;
+    }
+
+    public function getSalesman(): ?Salesman
+    {
+        return $this->salesman;
+    }
+
+    public function setSalesman(?Salesman $salesman): User
+    {
+        $this->salesman = $salesman;
+        return $this;
+    }
+
     /**
      * @return array|null
      */
@@ -577,7 +632,9 @@ class User extends CactusEntity
             ->setLastLoginIp($request['last_login_ip'])
             ->setToBeLoggedOut($request['to_be_logged_out'])
             ->setProfilePhotoUrl($request['profile_photo_path'])
-            ->setExtraDataIds($extraDataIds ?? []);
+            ->setExtraDataIds($extraDataIds ?? [])
+            ->setSectors($request['sectors'] ?? [])
+            ->setSalesmanId($request['salesman_id'] ?? null);
     }
 
     /**

@@ -11,6 +11,7 @@ Route::group([
     'namespace' => 'companies.',
     'as' => 'companies.'
 ], function () {
+    Route::post('getCustomers', [CompanyApiController::class, 'getCustomers'])->name('getCustomers');
     Route::post('names/paginated', [CompanyApiController::class, 'namesPaginated'])->name('namesPaginated');
     Route::post('{type}/names/paginated', [CompanyApiController::class, 'namesPaginatedByType'])->name('namesPaginatedByType');
     Route::post('{companyId}/getContacts', [CompanyApiController::class, 'getContactsByCompanyId'])->name('getContactsByCompanyId');

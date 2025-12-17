@@ -5,6 +5,8 @@ namespace App\Domains\Auth\Repositories\Eloquent\Models;
 use App\Domains\Auth\Repositories\Eloquent\Models\Traits\Attribute\RoleAttribute;
 use App\Domains\Auth\Repositories\Eloquent\Models\Traits\Method\RoleMethod;
 use App\Domains\Auth\Repositories\Eloquent\Models\Traits\Scope\RoleScope;
+use App\Domains\Widgets\Repositories\Eloquent\Models\Widget;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 /**
@@ -24,4 +26,10 @@ class Role extends SpatieRole
     protected $with = [
         'permissions',
     ];
+
+    public function widgets(): BelongsToMany
+    {
+        return $this->belongsToMany(Widget::class, 'roles_widgets')
+            ->withTimestamps();
+    }
 }

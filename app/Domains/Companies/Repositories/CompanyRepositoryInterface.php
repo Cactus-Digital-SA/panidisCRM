@@ -117,6 +117,14 @@ interface CompanyRepositoryInterface extends RepositoryInterface
     public function getContactsPaginatedByCompanyId(?string $searchTerm, int $offset, int $resultCount, int $companyId): array;
 
     /**
+     * @param string|null $searchTerm
+     * @param int $offset
+     * @param int $resultCount number of results per page
+     * @return array{data: Collection, count: int} Array contains paginated data and total count.
+     */
+    public function getCustomers(?string $searchTerm, int $offset, int $resultCount): array;
+
+    /**
      * @param array $tagIds
      * @param string $companyId
      * @return bool|null

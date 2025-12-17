@@ -59,6 +59,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
             $user->twoFactorQrCodeSvg = $user->twoFactorQrCodeSvg();
         }
 
+        $user->load(['roles','permissions','userDetails','notes','notes.user','extraData','salesman']);
 
         return ObjectSerializer::deserialize($user->toJson() ?? "{}", User::class, 'json');
     }
@@ -71,7 +72,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
 
     public function getById(string $id): ?User
     {
-        $user = $this->model->with(['roles','permissions','userDetails','notes','notes.user','extraData'])->findOrFail($id);
+        $user = $this->model->with(['roles','permissions','userDetails','notes','notes.user','extraData','salesman'])->findOrFail($id);
         $user->makeVisible('two_factor_secret');
 
         return ObjectSerializer::deserialize($user->toJson() ?? "{}", User::class, 'json');
@@ -164,7 +165,10 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
                 'password' => bcrypt($pass) ?? null,
                 'email_verified_at' =>  $entity->getEmailVerifiedAt() ? now() : null,
                 'active' => $entity->getActive() ?? true,
+                'salesman_id' => $entity->getSalesmanId() ?? null,
             ]);
+
+            $user->sectors()->sync($entity->getSectors() ?? []);
 
             $roles = [];
             foreach ($entity->getRoles() as $role) {
@@ -197,6 +201,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
 //        $user->notify(new UserRegistration($pass));
         } catch (Exception $e) {
             DB::rollBack();
+            Log::error($e);
             // duplicate email return specific message
             if ($e->errorInfo[1] == 1062) {
                 throw new GeneralException('Υπάρχει χρήστης με το ίδιο email. Δοκιμάστε ενα διαφορετικό.');
@@ -234,7 +239,11 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
                 'email' => $entity->getEmail(),
                 'email_verified_at' => $entity->getEmailVerifiedAt(),
                 'profile_photo_url' => $entity->getProfilePhotoUrl(),
+                'salesman_id' => $entity->getSalesmanId() ?? null,
             ]);
+
+
+            $user->sectors()->sync($entity->getSectors() ?? []);
 
             $syncData = [];
             $extraDataWithPivot = $entity->getExtraDataIds();
@@ -269,7 +278,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
             }
         } catch (Exception $e) {
             DB::rollBack();
-
+            Log::error($e);
             throw new GeneralException(__('Υπήρξε κάποιο πρόβλημα κατά την αποθήκευση. Προσπαθήστε ξανά.'));
         }
 

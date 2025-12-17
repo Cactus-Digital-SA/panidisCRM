@@ -300,7 +300,7 @@ class UserDetails extends CactusEntity
             ->setPhone($request['phone'])
             ->setPhoneConfirmed($request['phoneConfirmed'] ?? true)
             ->setPhoneConfirmedAt(Carbon::parse($request['phoneConfirmedAt']))
-            ->setBirthday(Carbon::parse($request['birthday']));
+            ->setBirthday($request['birthday'] ? Carbon::parse($request['birthday']) : null);
     }
 
 }

@@ -1,6 +1,7 @@
 @php
     /**
     * @var App\Domains\Auth\Models\User $user
+    * @var array<App\Domains\ErpSales\Models\Salesman> $salesmen
     * */
 @endphp
 @extends('backend.layouts.app')
@@ -103,7 +104,36 @@
                                             </div>
                                         </div>
 
-                                        @include('backend.content.extraData.components.extraData', ['model' => $user, 'extraData' => $extraData])
+                                        <div class="form-group row mb-2 mt-2">
+                                            <label for="email" class="col-md-2 col-form-label">Sectors</label>
+                                            <div class="col-md-10">
+                                                @php
+                                                    $userSectorIds = array_map(fn($sector) => $sector->getId(), $user->getSectors() ?? []);
+                                                @endphp
+                                                <select name="sectors[]" id="sectors" class="form-control select2" multiple data-placeholder="Sectors" >
+                                                    @foreach($sectors ?? [] as $sector)
+                                                        <option value="{{$sector->getId()}}" @if(in_array($sector->getId(), $userSectorIds)) selected @endif>{{$sector->getName()}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row mb-2 mt-2">
+                                            <label for="email" class="col-md-2 col-form-label">Σύνδεση με πωλητή ERP</label>
+                                            <div class="col-md-10">
+                                                <select name="salesman_id" class="form-control select2" data-placeholder="Σύνδεση με πωλητή ERP" data-allow-clear="true">
+                                                    <option value="">----</option>
+                                                    @foreach($salesmen ?? [] as $salesman)
+                                                        <option value="{{ $salesman->getId() }}" @if($salesman->getId() == $user->getSalesmanId()) selected @endif>
+                                                            {{ $salesman->getName() }} ({{ $salesman->getErpId() }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+
+                                        @include('backend.content.extraData.components.extraData', ['model' => $user, 'extraData' => $extraData, 'labelCol' => 'col-md-2', 'fieldCol' => 'col-md-10'])
 
                                         @include('backend.auth.includes.roles')
 

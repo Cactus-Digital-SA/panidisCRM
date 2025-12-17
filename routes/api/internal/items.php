@@ -12,5 +12,6 @@ Route::group([
 ], function () {
 
     Route::post('paginated', [ItemsApiController::class, 'itemsPaginated'])->name('itemsPaginated');
+    Route::post('categories-paginated', [ItemsApiController::class, 'categoriesPaginated'])->name('categoriesPaginated');
 
 });

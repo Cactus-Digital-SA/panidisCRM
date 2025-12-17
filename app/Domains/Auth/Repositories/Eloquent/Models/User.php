@@ -5,9 +5,13 @@ namespace App\Domains\Auth\Repositories\Eloquent\Models;
 use App\Domains\Auth\Repositories\Eloquent\Models\Traits\Method\UserMethod;
 use App\Domains\Companies\Repositories\Eloquent\Models\Company;
 use App\Domains\Companies\Repositories\Eloquent\Models\UserCompany;
+use App\Domains\ErpSales\Repositories\Eloquent\Models\Salesman;
 use App\Domains\ExtraData\Repositories\Eloquent\Models\ExtraData;
 use App\Domains\Files\Repositories\Eloquent\Models\File;
 use App\Domains\Notes\Repositories\Eloquent\Models\Note;
+use App\Domains\Sectors\Repositories\Eloquent\Models\Sector;
+use App\Domains\Sectors\Repositories\Eloquent\Models\SectorUser;
+use App\Domains\Widgets\Repositories\Eloquent\Models\Widget;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -51,7 +55,8 @@ class User extends Authenticatable
         'last_login_ip',
         'to_be_logged_out',
         'profile_photo_path',
-        'uuid'
+        'uuid',
+        'salesman_id'
     ];
 
     /**
@@ -159,5 +164,28 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Company::class, 'users_companies')
             ->using(UserCompany::class);
+    }
+
+    public function sectors(): BelongsToMany
+    {
+        return $this->belongsToMany(Sector::class, 'sector_user')
+            ->using(SectorUser::class)
+            ->withTimestamps();
+    }
+
+    public function widgets()
+    {
+        $roleIds = $this->roles()->pluck('id');
+
+        return Widget::query()
+            ->whereHas('roles', function ($q) use ($roleIds) {
+                $q->whereIn('roles.id', $roleIds)->where('roles_widgets.enabled', true);
+            })
+            ->orderBy('label');
+    }
+
+    public function salesman()
+    {
+        return $this->belongsTo(Salesman::class);
     }
 }

@@ -160,6 +160,11 @@ class CompanyService
         return $this->repository->getContactsPaginatedByCompanyId($searchTerm, $offset, $resultCount, $companyId);
     }
 
+    public function getCustomers(?string $searchTerm, int $offset, int $resultCount): array
+    {
+        return $this->repository->getCustomers($searchTerm, $offset, $resultCount);
+    }
+
     public function storeTags(array $tagIds, string $companyId): ?bool
     {
         return $this->repository->storeTags($tagIds, $companyId);

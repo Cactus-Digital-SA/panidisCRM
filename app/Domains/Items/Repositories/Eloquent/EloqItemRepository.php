@@ -133,4 +133,35 @@ class EloqItemRepository implements ItemRepositoryInterface
             "count" => $count
         );
     }
+
+    public function categoriesPaginated(?string $searchTerm, int $offset, int $resultCount): array
+    {
+        $query = EloquentItem::select(
+            DB::raw('category AS id'),
+            DB::raw('category AS text')
+        )->distinct();
+
+        $query = $query
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->where('category', '!=', '-');
+
+        if ($searchTerm != null) {
+            $query = $query->where('category', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        // Total distinct categories count
+        $count = (clone $query)->count('category');
+
+        // Paginate
+        $items = $query
+            ->skip($offset)
+            ->take($resultCount)
+            ->get();
+
+        return [
+            "data" => $items,
+            "count" => $count
+        ];
+    }
 }

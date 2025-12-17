@@ -14,5 +14,6 @@ class PmsSeeder extends Seeder
         $this->call(TicketStatusSeeder::class);
         $this->call(VisitStatusSeeder::class);
         $this->call(TagTypeSeeder::class);
+        $this->call(WidgetSeeder::class);
     }
 }

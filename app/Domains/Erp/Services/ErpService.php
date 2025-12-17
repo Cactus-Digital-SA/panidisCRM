@@ -2,6 +2,7 @@
 
 namespace App\Domains\Erp\Services;
 
+use App\Domains\Auth\Models\RolesEnum;
 use App\Domains\Clients\Models\Client;
 use App\Domains\Clients\Services\ClientService;
 use App\Domains\Companies\Models\Company;
@@ -11,14 +12,23 @@ use App\Domains\CountryCodes\Services\CountryCodeService;
 use App\Domains\Erp\DTOs\ERPReport;
 use App\Domains\Erp\Endpoints\CountriesEndpoint;
 use App\Domains\Erp\Endpoints\CustomersEndpoint;
+use App\Domains\Erp\Endpoints\SalesEndpoint;
+use App\Domains\ErpSales\Models\Salesman;
+use App\Domains\ErpSales\Models\SalesTarget;
+use App\Domains\ErpSales\Models\SalesWidget;
+use App\Domains\ErpSales\Services\SalesmanService;
 use App\Domains\Items\Models\Item;
 use App\Domains\Items\Services\ItemService;
+use App\Domains\Sectors\Models\Sector;
+use App\Domains\Sectors\Services\SectorService;
+use Illuminate\Support\Facades\Auth;
 
 class ErpService
 {
     public function __construct(private readonly CustomersEndpoint $customers, private readonly CountriesEndpoint $countries,
                                 private readonly CountryCodeService $countryCodeService, private readonly MapperService $mapperService,
-                                private readonly ClientService $clientService, private readonly CompanyService $companyService
+                                private readonly ClientService $clientService, private readonly CompanyService $companyService,
+                                private readonly SalesEndpoint $salesEndpoint
 
     )
     {}
@@ -117,9 +127,36 @@ class ErpService
         return $this->customers->getCustomerRevenueReport($customerERPId);
     }
 
-    public function getReport(ERPReport $report): string
+    public function getCustomerRevenueData(?string $customerCode = null)
     {
-        return $this->customers->getReport($report)->getResponseBody();
+        $info = $this->getCustomerRevenueReport($customerCode);
+        $response = $this->customers->getCustomerRevenueReportData($info) ?? [];
+
+        $data = $response->getData();
+
+        if (!$data['success'] || empty($data['rows'])) {
+            return [];
+        }
+
+        $mapped = [];
+
+        foreach ($data['rows'] as $row) {
+            $mapped[] = [
+                'index'     => $row[1] ?? null,
+                'salesman'  => $row[2] ?? null,
+                'code'      => $row[3] ?? null,
+                'name'      => $row[4] ?? null,
+                'balance'   => $row[5] ?: 0,
+                'turnover'  => $row[6] ?: 0,
+            ];
+        }
+
+        return $mapped;
+    }
+
+    public function getReport(ERPReport $report, ?int $page = 1): string
+    {
+        return $this->customers->getReport($report, $page)->getResponseBody();
     }
 
     public function getItems(?string $limit = "", ?string $itemERPId = null): void
@@ -151,6 +188,167 @@ class ErpService
 
             $itemService->storeOrUpdate($itemDTO);
         }
+
+    }
+
+    public function getAreas(): void
+    {
+        $salesAreas =  $this->salesEndpoint->getAreas()->getData();
+
+        $sectorService = app(SectorService::class);
+        foreach ($salesAreas as $area) {
+            $sectorDTO = new Sector();
+            $sectorDTO->setErpId($area["CODE"]);
+            $sectorDTO->setName($area["NAME"]);
+
+            $sectorService->createOrUpdateByErpId($sectorDTO, $sectorDTO->getErpId());
+        }
+    }
+
+    public function getSalesmen(): void
+    {
+        $salesmen = $this->salesEndpoint->getSalesman()->getData();
+
+        $salesmanService = app(SalesmanService::class);
+        foreach ($salesmen as $salesman) {
+            $salesmanDTO = new Salesman();
+            $salesmanDTO->setErpId($salesman["CODE"]);
+            $salesmanDTO->setName($salesman["NAME"]);
+
+            $salesmanService->createOrUpdateByErpId($salesmanDTO, $salesmanDTO->getErpId());
+        }
+
+    }
+
+    public function getSalesDashboardData(array $filters = []): array
+    {
+        $eloquentUser = Auth::user();
+        $salesmanService = app(SalesmanService::class);
+
+        $rawData = $this->getSalesWidgetData($filters);
+        $salesmen  = $salesmanService->getVisibleForUser($eloquentUser->id);
+
+        // Φιλτράρουμε τους Πωλητές με βάση την περιοχή που έχει ο Director
+        if ($eloquentUser->hasRole([RolesEnum::SALES_DIRECTOR->value])) {
+            $allowedErpIds = collect($salesmen)
+                ->map(fn ($s) => $s->getName())
+                ->filter()
+                ->values()
+                ->all();
+
+            $rawData = array_filter($rawData, function ($row) use ($allowedErpIds) {
+                return in_array($row->getSalesman() ?? null, $allowedErpIds, true);
+            });
+        }
+
+        $byArea = $this->buildSalesByArea($rawData);
+        $bySalesman = $this->buildSalesBySalesman($rawData);
+
+        return [
+            'raw'        => $rawData,
+            'byArea'     => $byArea,
+            'bySalesman' => $bySalesman,
+        ];
+    }
+
+    private function buildSalesByArea(array $widgets): array
+    {
+        $areas = [];
+
+        foreach ($widgets as $row) {
+            $area = $row->getArea();
+            $value = $row->getSalesValue();
+
+            if (!isset($areas[$area])) {
+                $areas[$area] = 0;
+            }
+
+            $areas[$area] += $value;
+        }
+
+        return [
+            'labels' => array_keys($areas),
+            'datasets' => [
+                ['data' => array_values($areas)]
+            ]
+        ];
+    }
+
+    private function buildSalesBySalesman(array $widgets): array
+    {
+        $salesmen = [];
+
+        foreach ($widgets as $row) {
+            $salesman = $row->getSalesman();
+            $value = $row->getSalesValue();
+
+            if (!isset($salesmen[$salesman])) {
+                $salesmen[$salesman] = 0;
+            }
+
+            $salesmen[$salesman] += $value;
+        }
+
+        return [
+            'labels' => array_keys($salesmen),
+            'datasets' => [
+                [
+                    'label' => 'Συνολικές Πωλήσεις',
+                    'data' => array_values($salesmen),
+                ]
+            ]
+        ];
+    }
+
+    public function getSalesWidgetData(array $filters = []): array
+    {
+        $response = $this->salesEndpoint->getSalesWidgetData($filters)->getData();
+        $salesData = $response['rows'] ?? [];
+
+        $data = [];
+        foreach ($salesData as $salesWidget) {
+            $salesWidgetDTO = new SalesWidget();
+            $salesWidgetDTO->setItemCode($salesWidget["ITEMCODE"] ?? '');
+            $salesWidgetDTO->setItemName($salesWidget["ITEMNAME"] ?? '');
+            $salesWidgetDTO->setSalesman($salesWidget["SALESMAN"] ?? '');
+            $salesWidgetDTO->setArea($salesWidget["AREA"] ?? '');
+            $salesWidgetDTO->setSalesValue(floatval($salesWidget["SALESVALUE"] ?? 0));
+            $salesWidgetDTO->setCustomer($salesWidget["CUSTOMER"] ?? '');
+            $salesWidgetDTO->setMark($salesWidget["MARK"] ?? '');
+            $salesWidgetDTO->setCategory($salesWidget["CATEGORY"] ?? '');
+
+            $data[] = $salesWidgetDTO;
+        }
+
+        return $data;
+    }
+
+
+    /**
+     * @param array $filters
+     * @return SalesTarget[]
+     */
+    public function getSalesTarget(array $filters = []): array
+    {
+        $response = $this->salesEndpoint->getSalesTarget($filters)->getData();
+        $salesTargetData = $response['rows'] ?? [];
+
+        $data = [];
+        foreach ($salesTargetData as $salesTarget) {
+            $salesTargetDTO = new SalesTarget();
+            $salesTargetDTO->setSalesmanCode($salesTarget["SalesmanCode"] ?? '');
+            $salesTargetDTO->setSalesmanName($salesTarget["SalesmanName"] ?? '');
+            $salesTargetDTO->setMonthSales($salesTarget["MonthSales"] ?? '');
+            $salesTargetDTO->setYearNum($salesTarget["YearNum"] ?? '');
+
+            $rawAmount = $salesTarget["TargetAmount"] ?? '0';
+            $normalizedAmount = (float) str_replace('.', '', $rawAmount);
+            $salesTargetDTO->setTargetAmount($normalizedAmount);
+
+            $data[] = $salesTargetDTO;
+        }
+
+        return $data;
 
     }
 

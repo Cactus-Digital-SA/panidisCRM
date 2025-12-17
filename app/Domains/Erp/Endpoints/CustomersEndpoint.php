@@ -92,6 +92,22 @@ class CustomersEndpoint
             ->setPages(array_key_exists("npages", $res) ? $res["npages"] : 1);
     }
 
+    public function getCustomerRevenueReportData(ErpReport $report, ?string $customerERPId = null): ERPResponse
+    {
+        $options = [
+            "service" => "getBrowserData",
+            "appId" => "3001",
+            "OBJECT" => "CUSTOMER[LIST=Υπόλοιπα πελατών με τζίρο]",
+            "reqID" => $report->getReportId(),
+        ];
+
+        if ($customerERPId) {
+            $options["FILTERS"] = "CUSTOMER.CODE=" . $customerERPId . "*";
+        }
+
+        return $this->erpClient->post("/s1services", $options);
+    }
+
     public function getReport(ERPReport $report, ?int $page = 1): ERPResponse
     {
         $options = [

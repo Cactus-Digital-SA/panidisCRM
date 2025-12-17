@@ -16,8 +16,10 @@ use App\Domains\Auth\Services\PermissionService;
 use App\Domains\Auth\Services\RoleService;
 use App\Domains\Auth\Services\UserDetailsService;
 use App\Domains\Auth\Services\UserService;
+use App\Domains\ErpSales\Services\SalesmanService;
 use App\Domains\ExtraData\Enums\ExtraDataModelsEnum;
 use App\Domains\ExtraData\Services\ExtraDataService;
+use App\Domains\Sectors\Services\SectorService;
 use App\Http\Controllers\Controller;
 use App\Domains\Auth\Models\User;
 use App\Models\ModelMorphEnum;
@@ -32,7 +34,9 @@ class UserController extends Controller
         private RoleService $roleService,
         private PermissionService $permissionService,
         private UserDetailsService $userDetailsService ,
-        private ExtraDataService $extraDataService
+        private ExtraDataService $extraDataService,
+        private SectorService $sectorService,
+        private SalesmanService $salesmanService
     )
     {}
 
@@ -73,11 +77,16 @@ class UserController extends Controller
     public function create(CreateUserRequest $request)
     {
         $extraData = $this->extraDataService->getByModel(ExtraDataModelsEnum::USER);
+        $sectors = $this->sectorService->get();
+
+        $salesmen = $this->salesmanService->get();
 
         return view('backend.auth.users.create', compact('extraData'))
             ->withRoles($this->roleService->get())
             ->withCategories($this->permissionService->getCategorizedPermissions())
-            ->withGeneral($this->permissionService->getUncategorizedPermissions());
+            ->withGeneral($this->permissionService->getUncategorizedPermissions())
+            ->withSectors($sectors)
+            ->withSalesmen($salesmen);
     }
 
     public function store(StoreUserRequest $request)
@@ -93,6 +102,8 @@ class UserController extends Controller
         $userDTO->setRoles($request['roles'] ?? []);
         $userDTO->setPermissions($request['permissions'] ?? []);
         $userDTO->setExtraDataIds($extraDataIds ?? []);
+        $userDTO->setSectors($request['sectors'] ?? []);
+        $userDTO->setSalesmanId($request['salesman_id'] ?? null);
 
         $user = $this->userService->store($userDTO);
 
@@ -118,8 +129,11 @@ class UserController extends Controller
     public function edit(EditUserRequest $request, string $userId)
     {
         $extraData = $this->extraDataService->getByModel(ExtraDataModelsEnum::USER);
-        $cactusUser = $this->userService->getByIdWithMorphsAndRelations($userId, User::morphBuilder(), ['roles','permissions','userDetails','notes','notes.user','extraData']);
+        $cactusUser = $this->userService->getByIdWithMorphsAndRelations($userId, User::morphBuilder(), ['roles','permissions','userDetails','notes','notes.user','extraData','sectors']);
         $authUser = $this->userService->getAuthUser();
+
+        $sectors = $this->sectorService->get();
+        $salesmen = $this->salesmanService->get();
 
         return view('backend.auth.users.edit', compact('extraData'))
             ->withUser($cactusUser)
@@ -128,7 +142,9 @@ class UserController extends Controller
             ->withUserRoles($this->roleService->getRolesIdByUserId($userId))
             ->withCategories($this->permissionService->getCategorizedPermissions())
             ->withGeneral($this->permissionService->getUncategorizedPermissions())
-            ->withUsedPermissions($this->permissionService->getUserPermissionId($userId));
+            ->withUsedPermissions($this->permissionService->getUserPermissionId($userId))
+            ->withSectors($sectors)
+            ->withSalesmen($salesmen);
     }
 
     public function update(UpdateUserRequest $request, string $userId)
@@ -142,6 +158,8 @@ class UserController extends Controller
         $userDTO->setPermissions($request['permissions'] ?? []);
         $userDTO->setEmailVerifiedAt($request['emailVerified'] ? now() : null);
         $userDTO->setExtraDataIds($extraDataIds ?? []);
+        $userDTO->setSectors($request['sectors'] ?? []);
+        $userDTO->setSalesmanId($request['salesman_id'] ?? null);
 
         $user = $this->userService->update($userDTO, $userId,true);
 
