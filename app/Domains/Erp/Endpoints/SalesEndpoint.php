@@ -48,4 +48,19 @@ class SalesEndpoint
         return $this->erpClient->post("/s1services", $options);
     }
 
+    public function getSalesTarget(array $filters = []): ERPResponse
+    {
+        $salesman = $filters['salesman'] ?? '%';
+        $month    = $filters['month'] ?? '%';
+
+        $options = [
+            'service' => 'SqlData',
+            'appId'   => '3001',
+            'SqlName' => '1003',
+            'param1'  => $salesman,
+            'param2'  => $month,
+        ];
+
+        return $this->erpClient->post('/s1services', $options);
+    }
 }

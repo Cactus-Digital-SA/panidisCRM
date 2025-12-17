@@ -59,6 +59,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
             $user->twoFactorQrCodeSvg = $user->twoFactorQrCodeSvg();
         }
 
+        $user->load(['roles','permissions','userDetails','notes','notes.user','extraData','salesman']);
 
         return ObjectSerializer::deserialize($user->toJson() ?? "{}", User::class, 'json');
     }
@@ -71,7 +72,7 @@ class EloqUserRepository extends EloquentRelationHelper implements UserRepositor
 
     public function getById(string $id): ?User
     {
-        $user = $this->model->with(['roles','permissions','userDetails','notes','notes.user','extraData'])->findOrFail($id);
+        $user = $this->model->with(['roles','permissions','userDetails','notes','notes.user','extraData','salesman'])->findOrFail($id);
         $user->makeVisible('two_factor_secret');
 
         return ObjectSerializer::deserialize($user->toJson() ?? "{}", User::class, 'json');

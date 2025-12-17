@@ -46,5 +46,10 @@ interface SalesManRepositoryInterface extends RepositoryInterface
      */
     public function deleteById(string $id): bool;
 
+    /**
+     * @param string $userId
+     * @return Salesman[]
+     */
+    public function getVisibleForUser(string $userId): array;
 
 }

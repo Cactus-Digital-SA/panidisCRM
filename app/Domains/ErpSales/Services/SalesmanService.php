@@ -71,4 +71,9 @@ class SalesmanService
     {
         return $this->repository->deleteById($id);
     }
+
+    public function getVisibleForUser(string $userId): array
+    {
+        return $this->repository->getVisibleForUser($userId);
+    }
 }

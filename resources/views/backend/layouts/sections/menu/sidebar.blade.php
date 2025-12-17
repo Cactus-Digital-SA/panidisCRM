@@ -148,6 +148,12 @@
                 </a>
                 <ul class="menu-sub">
 
+                    <li class="menu-item {{ Route::currentRouteName() === 'admin.sales.target' ? 'active' : '' }}">
+                        <a class="menu-link" href="{{ route('admin.sales.target') }}">
+                            <span class="menu-title">Sales Target</span>
+                        </a>
+                    </li>
+
                     <li class="menu-item {{ Route::currentRouteName() === 'admin.sales.widget' ? 'active' : '' }}">
                         <a class="menu-link" href="{{ route('admin.sales.widget') }}">
                             <span class="menu-title">Sales Dashboard</span>

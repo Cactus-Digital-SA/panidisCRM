@@ -2,6 +2,7 @@
 
 namespace App\Domains\Erp\Services;
 
+use App\Domains\Auth\Models\RolesEnum;
 use App\Domains\Clients\Models\Client;
 use App\Domains\Clients\Services\ClientService;
 use App\Domains\Companies\Models\Company;
@@ -13,12 +14,14 @@ use App\Domains\Erp\Endpoints\CountriesEndpoint;
 use App\Domains\Erp\Endpoints\CustomersEndpoint;
 use App\Domains\Erp\Endpoints\SalesEndpoint;
 use App\Domains\ErpSales\Models\Salesman;
+use App\Domains\ErpSales\Models\SalesTarget;
 use App\Domains\ErpSales\Models\SalesWidget;
 use App\Domains\ErpSales\Services\SalesmanService;
 use App\Domains\Items\Models\Item;
 use App\Domains\Items\Services\ItemService;
 use App\Domains\Sectors\Models\Sector;
 use App\Domains\Sectors\Services\SectorService;
+use Illuminate\Support\Facades\Auth;
 
 class ErpService
 {
@@ -219,7 +222,24 @@ class ErpService
 
     public function getSalesDashboardData(array $filters = []): array
     {
+        $eloquentUser = Auth::user();
+        $salesmanService = app(SalesmanService::class);
+
         $rawData = $this->getSalesWidgetData($filters);
+        $salesmen  = $salesmanService->getVisibleForUser($eloquentUser->id);
+
+        // Φιλτράρουμε τους Πωλητές με βάση την περιοχή που έχει ο Director
+        if ($eloquentUser->hasRole([RolesEnum::SALES_DIRECTOR->value])) {
+            $allowedErpIds = collect($salesmen)
+                ->map(fn ($s) => $s->getName())
+                ->filter()
+                ->values()
+                ->all();
+
+            $rawData = array_filter($rawData, function ($row) use ($allowedErpIds) {
+                return in_array($row->getSalesman() ?? null, $allowedErpIds, true);
+            });
+        }
 
         $byArea = $this->buildSalesByArea($rawData);
         $bySalesman = $this->buildSalesBySalesman($rawData);
@@ -301,6 +321,35 @@ class ErpService
         }
 
         return $data;
+    }
+
+
+    /**
+     * @param array $filters
+     * @return SalesTarget[]
+     */
+    public function getSalesTarget(array $filters = []): array
+    {
+        $response = $this->salesEndpoint->getSalesTarget($filters)->getData();
+        $salesTargetData = $response['rows'] ?? [];
+
+        $data = [];
+        foreach ($salesTargetData as $salesTarget) {
+            $salesTargetDTO = new SalesTarget();
+            $salesTargetDTO->setSalesmanCode($salesTarget["SalesmanCode"] ?? '');
+            $salesTargetDTO->setSalesmanName($salesTarget["SalesmanName"] ?? '');
+            $salesTargetDTO->setMonthSales($salesTarget["MonthSales"] ?? '');
+            $salesTargetDTO->setYearNum($salesTarget["YearNum"] ?? '');
+
+            $rawAmount = $salesTarget["TargetAmount"] ?? '0';
+            $normalizedAmount = (float) str_replace('.', '', $rawAmount);
+            $salesTargetDTO->setTargetAmount($normalizedAmount);
+
+            $data[] = $salesTargetDTO;
+        }
+
+        return $data;
+
     }
 
 }
